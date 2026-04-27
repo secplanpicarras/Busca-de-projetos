@@ -401,11 +401,21 @@ function renderSt() {
 function ni(s) { return (s || '').toString().replace(/\D/g, '') }
 
 function nm(a, b) {
-  const x = a.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  const y = (b || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-  const pts = x.split(/\s+/).filter(p => p.length > 3);
+  const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  const x = norm(a);
+  const y = norm((b || '').toString());
+  const pts = x.split(/\s+/).filter(p => p.length > 2);
   if (!pts.length) return false;
-  return pts.filter(p => y.includes(p)).length >= Math.ceil(pts.length * 0.6);
+  // Precisa bater o primeiro nome E pelo menos um sobrenome (evita Cleusa bater com Cleci)
+  const primeiroNome = pts[0];
+  const sobrenomes = pts.slice(1);
+  if (!y.includes(primeiroNome)) return false;
+  if (sobrenomes.length === 0) return true;
+  // Verifica se pelo menos 1 sobrenome bate exato (palavra inteira)
+  return sobrenomes.some(s => {
+    const re = new RegExp('\\b' + s + '\\b');
+    return re.test(y);
+  });
 }
 
 // PDF → imagem base64
@@ -478,7 +488,7 @@ async function buscar() {
         model: 'gpt-4o', max_tokens: 1000,
         messages: [{ role: 'user', content: [
           { type: 'image_url', image_url: { url: 'data:' + mediaType + ';base64,' + b64, detail: 'high' } },
-          { type: 'text', text: 'Você é um especialista em análise de matrículas de imóveis brasileiros. Extraia os nomes das PARTES ENVOLVIDAS na matrícula: proprietários (atuais e anteriores), adquirentes, vendedores, herdeiros, cônjuges, sócios, credores e devedores hipotecários. IGNORE completamente: nomes de vizinhos e confrontantes (pessoas citadas apenas para descrever os limites/confrontações do terreno como "terras de Fulano"), nomes de cartórios, tabeliões, escreventes, juízes e serventuários da justiça. Retorne APENAS JSON puro sem markdown: {"nomes":["Nome Completo 1","Nome Completo 2"]}.' }
+          { type: 'text', text: 'Você é um especialista em análise de matrículas de imóveis brasileiros. Extraia SOMENTE os nomes das PARTES ENVOLVIDAS nas transações: proprietários (atuais e anteriores), adquirentes, vendedores, herdeiros, cônjuges, sócios, credores hipotecários e devedores. IGNORE obrigatoriamente: (1) nomes de vizinhos e confrontantes citados para descrever limites do terreno como "terras de Fulano"; (2) oficial titular do cartório, tabeliões, escreventes, registradores, juízes e serventuários — aparecem no cabeçalho, rodapé ou assinando os atos; (3) nomes de ruas, logradouros e bairros; (4) empresas de loteamento citadas apenas como confrontantes. Retorne APENAS JSON puro sem markdown: {"nomes":["Nome Completo 1","Nome Completo 2"]}.' }
         ]}]
       })
     });
