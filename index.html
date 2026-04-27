@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEPLAN — Busca de Projetos Físicos</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<style>
+:root {
+  --bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--bg4:#2a2f45;
+  --border:#2e3350;--border2:#3d4468;
+  --txt:#e8eaf6;--txt2:#9ba3c4;--txt3:#5c6490;
+  --blue:#4a7cff;--blue2:#3a6ae8;--blue-bg:rgba(74,124,255,.12);
+  --green:#2ecc71;--green-bg:rgba(46,204,113,.12);--green-txt:#27ae60;
+  --amber:#f5a623;--amber-bg:rgba(245,166,35,.12);--amber-txt:#e09010;
+  --red:#e74c3c;--red-bg:rgba(231,76,60,.12);--red-txt:#c0392b;
+  --info-bg:rgba(74,124,255,.12);--info-txt:#4a7cff;
+  --radius:10px;--radius-sm:6px;
+}
+[data-theme=light] {
+  --bg:#f0f2f8;--bg2:#fff;--bg3:#e8ebf5;--bg4:#dde1f0;
+  --border:#d0d5e8;--border2:#b8bedd;
+  --txt:#1a1d2e;--txt2:#4a5080;--txt3:#8890b0;
+  --blue:#2d5be8;--blue2:#1f4bd0;--blue-bg:rgba(45,91,232,.1);
+  --green:#1a9e55;--green-bg:rgba(26,158,85,.1);--green-txt:#1a9e55;
+  --amber:#c47d0a;--amber-bg:rgba(196,125,10,.1);--amber-txt:#c47d0a;
+  --red:#c0392b;--red-bg:rgba(192,57,43,.1);--red-txt:#c0392b;
+  --info-bg:rgba(45,91,232,.1);--info-txt:#2d5be8;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;min-height:100vh;transition:background .2s,color .2s}
+/* TOPBAR */
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:58px;gap:14px;position:sticky;top:0;z-index:100}
+.logo{width:34px;height:34px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;flex-shrink:0;letter-spacing:-.5px}
+.topbar-info .title{font-size:14px;font-weight:700;color:var(--txt)}
+.topbar-info .sub{font-size:11px;color:var(--txt3);margin-top:1px}
+.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--txt2);transition:all .15s}
+.icon-btn:hover{background:var(--bg4);color:var(--txt)}
+/* WRAP */
+.wrap{max-width:900px;margin:0 auto;padding:22px 16px}
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:20px}
+.tab{flex:1;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:600;color:var(--txt2);text-align:center;transition:all .15s;user-select:none}
+.tab:hover{color:var(--txt);background:var(--bg3)}
+.tab.active{background:var(--blue);color:#fff}
+.panel{display:none}.panel.active{display:block}
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px}
+.card-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
+.ct-icon{width:26px;height:26px;border-radius:7px;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+/* FORM */
+.lbl{font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+input[type=text],input[type=password],select,textarea{
+  width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);
+  font-size:13px;font-family:inherit;background:var(--bg3);color:var(--txt);transition:border .15s,box-shadow .15s
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-bg)}
+select option{background:var(--bg2);color:var(--txt)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+/* BUTTONS */
+.btn{padding:9px 18px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg3);color:var(--txt);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .12s}
+.btn:hover{background:var(--bg4);border-color:var(--border2)}
+.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}
+.btn-primary:hover{background:var(--blue2);border-color:var(--blue2)}
+.btn-primary:disabled{background:var(--bg4);border-color:var(--border);color:var(--txt3);cursor:default}
+.btn-full{width:100%;padding:11px;font-size:14px}
+/* DROP ZONE */
+.drop{border:2px dashed var(--border2);border-radius:var(--radius);padding:18px 12px;text-align:center;cursor:pointer;background:var(--bg3);transition:all .15s}
+.drop:hover,.drop.over{background:var(--blue-bg);border-color:var(--blue)}
+.drop.done{border-style:solid;border-color:var(--green);background:var(--green-bg)}
+.drop-txt{font-size:13px;color:var(--txt3)}
+.drop.done .drop-txt{color:var(--green)}
+/* TAGS */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600;margin:2px}
+.t-ok{background:var(--green-bg);color:var(--green)}
+.t-warn{background:var(--amber-bg);color:var(--amber)}
+.t-err{background:var(--red-bg);color:var(--red)}
+.t-info{background:var(--info-bg);color:var(--info-txt)}
+.t-gray{background:var(--bg3);color:var(--txt2);border:1px solid var(--border)}
+/* SPINNER */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* STATUS ROWS */
+.urow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
+.urow:last-child{border-bottom:none}
+.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.chip-ok{background:var(--green-bg);color:var(--green)}
+.chip-nd{background:var(--bg3);color:var(--txt3);border:1px solid var(--border)}
+/* RESULTADO */
+.sb{border-left:3px solid var(--border);padding:12px 0 12px 16px;margin:10px 0}
+.sb-ok{border-color:var(--green)}.sb-warn{border-color:var(--amber)}.sb-err{border-color:var(--red)}
+.sb-title{font-size:13px;font-weight:700;margin-bottom:4px}
+.sb-sub{font-size:12px;color:var(--txt2);margin-bottom:8px}
+.pj{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin:6px 0}
+.pj-title{font-weight:700;font-size:13px;color:var(--txt)}
+.pj-sub{font-size:12px;color:var(--txt2);margin-top:3px}
+.br{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+hr{border:none;border-top:1px solid var(--border);margin:14px 0}
+/* ALERT */
+.alert{background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--amber-txt);margin-bottom:12px;line-height:1.5}
+.alert-info{background:var(--info-bg);border-color:var(--blue);color:var(--info-txt)}
+/* KPI GRID */
+.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.kpi{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px}
+.kpi-val{font-size:22px;font-weight:800;color:var(--blue);margin-bottom:2px}
+.kpi-lbl{font-size:11px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+/* CONFIG TOGGLE */
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+.toggle-row:last-child{border-bottom:none}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="logo">SP</div>
+  <div class="topbar-info">
+    <div class="title">Busca de Projetos Físicos</div>
+    <div class="sub">SEPLAN — Prefeitura de Balneário Piçarras</div>
+  </div>
+  <div class="topbar-right">
+    <button class="icon-btn" onclick="toggleTheme()" title="Alternar tema" id="theme-btn">🌙</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="tabs">
+    <div class="tab active" onclick="go('busca')">🔍 Buscar</div>
+    <div class="tab" onclick="go('dados')">📂 Planilhas</div>
+    <div class="tab" onclick="go('cfg')">⚙️ Config</div>
+  </div>
+
+  <!-- ===== BUSCA ===== -->
+  <div id="tab-busca" class="panel active">
+    <div class="card">
+      <div class="card-title"><div class="ct-icon">🔍</div>Dados da busca</div>
+      <div class="g2" style="margin-bottom:14px">
+        <div>
+          <div class="lbl">Inscrição imobiliária</div>
+          <input type="text" id="inp-insc" placeholder="Ex: 01.08.011.0032.001.001" oninput="chk()">
+        </div>
+        <div>
+          <div class="lbl">Nº processo (opcional)</div>
+          <input type="text" id="inp-proc" placeholder="Ex: 343/2014">
+        </div>
+      </div>
+      <div class="lbl">Matrícula do imóvel</div>
+      <div class="drop" id="drop-mat" onclick="document.getElementById('inp-mat').click()" style="margin-top:5px">
+        <div style="font-size:22px;margin-bottom:6px">📄</div>
+        <div class="drop-txt" id="lbl-mat">Clique ou arraste a matrícula aqui (PDF, JPG, PNG)</div>
+      </div>
+      <input type="file" id="inp-mat" accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none">
+      <button class="btn btn-primary btn-full" id="btn-b" style="margin-top:14px" disabled onclick="buscar()">
+        Iniciar busca
+      </button>
+    </div>
+    <div id="res"></div>
+  </div>
+
+  <!-- ===== PLANILHAS ===== -->
+  <div id="tab-dados" class="panel">
+    <div class="card">
+      <div class="card-title"><div class="ct-icon">📊</div>Status das planilhas</div>
+      <div id="st-pl"></div>
+      <div style="font-size:11px;color:var(--txt3);margin-top:10px">Dados salvos no navegador. Carregue uma vez por computador.</div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="ct-icon">📋</div>Planilha geral de busca</div>
+      <div class="drop" id="drop-g" onclick="document.getElementById('inp-g').click()">
+        <div style="font-size:20px;margin-bottom:4px">📥</div>
+        <div class="drop-txt">Planilha Geral de Busca.xlsx</div>
+      </div>
+      <input type="file" id="inp-g" accept=".xlsx,.xls,.csv" style="display:none">
+      <div id="cfg-g" style="display:none;margin-top:14px">
+        <div class="lbl" style="margin-bottom:8px">Configure as colunas</div>
+        <div class="g2" style="margin-bottom:10px">
+          <div><div class="lbl">Nome / titular</div><select id="sn"></select></div>
+          <div><div class="lbl">Inscrição imobiliária</div><select id="si"></select></div>
+        </div>
+        <div class="g2" style="margin-bottom:10px">
+          <div><div class="lbl">Nº alvará / processo</div><select id="sa"></select></div>
+          <div><div class="lbl">Ano</div><select id="sano"></select></div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="salvarG()">Salvar configuração</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="ct-icon">📁</div>Projetos na Seplan (localização física)</div>
+      <div class="drop" id="drop-sp" onclick="document.getElementById('inp-sp').click()">
+        <div style="font-size:20px;margin-bottom:4px">📥</div>
+        <div class="drop-txt">Projetos na Seplan.xlsx</div>
+      </div>
+      <input type="file" id="inp-sp" accept=".xlsx,.xls,.csv" style="display:none">
+      <div id="st-sp" style="margin-top:8px;font-size:12px;color:var(--txt2)"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="ct-icon">📦</div>CheckList Caixas</div>
+      <div class="g2">
+        <div>
+          <div class="lbl" style="margin-bottom:5px">01 – 384</div>
+          <div class="drop" id="drop-c1" onclick="document.getElementById('inp-c1').click()" style="padding:14px">
+            <div style="font-size:18px;margin-bottom:3px">📥</div>
+            <div class="drop-txt" style="font-size:12px">CheckList 01-384.xlsx</div>
+          </div>
+          <input type="file" id="inp-c1" accept=".xlsx,.xls,.csv" style="display:none">
+        </div>
+        <div>
+          <div class="lbl" style="margin-bottom:5px">385+</div>
+          <div class="drop" id="drop-c2" onclick="document.getElementById('inp-c2').click()" style="padding:14px">
+            <div style="font-size:18px;margin-bottom:3px">📥</div>
+            <div class="drop-txt" style="font-size:12px">CheckList 385+.xlsx</div>
+          </div>
+          <input type="file" id="inp-c2" accept=".xlsx,.xls,.csv" style="display:none">
+        </div>
+      </div>
+      <div id="st-cx" style="margin-top:8px;font-size:12px;color:var(--txt2)"></div>
+    </div>
+  </div>
+
+  <!-- ===== CONFIG ===== -->
+  <div id="tab-cfg" class="panel">
+    <div class="card">
+      <div class="card-title"><div class="ct-icon">🔑</div>Chave da API OpenAI</div>
+      <div class="alert alert-info">A chave fica salva apenas no seu navegador. Nunca é enviada para outros servidores além da OpenAI.</div>
+      <div class="lbl">Chave (sk-...)</div>
+      <input type="password" id="inp-key" placeholder="sk-..." style="margin-top:5px">
+      <button class="btn btn-primary btn-full" style="margin-top:10px" onclick="salvarKey()">Salvar chave</button>
+      <div id="st-key" style="font-size:12px;color:var(--txt2);margin-top:8px"></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><div class="ct-icon">ℹ️</div>Sobre o app</div>
+      <div style="font-size:13px;color:var(--txt2);line-height:1.7">
+        <p>Este app automatiza a busca de projetos físicos na SEPLAN.</p>
+        <p style="margin-top:8px">Fluxo: você informa a <strong style="color:var(--txt)">inscrição imobiliária</strong> e sobe a <strong style="color:var(--txt)">matrícula</strong> — a IA extrai os nomes dos proprietários e cruza automaticamente com as planilhas de aprovações e localização.</p>
+        <p style="margin-top:8px;color:var(--txt3);font-size:12px">Versão 1.0 · SEPLAN Balneário Piçarras</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+const DB = {
+  get(k) { try { return JSON.parse(localStorage.getItem('sp5_' + k)) } catch { return null } },
+  set(k, v) { try { localStorage.setItem('sp5_' + k, JSON.stringify(v)) } catch {} }
+};
+
+// Tema
+const savedTheme = DB.get('theme') || 'dark';
+document.documentElement.setAttribute('data-theme', savedTheme);
+document.getElementById('theme-btn').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+function toggleTheme() {
+  const cur = document.documentElement.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  document.getElementById('theme-btn').textContent = next === 'dark' ? '☀️' : '🌙';
+  DB.set('theme', next);
+}
+
+// Tabs
+function go(t) {
+  ['busca', 'dados', 'cfg'].forEach((n, i) => {
+    document.getElementById('tab-' + n).classList.toggle('active', n === t);
+    document.querySelectorAll('.tab')[i].classList.toggle('active', n === t);
+  });
+  if (t === 'dados') renderSt();
+  if (t === 'cfg') {
+    const k = DB.get('oai_key') || '';
+    document.getElementById('inp-key').value = k;
+    document.getElementById('st-key').textContent = k ? '✓ Chave salva: ' + k.slice(0, 10) + '...' : 'Nenhuma chave salva.';
+  }
+}
+
+function salvarKey() {
+  const k = document.getElementById('inp-key').value.trim();
+  DB.set('oai_key', k);
+  document.getElementById('st-key').textContent = k ? '✓ Chave salva: ' + k.slice(0, 10) + '...' : 'Chave removida.';
+  alert('Chave da OpenAI salva com sucesso!');
+}
+
+// Drop zones
+function setupDrop(did, iid, cb) {
+  const d = document.getElementById(did), i = document.getElementById(iid);
+  i.addEventListener('change', () => { if (i.files[0]) cb(i.files[0]) });
+  d.addEventListener('dragover', e => { e.preventDefault(); d.classList.add('over') });
+  d.addEventListener('dragleave', () => d.classList.remove('over'));
+  d.addEventListener('drop', e => { e.preventDefault(); d.classList.remove('over'); if (e.dataTransfer.files[0]) cb(e.dataTransfer.files[0]) });
+}
+
+setupDrop('drop-mat', 'inp-mat', f => {
+  document.getElementById('lbl-mat').textContent = '✓ ' + f.name;
+  document.getElementById('drop-mat').classList.add('done');
+  window._mat = f;
+  chk();
+});
+
+function chk() {
+  document.getElementById('btn-b').disabled = !(document.getElementById('inp-insc').value.trim() && window._mat);
+}
+
+// XLSX helpers
+function xlsx2wb(file, cb) {
+  const r = new FileReader();
+  r.onload = e => cb(XLSX.read(e.target.result, { type: 'array' }));
+  r.readAsArrayBuffer(file);
+}
+function wb2rows(wb, sn) { return XLSX.utils.sheet_to_json(wb.Sheets[sn || wb.SheetNames[0]], { header: 1 }) }
+
+// Planilha geral
+let _gwb = null;
+setupDrop('drop-g', 'inp-g', f => {
+  xlsx2wb(f, wb => {
+    _gwb = wb;
+    const h = (wb2rows(wb)[0] || []).map((x, i) => x || 'Col ' + (i + 1));
+    ['sn', 'si', 'sa', 'sano'].forEach(id => {
+      document.getElementById(id).innerHTML = h.map((x, i) => `<option value="${i}">${x}</option>`).join('');
+    });
+    const ni = h.findIndex(x => /nome|titular/i.test(x));
+    const ii = h.findIndex(x => /inscri/i.test(x));
+    const ai = h.findIndex(x => /alvar|n[uú]m|processo/i.test(x));
+    const ani = h.findIndex(x => /^ano$/i.test(x));
+    if (ni >= 0) document.getElementById('sn').value = ni;
+    if (ii >= 0) document.getElementById('si').value = ii;
+    if (ai >= 0) document.getElementById('sa').value = ai;
+    if (ani >= 0) document.getElementById('sano').value = ani;
+    document.getElementById('cfg-g').style.display = 'block';
+    document.getElementById('drop-g').classList.add('done');
+    document.querySelector('#drop-g .drop-txt').textContent = '✓ ' + f.name;
+  });
+});
+
+function salvarG() {
+  if (!_gwb) return;
+  const cfg = {
+    nc: +document.getElementById('sn').value,
+    ic: +document.getElementById('si').value,
+    ac: +document.getElementById('sa').value,
+    anc: +document.getElementById('sano').value
+  };
+  const all = [];
+  _gwb.SheetNames.forEach(sn => wb2rows(_gwb, sn).slice(1).forEach(r => all.push(r)));
+  DB.set('geral', all); DB.set('gcfg', cfg);
+  document.getElementById('cfg-g').style.display = 'none';
+  renderSt();
+  alert('✓ Planilha geral salva! ' + all.length + ' registros.');
+}
+
+// Projetos na Seplan
+setupDrop('drop-sp', 'inp-sp', f => {
+  xlsx2wb(f, wb => {
+    const idx = {};
+    wb.SheetNames.forEach(sn => wb2rows(wb, sn).forEach(row => row.forEach(cell => {
+      const v = (cell || '').toString().trim();
+      if (v && !idx[v]) idx[v] = sn;
+    })));
+    DB.set('seplan', idx);
+    document.getElementById('drop-sp').classList.add('done');
+    document.querySelector('#drop-sp .drop-txt').textContent = '✓ ' + f.name;
+    document.getElementById('st-sp').textContent = Object.keys(idx).length + ' processos indexados em ' + wb.SheetNames.length + ' aba(s).';
+    renderSt();
+  });
+});
+
+// Caixas
+function loadCx(f, key, did) {
+  xlsx2wb(f, wb => {
+    const idx = {};
+    wb.SheetNames.forEach(sn => wb2rows(wb, sn).slice(1).forEach(row => {
+      const p = (row[1] || '').toString().trim();
+      if (p) idx[p] = { cx: (row[0] || '').toString().trim(), nome: (row[6] || row[2] || '').toString().trim(), aba: sn };
+    }));
+    DB.set(key, idx);
+    document.getElementById(did).classList.add('done');
+    document.querySelector('#' + did + ' .drop-txt').textContent = '✓ ' + f.name;
+    const t = Object.keys(DB.get('cx1') || {}).length + Object.keys(DB.get('cx2') || {}).length;
+    document.getElementById('st-cx').textContent = 'Total indexado: ' + t + ' processos.';
+    renderSt();
+  });
+}
+setupDrop('drop-c1', 'inp-c1', f => loadCx(f, 'cx1', 'drop-c1'));
+setupDrop('drop-c2', 'inp-c2', f => loadCx(f, 'cx2', 'drop-c2'));
+
+function renderSt() {
+  const g = DB.get('geral'), s = DB.get('seplan'), c1 = DB.get('cx1'), c2 = DB.get('cx2');
+  document.getElementById('st-pl').innerHTML = [
+    { l: 'Planilha geral de busca', ok: !!g, i: g ? g.length + ' registros' : 'não carregada' },
+    { l: 'Projetos na Seplan', ok: !!s, i: s ? Object.keys(s).length + ' processos' : 'não carregada' },
+    { l: 'CheckList Caixas 01–384', ok: !!c1, i: c1 ? Object.keys(c1).length + ' processos' : 'não carregada' },
+    { l: 'CheckList Caixas 385+', ok: !!c2, i: c2 ? Object.keys(c2).length + ' processos' : 'não carregada' },
+  ].map(x => `<div class="urow"><span>${x.l}</span><span class="chip ${x.ok ? 'chip-ok' : 'chip-nd'}">${x.ok ? '✓ ' : ''}${x.i}</span></div>`).join('');
+}
+
+// Helpers
+function ni(s) { return (s || '').toString().replace(/\D/g, '') }
+
+function nm(a, b) {
+  const x = a.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const y = (b || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  const pts = x.split(/\s+/).filter(p => p.length > 3);
+  if (!pts.length) return false;
+  return pts.filter(p => y.includes(p)).length >= Math.ceil(pts.length * 0.6);
+}
+
+// PDF → imagem base64
+async function pdfToB64(file) {
+  const ab = await file.arrayBuffer();
+  const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
+  const totalPages = Math.min(pdf.numPages, 3);
+  const canvases = [];
+  let totalH = 0, maxW = 0;
+  for (let i = 1; i <= totalPages; i++) {
+    const page = await pdf.getPage(i);
+    const vp = page.getViewport({ scale: 2 });
+    const c = document.createElement('canvas');
+    c.width = vp.width; c.height = vp.height;
+    await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+    canvases.push(c);
+    totalH += vp.height;
+    if (vp.width > maxW) maxW = vp.width;
+  }
+  const big = document.createElement('canvas');
+  big.width = maxW; big.height = totalH;
+  const ctx = big.getContext('2d');
+  let y = 0;
+  for (const c of canvases) { ctx.drawImage(c, 0, y); y += c.height; }
+  return big.toDataURL('image/jpeg', 0.85).split(',')[1];
+}
+
+// BUSCA PRINCIPAL
+async function buscar() {
+  const btn = document.getElementById('btn-b');
+  const res = document.getElementById('res');
+  btn.disabled = true;
+  const insc = document.getElementById('inp-insc').value.trim();
+  const inscN = ni(insc);
+  const key = DB.get('oai_key') || '';
+
+  function st(h) { res.innerHTML = `<div class="card" style="font-size:13px;color:var(--txt2)">${h}</div>` }
+
+  if (!key) {
+    st('⚠️ Configure sua chave da OpenAI na aba <strong>Config</strong> primeiro.');
+    btn.disabled = false; return;
+  }
+
+  st('<span class="spin"></span>Processando matrícula...');
+
+  let b64, mediaType = 'image/jpeg';
+  try {
+    const isPdf = window._mat.type === 'application/pdf' || window._mat.name.endsWith('.pdf');
+    if (isPdf) {
+      b64 = await pdfToB64(window._mat);
+    } else {
+      b64 = await new Promise((ok, err) => {
+        const r = new FileReader();
+        r.onload = () => ok(r.result.split(',')[1]);
+        r.onerror = err;
+        r.readAsDataURL(window._mat);
+      });
+      mediaType = window._mat.type;
+    }
+  } catch (e) { st('Erro ao processar arquivo: ' + e.message); btn.disabled = false; return; }
+
+  st('<span class="spin"></span>Enviando para a IA...');
+
+  let nomes = [];
+  try {
+    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
+      body: JSON.stringify({
+        model: 'gpt-4o', max_tokens: 1000,
+        messages: [{ role: 'user', content: [
+          { type: 'image_url', image_url: { url: 'data:' + mediaType + ';base64,' + b64, detail: 'high' } },
+          { type: 'text', text: 'Você é um especialista em análise de matrículas de imóveis brasileiros. Extraia os nomes das PARTES ENVOLVIDAS na matrícula: proprietários (atuais e anteriores), adquirentes, vendedores, herdeiros, cônjuges, sócios, credores e devedores hipotecários. IGNORE completamente: nomes de vizinhos e confrontantes (pessoas citadas apenas para descrever os limites/confrontações do terreno como "terras de Fulano"), nomes de cartórios, tabeliões, escreventes, juízes e serventuários da justiça. Retorne APENAS JSON puro sem markdown: {"nomes":["Nome Completo 1","Nome Completo 2"]}.' }
+        ]}]
+      })
+    });
+    const d = await resp.json();
+    if (d.error) { st('Erro OpenAI: ' + d.error.message); btn.disabled = false; return; }
+    const txt = d.choices[0].message.content || '';
+    try { nomes = JSON.parse(txt.replace(/```json|```/g, '').trim()).nomes || [] }
+    catch { const m = txt.match(/"nomes"\s*:\s*\[([^\]]+)\]/); if (m) nomes = m[1].split(',').map(n => n.replace(/"/g, '').trim()).filter(Boolean) }
+  } catch (e) { st('Erro na chamada: ' + e.message); btn.disabled = false; return; }
+
+  if (!nomes.length) { st('Nenhum nome extraído da matrícula.'); btn.disabled = false; return; }
+
+  st('<span class="spin"></span>Cruzando com planilhas...');
+  await new Promise(r => setTimeout(r, 80));
+
+  const geral = DB.get('geral') || [];
+  const cfg = DB.get('gcfg') || { nc: 5, ic: 4, ac: 0, anc: 1 };
+  const sp = DB.get('seplan') || {};
+  const cx1 = DB.get('cx1') || {};
+  const cx2 = DB.get('cx2') || {};
+
+  const projs = [];
+  nomes.forEach(nome => {
+    geral.filter(r => nm(nome, (r[cfg.nc] || ''))).forEach(row => {
+      const alv = (row[cfg.ac] || '').toString().trim();
+      const ano = (row[cfg.anc] || '').toString().trim();
+      const ch = alv + '_' + ano;
+      if (!alv || projs.find(p => p.ch === ch)) return;
+      projs.push({
+        ch, alv, ano,
+        nome: (row[cfg.nc] || '').toString().trim(),
+        inscT: (row[cfg.ic] || '').toString().trim(),
+        ok: ni(row[cfg.ic]) === inscN && inscN.length > 0,
+        nb: nome
+      });
+    });
+  });
+
+  const conf = projs.filter(p => p.ok);
+  const alrt = projs.filter(p => !p.ok);
+
+  function lBadge(p) {
+    const k = p.alv + '/' + p.ano;
+    if (sp[k]) return `<span class="tag t-info">📁 Projetos na Seplan: ${sp[k]}</span>`;
+    if (cx1[k]) return `<span class="tag t-info">📦 CheckList 01–384 — Caixa ${cx1[k].cx} · ${cx1[k].aba}</span>`;
+    if (cx2[k]) return `<span class="tag t-info">📦 CheckList 385+ — Caixa ${cx2[k].cx} · ${cx2[k].aba}</span>`;
+    return `<span class="tag t-gray">📋 Verificar localização manualmente</span>`;
+  }
+
+  function rp(p) {
+    const inscBadge = p.ok
+      ? `<span class="tag t-ok">✓ Inscrição confirmada</span>`
+      : `<span class="tag t-warn">⚠ Sem inscrição vinculada</span>`;
+    return `<div class="pj">
+      <div class="pj-title">${p.alv}/${p.ano} — ${p.nome}</div>
+      <div class="pj-sub">Encontrado por: <em>${p.nb}</em>${p.inscT ? ' · Inscrição na planilha: ' + p.inscT : ''}</div>
+      <div class="br">${inscBadge}${lBadge(p)}</div>
+    </div>`;
+  }
+
+  // KPIs
+  const kpiHtml = `<div class="kpi-grid">
+    <div class="kpi"><div class="kpi-val">${nomes.length}</div><div class="kpi-lbl">Nomes extraídos</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--green)">${conf.length}</div><div class="kpi-lbl">Confirmados</div></div>
+    <div class="kpi"><div class="kpi-val" style="color:var(--amber)">${alrt.length}</div><div class="kpi-lbl">Para verificar</div></div>
+  </div>`;
+
+  let html = `<div class="card">
+    <div class="card-title"><div class="ct-icon">✅</div>Resultado — Inscrição: ${insc}</div>
+    ${kpiHtml}
+    <div style="margin-bottom:12px">
+      <div class="lbl" style="margin-bottom:6px">Nomes extraídos da matrícula</div>
+      ${nomes.map(n => `<span class="tag t-info">${n}</span>`).join('')}
+    </div>
+    <hr>`;
+
+  if (conf.length) {
+    html += `<div class="sb sb-ok">
+      <div class="sb-title">✓ Confirmados — nome e inscrição batem (${conf.length})</div>
+      ${conf.map(rp).join('')}
+    </div>`;
+  }
+  if (alrt.length) {
+    html += `<div class="sb sb-warn">
+      <div class="sb-title">⚠ Atenção — nome encontrado, sem inscrição vinculada (${alrt.length})</div>
+      <div class="sb-sub">Pode ser projeto pré-2010 sem inscrição cadastrada. Verifique no livro físico.</div>
+      ${alrt.map(rp).join('')}
+    </div>`;
+  }
+  if (!projs.length) {
+    html += `<div class="sb sb-err">
+      <div class="sb-title">✗ Nenhum projeto encontrado</div>
+      <div class="sb-sub">Nenhum dos nomes extraídos consta nas planilhas de aprovações.</div>
+    </div>`;
+  }
+  html += '</div>';
+  res.innerHTML = html;
+  btn.disabled = false;
+}
+
+// Init
+renderSt();
+</script>
+</body>
+</html>
