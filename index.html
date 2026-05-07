@@ -1,596 +1,493 @@
 <!DOCTYPE html>
-<html lang="pt-BR" data-theme="dark">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SEPLAN — Busca de Projetos Físicos</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<title>Busca de Projeto — SEPLAN</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg:#0f1117;--bg2:#1a1d27;--bg3:#22263a;--bg4:#2a2f45;
-  --border:#2e3350;--border2:#3d4468;
-  --txt:#e8eaf6;--txt2:#9ba3c4;--txt3:#5c6490;
-  --blue:#4a7cff;--blue2:#3a6ae8;--blue-bg:rgba(74,124,255,.12);
-  --green:#2ecc71;--green-bg:rgba(46,204,113,.12);--green-txt:#27ae60;
-  --amber:#f5a623;--amber-bg:rgba(245,166,35,.12);--amber-txt:#e09010;
-  --red:#e74c3c;--red-bg:rgba(231,76,60,.12);--red-txt:#c0392b;
-  --info-bg:rgba(74,124,255,.12);--info-txt:#4a7cff;
-  --radius:10px;--radius-sm:6px;
-}
-[data-theme=light] {
-  --bg:#f0f2f8;--bg2:#fff;--bg3:#e8ebf5;--bg4:#dde1f0;
-  --border:#d0d5e8;--border2:#b8bedd;
-  --txt:#1a1d2e;--txt2:#4a5080;--txt3:#8890b0;
-  --blue:#2d5be8;--blue2:#1f4bd0;--blue-bg:rgba(45,91,232,.1);
-  --green:#1a9e55;--green-bg:rgba(26,158,85,.1);--green-txt:#1a9e55;
-  --amber:#c47d0a;--amber-bg:rgba(196,125,10,.1);--amber-txt:#c47d0a;
-  --red:#c0392b;--red-bg:rgba(192,57,43,.1);--red-txt:#c0392b;
-  --info-bg:rgba(45,91,232,.1);--info-txt:#2d5be8;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--txt);font-size:14px;min-height:100vh;transition:background .2s,color .2s}
-/* TOPBAR */
-.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;height:58px;gap:14px;position:sticky;top:0;z-index:100}
-.logo{width:34px;height:34px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:#fff;flex-shrink:0;letter-spacing:-.5px}
-.topbar-info .title{font-size:14px;font-weight:700;color:var(--txt)}
-.topbar-info .sub{font-size:11px;color:var(--txt3);margin-top:1px}
-.topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
-.icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:var(--bg3);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--txt2);transition:all .15s}
-.icon-btn:hover{background:var(--bg4);color:var(--txt)}
-/* WRAP */
-.wrap{max-width:900px;margin:0 auto;padding:22px 16px}
-/* TABS */
-.tabs{display:flex;gap:3px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:20px}
-.tab{flex:1;padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;font-size:13px;font-weight:600;color:var(--txt2);text-align:center;transition:all .15s;user-select:none}
-.tab:hover{color:var(--txt);background:var(--bg3)}
-.tab.active{background:var(--blue);color:#fff}
-.panel{display:none}.panel.active{display:block}
-/* CARD */
-.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px}
-.card-title{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px}
-.ct-icon{width:26px;height:26px;border-radius:7px;background:var(--blue-bg);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
-/* FORM */
-.lbl{font-size:11px;font-weight:700;color:var(--txt3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
-input[type=text],input[type=password],select,textarea{
-  width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);
-  font-size:13px;font-family:inherit;background:var(--bg3);color:var(--txt);transition:border .15s,box-shadow .15s
-}
-input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-bg)}
-select option{background:var(--bg2);color:var(--txt)}
-.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-/* BUTTONS */
-.btn{padding:9px 18px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--bg3);color:var(--txt);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .12s}
-.btn:hover{background:var(--bg4);border-color:var(--border2)}
-.btn-primary{background:var(--blue);color:#fff;border-color:var(--blue)}
-.btn-primary:hover{background:var(--blue2);border-color:var(--blue2)}
-.btn-primary:disabled{background:var(--bg4);border-color:var(--border);color:var(--txt3);cursor:default}
-.btn-full{width:100%;padding:11px;font-size:14px}
-/* DROP ZONE */
-.drop{border:2px dashed var(--border2);border-radius:var(--radius);padding:18px 12px;text-align:center;cursor:pointer;background:var(--bg3);transition:all .15s}
-.drop:hover,.drop.over{background:var(--blue-bg);border-color:var(--blue)}
-.drop.done{border-style:solid;border-color:var(--green);background:var(--green-bg)}
-.drop-txt{font-size:13px;color:var(--txt3)}
-.drop.done .drop-txt{color:var(--green)}
-/* TAGS */
-.tag{display:inline-flex;align-items:center;gap:4px;padding:4px 11px;border-radius:20px;font-size:12px;font-weight:600;margin:2px}
-.t-ok{background:var(--green-bg);color:var(--green)}
-.t-warn{background:var(--amber-bg);color:var(--amber)}
-.t-err{background:var(--red-bg);color:var(--red)}
-.t-info{background:var(--info-bg);color:var(--info-txt)}
-.t-gray{background:var(--bg3);color:var(--txt2);border:1px solid var(--border)}
-/* SPINNER */
-.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--border2);border-top-color:var(--blue);border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle;margin-right:6px}
-@keyframes sp{to{transform:rotate(360deg)}}
-/* STATUS ROWS */
-.urow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px}
-.urow:last-child{border-bottom:none}
-.chip{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700}
-.chip-ok{background:var(--green-bg);color:var(--green)}
-.chip-nd{background:var(--bg3);color:var(--txt3);border:1px solid var(--border)}
-/* RESULTADO */
-.sb{border-left:3px solid var(--border);padding:12px 0 12px 16px;margin:10px 0}
-.sb-ok{border-color:var(--green)}.sb-warn{border-color:var(--amber)}.sb-err{border-color:var(--red)}
-.sb-title{font-size:13px;font-weight:700;margin-bottom:4px}
-.sb-sub{font-size:12px;color:var(--txt2);margin-bottom:8px}
-.pj{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin:6px 0}
-.pj-title{font-weight:700;font-size:13px;color:var(--txt)}
-.pj-sub{font-size:12px;color:var(--txt2);margin-top:3px}
-.br{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
-hr{border:none;border-top:1px solid var(--border);margin:14px 0}
-/* ALERT */
-.alert{background:var(--amber-bg);border:1px solid var(--amber);border-radius:var(--radius-sm);padding:10px 14px;font-size:12px;color:var(--amber-txt);margin-bottom:12px;line-height:1.5}
-.alert-info{background:var(--info-bg);border-color:var(--blue);color:var(--info-txt)}
-/* KPI GRID */
-.kpi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.kpi{background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px}
-.kpi-val{font-size:22px;font-weight:800;color:var(--blue);margin-bottom:2px}
-.kpi-lbl{font-size:11px;color:var(--txt3);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
-/* CONFIG TOGGLE */
-.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
-.toggle-row:last-child{border-bottom:none}
+  :root {
+    --bg: #0f1117; --bg2: #171b26; --bg3: #1e2333;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+    --text: #e8eaf0; --text2: #8b90a0; --text3: #555b6e;
+    --accent: #4f7cff; --accent2: #3d6be8;
+    --success: #2ecc71; --warning: #f39c12; --danger: #e74c3c;
+    --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; }
+
+  #loginScreen { min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+  .login-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 16px; padding: 2.5rem; width: 100%; max-width: 360px; text-align: center; }
+  .login-logo { width: 48px; height: 48px; background: var(--accent); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 20px; color: #fff; margin: 0 auto 1.25rem; }
+  .login-card h1 { font-size: 18px; font-weight: 500; margin-bottom: .25rem; }
+  .login-card p { font-size: 13px; color: var(--text2); margin-bottom: 1.5rem; }
+  .login-card input { width: 100%; padding: 10px 14px; background: var(--bg3); border: 1px solid var(--border2); border-radius: 8px; color: var(--text); font-size: 14px; font-family: var(--mono); letter-spacing: .05em; margin-bottom: .75rem; outline: none; }
+  .login-card input:focus { border-color: var(--accent); }
+  .login-error { font-size: 12px; color: var(--danger); margin-bottom: .75rem; display: none; }
+
+  #app { display: none; min-height: 100vh; }
+  .topbar { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 0 2rem; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
+  .topbar-logo { width: 32px; height: 32px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 500; font-size: 13px; color: #fff; }
+  .topbar-title { font-size: 14px; font-weight: 500; }
+  .topbar-sub { font-size: 12px; color: var(--text2); }
+
+  .main { max-width: 780px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+  .steps { display: flex; gap: 6px; margin-bottom: 1.75rem; flex-wrap: wrap; }
+  .step-pill { display: flex; align-items: center; gap: 6px; padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border2); font-size: 12px; color: var(--text2); font-family: var(--mono); }
+  .step-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .step-pill.done { border-color: var(--accent); color: var(--accent); }
+
+  .card { background: var(--bg2); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+  .card-label { font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: .08em; margin-bottom: 1rem; font-family: var(--mono); }
+
+  .upload-zone { border: 1px dashed var(--border2); border-radius: 10px; padding: 2.5rem 1rem; text-align: center; cursor: pointer; transition: all .2s; }
+  .upload-zone:hover { border-color: var(--accent); background: rgba(79,124,255,.04); }
+  .upload-zone svg { display: block; margin: 0 auto .75rem; color: var(--text3); }
+  .upload-zone p { font-size: 14px; color: var(--text2); margin-bottom: .25rem; }
+  .upload-zone span { font-size: 12px; color: var(--text3); }
+
+  .progress-wrap { margin-top: .75rem; display: none; }
+  .progress-bar { height: 2px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width .4s; }
+  .progress-msg { font-size: 12px; color: var(--text2); margin-top: .5rem; font-family: var(--mono); }
+
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: 1px solid var(--border2); background: transparent; cursor: pointer; font-size: 13px; font-weight: 500; color: var(--text); font-family: var(--sans); transition: all .15s; }
+  .btn:hover { background: var(--bg3); }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: var(--accent2); }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+  .btn-ghost { border-color: transparent; }
+  .btn-ghost:hover { border-color: var(--border2); }
+  .btn-row { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }
+
+  .name-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; border-bottom: 1px solid var(--border); }
+  .name-row:last-of-type { border-bottom: none; }
+  .name-row input { flex: 1; padding: 5px 8px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px; font-family: var(--mono); outline: none; }
+  .name-row input:focus { border-color: var(--accent); }
+  .conf-badge { font-size: 11px; padding: 2px 8px; border-radius: 999px; border: 1px solid; white-space: nowrap; font-family: var(--mono); }
+  .conf-alta  { color: #2ecc71; border-color: #2ecc7140; background: #2ecc7110; }
+  .conf-media { color: #f39c12; border-color: #f39c1240; background: #f39c1210; }
+  .conf-baixa { color: #e74c3c; border-color: #e74c3c40; background: #e74c3c10; }
+  .del-btn { background: none; border: none; cursor: pointer; color: var(--text3); font-size: 18px; line-height: 1; padding: 2px 4px; transition: color .15s; }
+  .del-btn:hover { color: var(--danger); }
+  .add-row { display: flex; gap: 8px; margin-top: .75rem; }
+  .add-row input { flex: 1; padding: 8px 10px; background: var(--bg3); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 13px; font-family: var(--mono); outline: none; }
+  .add-row input:focus { border-color: var(--accent); }
+  .empty-note { font-size: 13px; color: var(--text3); text-align: center; padding: 1.5rem 0; }
+
+  .tabs { display: flex; gap: 4px; margin-bottom: 1rem; }
+  .tab { padding: 5px 14px; border-radius: 999px; border: 1px solid var(--border); font-size: 12px; cursor: pointer; color: var(--text2); background: transparent; font-family: var(--sans); transition: all .15s; }
+  .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+  .highlight-item { margin-bottom: .75rem; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .highlight-header { padding: 8px 12px; background: var(--bg3); font-size: 12px; font-family: var(--mono); color: var(--text2); display: flex; justify-content: space-between; }
+  .highlight-canvas-wrap { position: relative; background: #525659; }
+  .highlight-canvas-wrap canvas { display: block; width: 100%; }
+  .page-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+
+  .result-item { padding: .875rem 0; border-bottom: 1px solid var(--border); }
+  .result-item:last-child { border-bottom: none; }
+  .result-name { font-size: 14px; font-weight: 500; color: var(--text); font-family: var(--mono); }
+  .result-score { font-size: 11px; color: var(--text3); margin-top: 3px; font-family: var(--mono); }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; margin-top: .5rem; }
+  .chip { font-size: 11px; padding: 2px 9px; border-radius: 999px; border: 1px solid; font-family: var(--mono); }
+  .chip-blue { background: rgba(79,124,255,.1); color: #7fa4ff; border-color: rgba(79,124,255,.25); }
+  .chip-gray { background: var(--bg3); color: var(--text2); border-color: var(--border2); }
+  .no-result { font-size: 13px; color: var(--text3); padding: .5rem 0; font-family: var(--mono); }
+  .result-section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: .75rem; }
+  .result-count { font-size: 11px; padding: 2px 9px; border-radius: 999px; border: 1px solid; font-family: var(--mono); }
+  .count-found { color: var(--accent); border-color: rgba(79,124,255,.3); background: rgba(79,124,255,.08); }
+  .count-none  { color: var(--text3); border-color: var(--border); }
+  .summary-bar { display: flex; justify-content: space-between; align-items: center; font-size: 13px; color: var(--text2); }
+  .summary-found { font-weight: 500; color: var(--accent); font-family: var(--mono); }
 </style>
 </head>
 <body>
 
-<div class="topbar">
-  <div class="logo">SP</div>
-  <div class="topbar-info">
-    <div class="title">Busca de Projetos Físicos</div>
-    <div class="sub">SEPLAN — Prefeitura de Balneário Piçarras</div>
-  </div>
-  <div class="topbar-right">
-    <button class="icon-btn" onclick="toggleTheme()" title="Alternar tema" id="theme-btn">🌙</button>
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">S</div>
+    <h1>Busca de Projeto</h1>
+    <p>SEPLAN · Balneário Piçarras</p>
+    <input type="password" id="loginInput" placeholder="Senha de acesso" onkeydown="if(event.key==='Enter')checkLogin()">
+    <div class="login-error" id="loginError">Senha incorreta.</div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="checkLogin()">Entrar</button>
   </div>
 </div>
 
-<div class="wrap">
-  <div class="tabs">
-    <div class="tab active" onclick="go('busca')">🔍 Buscar</div>
-    <div class="tab" onclick="go('dados')">📂 Planilhas</div>
-    <div class="tab" onclick="go('cfg')">⚙️ Config</div>
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-logo">S</div>
+      <div>
+        <div class="topbar-title">Busca de Projeto</div>
+        <div class="topbar-sub">SEPLAN · Balneário Piçarras</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-sm btn-ghost" onclick="logout()">Sair</button>
+    </div>
   </div>
 
-  <!-- ===== BUSCA ===== -->
-  <div id="tab-busca" class="panel active">
-    <div class="card">
-      <div class="card-title"><div class="ct-icon">🔍</div>Dados da busca</div>
-      <div class="g2" style="margin-bottom:14px">
-        <div>
-          <div class="lbl">Inscrição imobiliária</div>
-          <input type="text" id="inp-insc" placeholder="Ex: 01.08.011.0032.001.001" oninput="chk()">
-        </div>
-        <div>
-          <div class="lbl">Nº processo (opcional)</div>
-          <input type="text" id="inp-proc" placeholder="Ex: 343/2014">
-        </div>
-      </div>
-      <div class="lbl">Matrícula do imóvel</div>
-      <div class="drop" id="drop-mat" onclick="document.getElementById('inp-mat').click()" style="margin-top:5px">
-        <div style="font-size:22px;margin-bottom:6px">📄</div>
-        <div class="drop-txt" id="lbl-mat">Clique ou arraste a matrícula aqui (PDF, JPG, PNG)</div>
-      </div>
-      <input type="file" id="inp-mat" accept=".pdf,.png,.jpg,.jpeg,.webp" style="display:none">
-      <button class="btn btn-primary btn-full" id="btn-b" style="margin-top:14px" disabled onclick="buscar()">
-        Iniciar busca
-      </button>
-    </div>
-    <div id="res"></div>
-  </div>
-
-  <!-- ===== PLANILHAS ===== -->
-  <div id="tab-dados" class="panel">
-    <div class="card">
-      <div class="card-title"><div class="ct-icon">📊</div>Status das planilhas</div>
-      <div id="st-pl"></div>
-      <div style="font-size:11px;color:var(--txt3);margin-top:10px">Dados salvos no navegador. Carregue uma vez por computador.</div>
+  <div class="main">
+    <div class="steps">
+      <div class="step-pill active" id="pill1"><span>01</span> Matrícula</div>
+      <div class="step-pill" id="pill2"><span>02</span> Proprietários</div>
+      <div class="step-pill" id="pill3"><span>03</span> Resultados</div>
     </div>
 
-    <div class="card">
-      <div class="card-title"><div class="ct-icon">📋</div>Planilha geral de busca</div>
-      <div class="drop" id="drop-g" onclick="document.getElementById('inp-g').click()">
-        <div style="font-size:20px;margin-bottom:4px">📥</div>
-        <div class="drop-txt">Planilha Geral de Busca.xlsx</div>
+    <!-- PANE 1 -->
+    <div id="pane1">
+      <div class="card">
+        <div class="card-label">Upload da matrícula</div>
+        <div class="upload-zone" id="dropzone" onclick="document.getElementById('pdfInput').click()">
+          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/>
+          </svg>
+          <p>Clique ou arraste o PDF aqui</p>
+          <span>Matrícula com até 90 dias de emissão</span>
+        </div>
+        <input type="file" id="pdfInput" accept=".pdf" style="display:none">
+        <div class="progress-wrap" id="progressWrap">
+          <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+          <div class="progress-msg" id="progressMsg">Processando...</div>
+        </div>
       </div>
-      <input type="file" id="inp-g" accept=".xlsx,.xls,.csv" style="display:none">
-      <div id="cfg-g" style="display:none;margin-top:14px">
-        <div class="lbl" style="margin-bottom:8px">Configure as colunas</div>
-        <div class="g2" style="margin-bottom:10px">
-          <div><div class="lbl">Nome / titular</div><select id="sn"></select></div>
-          <div><div class="lbl">Inscrição imobiliária</div><select id="si"></select></div>
-        </div>
-        <div class="g2" style="margin-bottom:10px">
-          <div><div class="lbl">Nº alvará / processo</div><select id="sa"></select></div>
-          <div><div class="lbl">Ano</div><select id="sano"></select></div>
-        </div>
-        <button class="btn btn-primary btn-full" onclick="salvarG()">Salvar configuração</button>
+      <div class="btn-row">
+        <button class="btn" onclick="goManual()">✏️ Digitar nomes manualmente</button>
       </div>
     </div>
 
-    <div class="card">
-      <div class="card-title"><div class="ct-icon">📁</div>Projetos na Seplan (localização física)</div>
-      <div class="drop" id="drop-sp" onclick="document.getElementById('inp-sp').click()">
-        <div style="font-size:20px;margin-bottom:4px">📥</div>
-        <div class="drop-txt">Projetos na Seplan.xlsx</div>
-      </div>
-      <input type="file" id="inp-sp" accept=".xlsx,.xls,.csv" style="display:none">
-      <div id="st-sp" style="margin-top:8px;font-size:12px;color:var(--txt2)"></div>
-    </div>
-
-    <div class="card">
-      <div class="card-title"><div class="ct-icon">📦</div>CheckList Caixas</div>
-      <div class="g2">
-        <div>
-          <div class="lbl" style="margin-bottom:5px">01 – 384</div>
-          <div class="drop" id="drop-c1" onclick="document.getElementById('inp-c1').click()" style="padding:14px">
-            <div style="font-size:18px;margin-bottom:3px">📥</div>
-            <div class="drop-txt" style="font-size:12px">CheckList 01-384.xlsx</div>
+    <!-- PANE 2 -->
+    <div id="pane2" style="display:none">
+      <div class="card">
+        <div class="tabs">
+          <button class="tab active" id="tabNames" onclick="showTab('names')">Nomes extraídos</button>
+          <button class="tab" id="tabPDF" onclick="showTab('pdf')">Conferir no PDF</button>
+        </div>
+        <div id="tabNamesContent">
+          <div class="card-label" style="margin-bottom:.5rem">Edite antes de buscar</div>
+          <div id="namesRows"></div>
+          <div class="add-row">
+            <input type="text" id="newNameInput" placeholder="Adicionar nome manualmente..." onkeydown="if(event.key==='Enter')addName()">
+            <button class="btn btn-sm" onclick="addName()">+ Adicionar</button>
           </div>
-          <input type="file" id="inp-c1" accept=".xlsx,.xls,.csv" style="display:none">
         </div>
-        <div>
-          <div class="lbl" style="margin-bottom:5px">385+</div>
-          <div class="drop" id="drop-c2" onclick="document.getElementById('inp-c2').click()" style="padding:14px">
-            <div style="font-size:18px;margin-bottom:3px">📥</div>
-            <div class="drop-txt" style="font-size:12px">CheckList 385+.xlsx</div>
-          </div>
-          <input type="file" id="inp-c2" accept=".xlsx,.xls,.csv" style="display:none">
+        <div id="tabPDFContent" style="display:none">
+          <div class="card-label" style="margin-bottom:.5rem">Nomes destacados no documento</div>
+          <div id="highlightPanel"><div class="empty-note">Nenhum PDF carregado.</div></div>
         </div>
       </div>
-      <div id="st-cx" style="margin-top:8px;font-size:12px;color:var(--txt2)"></div>
-    </div>
-  </div>
-
-  <!-- ===== CONFIG ===== -->
-  <div id="tab-cfg" class="panel">
-    <div class="card">
-      <div class="card-title"><div class="ct-icon">🔑</div>Chave da API OpenAI</div>
-      <div class="alert alert-info">A chave fica salva apenas no seu navegador. Nunca é enviada para outros servidores além da OpenAI.</div>
-      <div class="lbl">Chave (sk-...)</div>
-      <input type="password" id="inp-key" placeholder="sk-..." style="margin-top:5px">
-      <button class="btn btn-primary btn-full" style="margin-top:10px" onclick="salvarKey()">Salvar chave</button>
-      <div id="st-key" style="font-size:12px;color:var(--txt2);margin-top:8px"></div>
+      <div class="btn-row">
+        <button class="btn" onclick="goTo(1)">← Voltar</button>
+        <button class="btn btn-primary" onclick="startSearch()">🔍 Buscar na planilha</button>
+      </div>
     </div>
 
-    <div class="card">
-      <div class="card-title"><div class="ct-icon">ℹ️</div>Sobre o app</div>
-      <div style="font-size:13px;color:var(--txt2);line-height:1.7">
-        <p>Este app automatiza a busca de projetos físicos na SEPLAN.</p>
-        <p style="margin-top:8px">Fluxo: você informa a <strong style="color:var(--txt)">inscrição imobiliária</strong> e sobe a <strong style="color:var(--txt)">matrícula</strong> — a IA extrai os nomes dos proprietários e cruza automaticamente com as planilhas de aprovações e localização.</p>
-        <p style="margin-top:8px;color:var(--txt3);font-size:12px">Versão 1.0 · SEPLAN Balneário Piçarras</p>
+    <!-- PANE 3 -->
+    <div id="pane3" style="display:none">
+      <div class="card" id="searchStatusCard" style="display:none">
+        <div class="progress-bar"><div class="progress-fill" id="searchFill" style="width:0%"></div></div>
+        <div class="progress-msg" id="searchMsg">Carregando planilha...</div>
+      </div>
+      <div id="resultsContainer"></div>
+      <div class="btn-row" style="margin-top:1rem">
+        <button class="btn" onclick="goTo(2)">← Voltar</button>
+        <button class="btn btn-primary" onclick="startSearch()">↺ Buscar novamente</button>
       </div>
     </div>
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const PASSWORD    = '@Ma07nu209970';
+const SUPABASE_URL = 'https://oqmiwgnxltfgmdmhmxmq.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xbWl3Z254bHRmZ21kbWhteG1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNDQzMDksImV4cCI6MjA5MzcyMDMwOX0.XClbKEYt-DJezINAydYPn8enQoNT8Ub-J0xVeY3dfQE';
+const SHEET_ID    = '1AGrwH3KW1dgtvUr8H2uPlaj_Vleq7mwYDGoW6JHkOFI';
+// ──────────────────────────────────────────────────────────────────────────────
 
-const DB = {
-  get(k) { try { return JSON.parse(localStorage.getItem('sp5_' + k)) } catch { return null } },
-  set(k, v) { try { localStorage.setItem('sp5_' + k, JSON.stringify(v)) } catch {} }
-};
+const pdfjsLib = window['pdfjs-dist/build/pdf'];
+if (pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// Tema
-const savedTheme = DB.get('theme') || 'dark';
-document.documentElement.setAttribute('data-theme', savedTheme);
-document.getElementById('theme-btn').textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+let names = [], namesMeta = [], sheetData = null, pdfDoc = null, pdfPages = [];
 
-function toggleTheme() {
-  const cur = document.documentElement.getAttribute('data-theme');
-  const next = cur === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  document.getElementById('theme-btn').textContent = next === 'dark' ? '☀️' : '🌙';
-  DB.set('theme', next);
-}
-
-// Tabs
-function go(t) {
-  ['busca', 'dados', 'cfg'].forEach((n, i) => {
-    document.getElementById('tab-' + n).classList.toggle('active', n === t);
-    document.querySelectorAll('.tab')[i].classList.toggle('active', n === t);
-  });
-  if (t === 'dados') renderSt();
-  if (t === 'cfg') {
-    const k = DB.get('oai_key') || '';
-    document.getElementById('inp-key').value = k;
-    document.getElementById('st-key').textContent = k ? '✓ Chave salva: ' + k.slice(0, 10) + '...' : 'Nenhuma chave salva.';
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+function checkLogin() {
+  if (document.getElementById('loginInput').value === PASSWORD) {
+    sessionStorage.setItem('seplan_auth', '1');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+  } else {
+    document.getElementById('loginError').style.display = 'block';
   }
 }
-
-function salvarKey() {
-  const k = document.getElementById('inp-key').value.trim();
-  DB.set('oai_key', k);
-  document.getElementById('st-key').textContent = k ? '✓ Chave salva: ' + k.slice(0, 10) + '...' : 'Chave removida.';
-  alert('Chave da OpenAI salva com sucesso!');
+function logout() { sessionStorage.removeItem('seplan_auth'); location.reload(); }
+if (sessionStorage.getItem('seplan_auth') === '1') {
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
 }
 
-// Drop zones
-function setupDrop(did, iid, cb) {
-  const d = document.getElementById(did), i = document.getElementById(iid);
-  i.addEventListener('change', () => { if (i.files[0]) cb(i.files[0]) });
-  d.addEventListener('dragover', e => { e.preventDefault(); d.classList.add('over') });
-  d.addEventListener('dragleave', () => d.classList.remove('over'));
-  d.addEventListener('drop', e => { e.preventDefault(); d.classList.remove('over'); if (e.dataTransfer.files[0]) cb(e.dataTransfer.files[0]) });
+// ─── NAV ──────────────────────────────────────────────────────────────────────
+function goTo(step) {
+  ['pane1','pane2','pane3'].forEach((id, i) => {
+    document.getElementById(id).style.display = i + 1 === step ? 'block' : 'none';
+  });
+  ['pill1','pill2','pill3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.className = 'step-pill' + (i + 1 < step ? ' done' : i + 1 === step ? ' active' : '');
+  });
+}
+function goManual() { names = []; namesMeta = []; renderNames(); goTo(2); }
+function showTab(t) {
+  document.getElementById('tabNamesContent').style.display = t === 'names' ? 'block' : 'none';
+  document.getElementById('tabPDFContent').style.display   = t === 'pdf'   ? 'block' : 'none';
+  document.getElementById('tabNames').className = 'tab' + (t === 'names' ? ' active' : '');
+  document.getElementById('tabPDF').className   = 'tab' + (t === 'pdf'   ? ' active' : '');
+  if (t === 'pdf') renderHighlights();
 }
 
-setupDrop('drop-mat', 'inp-mat', f => {
-  document.getElementById('lbl-mat').textContent = '✓ ' + f.name;
-  document.getElementById('drop-mat').classList.add('done');
-  window._mat = f;
-  chk();
+// ─── UPLOAD ───────────────────────────────────────────────────────────────────
+document.getElementById('pdfInput').addEventListener('change', async function () {
+  const file = this.files[0];
+  if (!file) return;
+  const buf = await file.arrayBuffer();
+  document.getElementById('progressWrap').style.display = 'block';
+  setProgress(10, 'Lendo PDF...');
+  const text = await extractPdfText(buf);
+  setProgress(50, 'Enviando para análise da IA...');
+  const extracted = await callEdgeFunction(text);
+  setProgress(95, 'Pronto!');
+  names     = extracted.map(e => e.name);
+  namesMeta = extracted;
+  renderNames();
+  setTimeout(() => goTo(2), 500);
 });
 
-function chk() {
-  document.getElementById('btn-b').disabled = !(document.getElementById('inp-insc').value.trim() && window._mat);
-}
-
-// XLSX helpers
-function xlsx2wb(file, cb) {
-  const r = new FileReader();
-  r.onload = e => cb(XLSX.read(e.target.result, { type: 'array' }));
-  r.readAsArrayBuffer(file);
-}
-function wb2rows(wb, sn) { return XLSX.utils.sheet_to_json(wb.Sheets[sn || wb.SheetNames[0]], { header: 1 }) }
-
-// Planilha geral
-let _gwb = null;
-setupDrop('drop-g', 'inp-g', f => {
-  xlsx2wb(f, wb => {
-    _gwb = wb;
-    const h = (wb2rows(wb)[0] || []).map((x, i) => x || 'Col ' + (i + 1));
-    ['sn', 'si', 'sa', 'sano'].forEach(id => {
-      document.getElementById(id).innerHTML = h.map((x, i) => `<option value="${i}">${x}</option>`).join('');
-    });
-    const ni = h.findIndex(x => /nome|titular/i.test(x));
-    const ii = h.findIndex(x => /inscri/i.test(x));
-    const ai = h.findIndex(x => /alvar|n[uú]m|processo/i.test(x));
-    const ani = h.findIndex(x => /^ano$/i.test(x));
-    if (ni >= 0) document.getElementById('sn').value = ni;
-    if (ii >= 0) document.getElementById('si').value = ii;
-    if (ai >= 0) document.getElementById('sa').value = ai;
-    if (ani >= 0) document.getElementById('sano').value = ani;
-    document.getElementById('cfg-g').style.display = 'block';
-    document.getElementById('drop-g').classList.add('done');
-    document.querySelector('#drop-g .drop-txt').textContent = '✓ ' + f.name;
-  });
+const dz = document.getElementById('dropzone');
+dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor = 'var(--accent)'; });
+dz.addEventListener('dragleave', () => { dz.style.borderColor = ''; });
+dz.addEventListener('drop', e => {
+  e.preventDefault(); dz.style.borderColor = '';
+  const f = e.dataTransfer.files[0];
+  if (f) { const dt = new DataTransfer(); dt.items.add(f); document.getElementById('pdfInput').files = dt.files; document.getElementById('pdfInput').dispatchEvent(new Event('change')); }
 });
 
-function salvarG() {
-  if (!_gwb) return;
-  const cfg = {
-    nc: +document.getElementById('sn').value,
-    ic: +document.getElementById('si').value,
-    ac: +document.getElementById('sa').value,
-    anc: +document.getElementById('sano').value
-  };
-  const all = [];
-  _gwb.SheetNames.forEach(sn => wb2rows(_gwb, sn).slice(1).forEach(r => all.push(r)));
-  DB.set('geral', all); DB.set('gcfg', cfg);
-  document.getElementById('cfg-g').style.display = 'none';
-  renderSt();
-  alert('✓ Planilha geral salva! ' + all.length + ' registros.');
+function setProgress(pct, msg) {
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressMsg').textContent = msg;
 }
 
-// Projetos na Seplan
-setupDrop('drop-sp', 'inp-sp', f => {
-  xlsx2wb(f, wb => {
-    const idx = {};
-    wb.SheetNames.forEach(sn => wb2rows(wb, sn).forEach(row => row.forEach(cell => {
-      const v = (cell || '').toString().trim();
-      if (v && !idx[v]) idx[v] = sn;
-    })));
-    DB.set('seplan', idx);
-    document.getElementById('drop-sp').classList.add('done');
-    document.querySelector('#drop-sp .drop-txt').textContent = '✓ ' + f.name;
-    document.getElementById('st-sp').textContent = Object.keys(idx).length + ' processos indexados em ' + wb.SheetNames.length + ' aba(s).';
-    renderSt();
-  });
-});
-
-// Caixas
-function loadCx(f, key, did) {
-  xlsx2wb(f, wb => {
-    const idx = {};
-    wb.SheetNames.forEach(sn => wb2rows(wb, sn).slice(1).forEach(row => {
-      const p = (row[1] || '').toString().trim();
-      if (p) idx[p] = { cx: (row[0] || '').toString().trim(), nome: (row[6] || row[2] || '').toString().trim(), aba: sn };
-    }));
-    DB.set(key, idx);
-    document.getElementById(did).classList.add('done');
-    document.querySelector('#' + did + ' .drop-txt').textContent = '✓ ' + f.name;
-    const t = Object.keys(DB.get('cx1') || {}).length + Object.keys(DB.get('cx2') || {}).length;
-    document.getElementById('st-cx').textContent = 'Total indexado: ' + t + ' processos.';
-    renderSt();
-  });
-}
-setupDrop('drop-c1', 'inp-c1', f => loadCx(f, 'cx1', 'drop-c1'));
-setupDrop('drop-c2', 'inp-c2', f => loadCx(f, 'cx2', 'drop-c2'));
-
-function renderSt() {
-  const g = DB.get('geral'), s = DB.get('seplan'), c1 = DB.get('cx1'), c2 = DB.get('cx2');
-  document.getElementById('st-pl').innerHTML = [
-    { l: 'Planilha geral de busca', ok: !!g, i: g ? g.length + ' registros' : 'não carregada' },
-    { l: 'Projetos na Seplan', ok: !!s, i: s ? Object.keys(s).length + ' processos' : 'não carregada' },
-    { l: 'CheckList Caixas 01–384', ok: !!c1, i: c1 ? Object.keys(c1).length + ' processos' : 'não carregada' },
-    { l: 'CheckList Caixas 385+', ok: !!c2, i: c2 ? Object.keys(c2).length + ' processos' : 'não carregada' },
-  ].map(x => `<div class="urow"><span>${x.l}</span><span class="chip ${x.ok ? 'chip-ok' : 'chip-nd'}">${x.ok ? '✓ ' : ''}${x.i}</span></div>`).join('');
-}
-
-// Helpers
-function ni(s) { return (s || '').toString().replace(/\D/g, '') }
-
-function nm(a, b) {
-  const norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
-  const x = norm(a);
-  const y = norm((b || '').toString());
-  const pts = x.split(/\s+/).filter(p => p.length > 2);
-  if (!pts.length) return false;
-  // Precisa bater o primeiro nome E pelo menos um sobrenome (evita Cleusa bater com Cleci)
-  const primeiroNome = pts[0];
-  const sobrenomes = pts.slice(1);
-  if (!y.includes(primeiroNome)) return false;
-  if (sobrenomes.length === 0) return true;
-  // Verifica se pelo menos 1 sobrenome bate exato (palavra inteira)
-  return sobrenomes.some(s => {
-    const re = new RegExp('\\b' + s + '\\b');
-    return re.test(y);
-  });
-}
-
-// PDF → imagem base64
-async function pdfToB64(file) {
-  const ab = await file.arrayBuffer();
-  const pdf = await pdfjsLib.getDocument({ data: ab }).promise;
-  const totalPages = Math.min(pdf.numPages, 5);
-  const canvases = [];
-  let totalH = 0, maxW = 0;
-  for (let i = 1; i <= totalPages; i++) {
-    const page = await pdf.getPage(i);
-    const vp = page.getViewport({ scale: 3 });
-    const c = document.createElement('canvas');
-    c.width = vp.width; c.height = vp.height;
-    await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
-    canvases.push(c);
-    totalH += vp.height;
-    if (vp.width > maxW) maxW = vp.width;
-  }
-  const big = document.createElement('canvas');
-  big.width = maxW; big.height = totalH;
-  const ctx = big.getContext('2d');
-  let y = 0;
-  for (const c of canvases) { ctx.drawImage(c, 0, y); y += c.height; }
-  return big.toDataURL('image/jpeg', 0.85).split(',')[1];
-}
-
-// BUSCA PRINCIPAL
-async function buscar() {
-  const btn = document.getElementById('btn-b');
-  const res = document.getElementById('res');
-  btn.disabled = true;
-  const insc = document.getElementById('inp-insc').value.trim();
-  const inscN = ni(insc);
-  const key = DB.get('oai_key') || '';
-
-  function st(h) { res.innerHTML = `<div class="card" style="font-size:13px;color:var(--txt2)">${h}</div>` }
-
-  if (!key) {
-    st('⚠️ Configure sua chave da OpenAI na aba <strong>Config</strong> primeiro.');
-    btn.disabled = false; return;
-  }
-
-  st('<span class="spin"></span>Processando matrícula...');
-
-  let b64, mediaType = 'image/jpeg';
+async function extractPdfText(buffer) {
   try {
-    const isPdf = window._mat.type === 'application/pdf' || window._mat.name.endsWith('.pdf');
-    if (isPdf) {
-      b64 = await pdfToB64(window._mat);
-    } else {
-      b64 = await new Promise((ok, err) => {
-        const r = new FileReader();
-        r.onload = () => ok(r.result.split(',')[1]);
-        r.onerror = err;
-        r.readAsDataURL(window._mat);
-      });
-      mediaType = window._mat.type;
+    pdfDoc = await pdfjsLib.getDocument({ data: buffer.slice(0) }).promise;
+    let full = ''; pdfPages = [];
+    for (let i = 1; i <= Math.min(pdfDoc.numPages, 15); i++) {
+      const page    = await pdfDoc.getPage(i);
+      const content = await page.getTextContent();
+      const items   = content.items.map(s => ({ str: s.str, transform: s.transform, width: s.width, height: s.height }));
+      const pageText = items.map(s => s.str).join(' ');
+      pdfPages.push({ pageNum: i, page, items, text: pageText });
+      full += pageText + '\n';
     }
-  } catch (e) { st('Erro ao processar arquivo: ' + e.message); btn.disabled = false; return; }
-
-  st('<span class="spin"></span>Enviando para a IA...');
-
-  let nomes = [];
-  try {
-    const resp = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + key },
-      body: JSON.stringify({
-        model: 'gpt-4o', max_tokens: 1000,
-        messages: [{ role: 'user', content: [
-          { type: 'image_url', image_url: { url: 'data:' + mediaType + ';base64,' + b64, detail: 'high' } },
-          { type: 'text', text: 'Você é um especialista em análise de matrículas de imóveis brasileiros. Extraia SOMENTE os nomes das PARTES ENVOLVIDAS nas transações: proprietários (atuais e anteriores), adquirentes, vendedores, herdeiros, cônjuges, sócios, credores hipotecários e devedores. IGNORE obrigatoriamente: (1) nomes de vizinhos e confrontantes citados para descrever limites do terreno como "terras de Fulano"; (2) oficial titular do cartório, tabeliões, escreventes, registradores, juízes e serventuários — aparecem no cabeçalho, rodapé ou assinando os atos; (3) nomes de ruas, logradouros e bairros; (4) empresas de loteamento citadas apenas como confrontantes. Retorne APENAS JSON puro sem markdown: {"nomes":["Nome Completo 1","Nome Completo 2"]}.' }
-        ]}]
-      })
-    });
-    const d = await resp.json();
-    if (d.error) { st('Erro OpenAI: ' + d.error.message); btn.disabled = false; return; }
-    const txt = d.choices[0].message.content || '';
-    try { nomes = JSON.parse(txt.replace(/```json|```/g, '').trim()).nomes || [] }
-    catch { const m = txt.match(/"nomes"\s*:\s*\[([^\]]+)\]/); if (m) nomes = m[1].split(',').map(n => n.replace(/"/g, '').trim()).filter(Boolean) }
-  } catch (e) { st('Erro na chamada: ' + e.message); btn.disabled = false; return; }
-
-  if (!nomes.length) { st('Nenhum nome extraído da matrícula.'); btn.disabled = false; return; }
-
-  st('<span class="spin"></span>Cruzando com planilhas...');
-  await new Promise(r => setTimeout(r, 80));
-
-  const geral = DB.get('geral') || [];
-  const cfg = DB.get('gcfg') || { nc: 5, ic: 4, ac: 0, anc: 1 };
-  const sp = DB.get('seplan') || {};
-  const cx1 = DB.get('cx1') || {};
-  const cx2 = DB.get('cx2') || {};
-
-  const projs = [];
-  nomes.forEach(nome => {
-    geral.filter(r => nm(nome, (r[cfg.nc] || ''))).forEach(row => {
-      const alv = (row[cfg.ac] || '').toString().trim();
-      const ano = (row[cfg.anc] || '').toString().trim();
-      const ch = alv + '_' + ano;
-      if (!alv || projs.find(p => p.ch === ch)) return;
-      projs.push({
-        ch, alv, ano,
-        nome: (row[cfg.nc] || '').toString().trim(),
-        inscT: (row[cfg.ic] || '').toString().trim(),
-        ok: ni(row[cfg.ic]) === inscN && inscN.length > 0,
-        nb: nome
-      });
-    });
-  });
-
-  const conf = projs.filter(p => p.ok);
-  const alrt = projs.filter(p => !p.ok);
-
-  function lBadge(p) {
-    const k = p.alv + '/' + p.ano;
-    if (sp[k]) return `<span class="tag t-info">📁 Projetos na Seplan: ${sp[k]}</span>`;
-    if (cx1[k]) return `<span class="tag t-info">📦 CheckList 01–384 — Caixa ${cx1[k].cx} · ${cx1[k].aba}</span>`;
-    if (cx2[k]) return `<span class="tag t-info">📦 CheckList 385+ — Caixa ${cx2[k].cx} · ${cx2[k].aba}</span>`;
-    return `<span class="tag t-gray">📋 Verificar localização manualmente</span>`;
-  }
-
-  function rp(p) {
-    const inscBadge = p.ok
-      ? `<span class="tag t-ok">✓ Inscrição confirmada</span>`
-      : `<span class="tag t-warn">⚠ Sem inscrição vinculada</span>`;
-    return `<div class="pj">
-      <div class="pj-title">${p.alv}/${p.ano} — ${p.nome}</div>
-      <div class="pj-sub">Encontrado por: <em>${p.nb}</em>${p.inscT ? ' · Inscrição na planilha: ' + p.inscT : ''}</div>
-      <div class="br">${inscBadge}${lBadge(p)}</div>
-    </div>`;
-  }
-
-  // KPIs
-  const kpiHtml = `<div class="kpi-grid">
-    <div class="kpi"><div class="kpi-val">${nomes.length}</div><div class="kpi-lbl">Nomes extraídos</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--green)">${conf.length}</div><div class="kpi-lbl">Confirmados</div></div>
-    <div class="kpi"><div class="kpi-val" style="color:var(--amber)">${alrt.length}</div><div class="kpi-lbl">Para verificar</div></div>
-  </div>`;
-
-  let html = `<div class="card">
-    <div class="card-title"><div class="ct-icon">✅</div>Resultado — Inscrição: ${insc}</div>
-    ${kpiHtml}
-    <div style="margin-bottom:12px">
-      <div class="lbl" style="margin-bottom:6px">Nomes extraídos da matrícula</div>
-      ${nomes.map(n => `<span class="tag t-info">${n}</span>`).join('')}
-    </div>
-    <hr>`;
-
-  if (conf.length) {
-    html += `<div class="sb sb-ok">
-      <div class="sb-title">✓ Confirmados — nome e inscrição batem (${conf.length})</div>
-      ${conf.map(rp).join('')}
-    </div>`;
-  }
-  if (alrt.length) {
-    html += `<div class="sb sb-warn">
-      <div class="sb-title">⚠ Atenção — nome encontrado, sem inscrição vinculada (${alrt.length})</div>
-      <div class="sb-sub">Pode ser projeto pré-2010 sem inscrição cadastrada. Verifique no livro físico.</div>
-      ${alrt.map(rp).join('')}
-    </div>`;
-  }
-  if (!projs.length) {
-    html += `<div class="sb sb-err">
-      <div class="sb-title">✗ Nenhum projeto encontrado</div>
-      <div class="sb-sub">Nenhum dos nomes extraídos consta nas planilhas de aprovações.</div>
-    </div>`;
-  }
-  html += '</div>';
-  res.innerHTML = html;
-  btn.disabled = false;
+    return full;
+  } catch (e) { return ''; }
 }
 
-// Init
-renderSt();
+async function callEdgeFunction(pdfText) {
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/functions/v1/extrair-nomes`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${SUPABASE_ANON}`,
+      },
+      body: JSON.stringify({ pdfText }),
+    });
+    const data = await resp.json();
+    if (data.error) { console.error(data.error); return []; }
+    return data.names || [];
+  } catch (e) { console.error(e); return []; }
+}
+
+// ─── NAMES ────────────────────────────────────────────────────────────────────
+function renderNames() {
+  const c = document.getElementById('namesRows');
+  if (!names.length) { c.innerHTML = '<div class="empty-note">Nenhum nome extraído. Adicione manualmente.</div>'; return; }
+  c.innerHTML = names.map((n, i) => {
+    const conf = (namesMeta[i] || {}).confidence || '';
+    const cls  = conf === 'alta' ? 'conf-alta' : conf === 'media' ? 'conf-media' : conf === 'baixa' ? 'conf-baixa' : '';
+    const lbl  = conf === 'alta' ? 'leitura segura' : conf === 'media' ? 'verificar' : conf === 'baixa' ? 'conferir no PDF' : '';
+    return `<div class="name-row">
+      <input type="text" value="${n}" onchange="names[${i}]=this.value.toUpperCase();this.value=this.value.toUpperCase()">
+      ${cls ? `<span class="conf-badge ${cls}">${lbl}</span>` : ''}
+      <button class="del-btn" onclick="removeName(${i})" title="Remover">×</button>
+    </div>`;
+  }).join('');
+}
+function removeName(i) { names.splice(i, 1); namesMeta.splice(i, 1); renderNames(); }
+function addName() {
+  const inp = document.getElementById('newNameInput');
+  const v   = inp.value.trim().toUpperCase();
+  if (v) { names.push(v); namesMeta.push({ confidence: '' }); renderNames(); inp.value = ''; }
+}
+
+// ─── HIGHLIGHTS ───────────────────────────────────────────────────────────────
+async function renderHighlights() {
+  const panel = document.getElementById('highlightPanel');
+  if (!pdfDoc || !names.length) { panel.innerHTML = '<div class="empty-note">Faça upload de um PDF para ver os destaques.</div>'; return; }
+  panel.innerHTML = '<div class="empty-note">Renderizando páginas...</div>';
+  const found = pdfPages.filter(pg => names.some(n => n.length > 3 && pg.text.toUpperCase().includes(n.substring(0, Math.min(n.length, 7)))));
+  if (!found.length) { panel.innerHTML = '<div class="empty-note">Nomes não encontrados visualmente nas páginas.</div>'; return; }
+  panel.innerHTML = '';
+  for (const pg of found) {
+    const hits  = names.filter(n => n.length > 3 && pg.text.toUpperCase().includes(n.substring(0, Math.min(n.length, 7))));
+    const wrap  = document.createElement('div'); wrap.className = 'highlight-item';
+    const hdr   = document.createElement('div'); hdr.className = 'highlight-header';
+    hdr.innerHTML = `<span>Página ${pg.pageNum}</span><span style="color:var(--text3)">${hits.join(' · ')}</span>`;
+    wrap.appendChild(hdr);
+    const cWrap   = document.createElement('div'); cWrap.className = 'highlight-canvas-wrap';
+    const canvas  = document.createElement('canvas');
+    const scale   = 1.5;
+    const vp      = pg.page.getViewport({ scale });
+    canvas.width  = vp.width; canvas.height = vp.height;
+    cWrap.appendChild(canvas);
+    const overlay = document.createElement('canvas');
+    overlay.width = vp.width; overlay.height = vp.height;
+    overlay.className = 'page-overlay';
+    cWrap.appendChild(overlay);
+    wrap.appendChild(cWrap); panel.appendChild(wrap);
+    await pg.page.render({ canvasContext: canvas.getContext('2d'), viewport: vp }).promise;
+    const octx = overlay.getContext('2d');
+    octx.fillStyle = 'rgba(255,210,0,0.38)';
+    for (const item of pg.items) {
+      const hit = names.some(n => { const parts = n.split(' ').filter(w => w.length > 3); return parts.some(p => item.str.toUpperCase().includes(p.substring(0, Math.min(p.length, 5)))); });
+      if (hit && item.str.trim().length > 2) {
+        const [,,,, e, f] = item.transform;
+        const x = e * scale, y = vp.height - (f * scale);
+        const w = item.width * scale, h = (item.height || 12) * scale;
+        octx.fillRect(x, y - h * 0.9, w, h * 1.15);
+      }
+    }
+  }
+}
+
+// ─── SEARCH ───────────────────────────────────────────────────────────────────
+async function startSearch() {
+  const cleaned = names.filter(n => n.trim());
+  if (!cleaned.length) { alert('Adicione pelo menos um nome para buscar.'); return; }
+  goTo(3);
+  document.getElementById('searchStatusCard').style.display = 'block';
+  document.getElementById('resultsContainer').innerHTML = '';
+  setSearchProgress(10, 'Carregando planilha...');
+  try {
+    if (!sheetData) {
+      const url  = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+      const resp = await fetch(url);
+      const csv  = await resp.text();
+      const rows = csv.split('\n').map(parseCSV);
+      const hdrs = rows[0];
+      sheetData  = rows.slice(1).filter(r => r.length > 1 && r[5]).map(r => {
+        const o = {}; hdrs.forEach((h, i) => { o[h.trim()] = r[i] ? r[i].trim() : ''; }); return o;
+      });
+    }
+    setSearchProgress(60, `Buscando em ${sheetData.length.toLocaleString('pt-BR')} processos...`);
+    const results = cleaned.map(name => {
+      const matches = [];
+      sheetData.forEach(row => {
+        const titular = row['Titular da Obra - Nome'] || row['Álvará - Nome da Obra'] || '';
+        const score   = fuzzyScore(name, titular);
+        if (score >= 50) matches.push({ score, titular, alvara: row['Alvará'] || '', ano: row['Ano'] || '', tipo: row['Álvará - Tipo de Alvará'] || '', inscricao: row['Cadastro Imobiliário - Inscrição Imobiliária'] || '' });
+      });
+      matches.sort((a, b) => b.score - a.score);
+      return { name, matches: matches.slice(0, 10) };
+    });
+    setSearchProgress(100, 'Concluído!');
+    setTimeout(() => { document.getElementById('searchStatusCard').style.display = 'none'; }, 700);
+    renderResults(results);
+    saveSearch(results);
+  } catch (err) {
+    setSearchProgress(0, 'Erro ao carregar planilha. Verifique se ela está pública.');
+    console.error(err);
+  }
+}
+
+function setSearchProgress(pct, msg) {
+  document.getElementById('searchFill').style.width = pct + '%';
+  document.getElementById('searchMsg').textContent  = msg;
+}
+
+function parseCSV(row) {
+  const res = []; let cur = '', inQ = false;
+  for (const c of row) {
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { res.push(cur); cur = ''; }
+    else { cur += c; }
+  }
+  res.push(cur); return res;
+}
+
+function normalize(s) {
+  return (s||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();
+}
+
+function fuzzyScore(query, target) {
+  const q = normalize(query), t = normalize(target);
+  if (!q || !t) return 0;
+  if (t === q) return 100;
+  if (t.includes(q)) return 90;
+  const qParts = q.split(' ').filter(w => w.length > 2);
+  const tWords = t.split(' ');
+  let matched = 0;
+  qParts.forEach(qw => { if (tWords.some(tw => tw === qw || (tw.length > 3 && qw.length > 3 && (tw.startsWith(qw.slice(0,4)) || qw.startsWith(tw.slice(0,4)))))) matched++; });
+  if (!qParts.length) return 0;
+  let score = (matched / qParts.length) * 80;
+  if (qParts.length >= 2 && matched >= 2) { const last = qParts[qParts.length-1]; if (tWords.includes(last)) score = Math.max(score, 70); }
+  return score;
+}
+
+function renderResults(results) {
+  const foundCount = results.filter(r => r.matches.length > 0).length;
+  let html = `<div class="card" style="margin-bottom:.75rem"><div class="summary-bar"><span>${results.length} proprietário(s) pesquisado(s)</span><span class="summary-found">${foundCount} com resultado(s)</span></div></div>`;
+  results.forEach(({ name, matches }) => {
+    html += `<div class="card"><div class="result-section-header"><div class="card-label" style="margin-bottom:0">${name}</div><span class="result-count ${matches.length ? 'count-found' : 'count-none'}">${matches.length} resultado(s)</span></div>`;
+    if (!matches.length) {
+      html += `<div class="no-result">— Nenhum processo encontrado</div>`;
+    } else {
+      matches.forEach(m => {
+        html += `<div class="result-item"><div class="result-name">${m.titular}</div><div class="result-score">correspondência: ${Math.round(m.score)}%</div><div class="chips">
+          ${m.alvara    ? `<span class="chip chip-blue">Alvará ${m.alvara}</span>` : ''}
+          ${m.ano       ? `<span class="chip chip-gray">${m.ano}</span>` : ''}
+          ${m.tipo      ? `<span class="chip chip-gray">${m.tipo}</span>` : ''}
+          ${m.inscricao ? `<span class="chip chip-gray">${m.inscricao}</span>` : ''}
+        </div></div>`;
+      });
+    }
+    html += `</div>`;
+  });
+  document.getElementById('resultsContainer').innerHTML = html;
+}
+
+// ─── SALVAR BUSCA (localStorage por enquanto) ─────────────────────────────────
+function saveSearch(results) {
+  const record = {
+    id: Date.now(),
+    data: new Date().toLocaleDateString('pt-BR'),
+    hora: new Date().toLocaleTimeString('pt-BR'),
+    proprietarios: results.map(r => ({
+      nome: r.name,
+      encontrado: r.matches.length > 0,
+      processos: r.matches.map(m => ({ alvara: m.alvara, ano: m.ano, tipo: m.tipo, titular: m.titular, score: Math.round(m.score) }))
+    }))
+  };
+  const existing = JSON.parse(localStorage.getItem('seplan_buscas') || '[]');
+  existing.unshift(record);
+  localStorage.setItem('seplan_buscas', JSON.stringify(existing.slice(0, 200)));
+}
 </script>
 </body>
 </html>
