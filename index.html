@@ -655,18 +655,30 @@ function renderResults(inscricaoResults, nameResults) {
       if (!matches.length) {
         html += `<div style="font-size:13px;color:var(--text3);font-family:var(--mono)">— nenhum processo encontrado</div>`;
       } else {
-        matches.forEach(m => {
+        matches.forEach((m, mi) => {
           const sc = scoreColor(m.score);
-          html += `<div class="result-item">
-            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">
-              <div class="result-name">${m.titular}</div>
-              <span style="font-size:11px;padding:2px 8px;border-radius:999px;background:${sc.bg};color:${sc.text};border:1px solid ${sc.border};font-family:var(--mono);white-space:nowrap;flex-shrink:0">${Math.round(m.score)}%</span>
-            </div>
-            <div class="chips" style="margin-top:.5rem">
-              ${m.alvara    ? chipHtml('Alvará ' + m.alvara, 'blue') : ''}
-              ${m.ano       ? chipHtml(m.ano, 'teal') : ''}
-              ${m.tipo      ? chipHtml(m.tipo, 'purple') : ''}
-              ${m.inscricao ? chipHtml(m.inscricao, 'gray') : ''}
+          const processId = 'live_' + name.replace(/[^A-Z0-9]/gi,'_') + '_' + mi;
+          const saved  = localStorage.getItem('proc_rel_' + processId);
+          const isRel  = saved === 'sim';
+          const isNao  = saved === 'nao';
+          html += `<div class="result-item" id="prow_${processId}" style="${isNao ? 'opacity:.4' : ''}">
+            <div style="display:flex;align-items:flex-start;gap:8px">
+              <div style="flex:1">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">
+                  <div class="result-name" style="${isRel ? 'color:#1D9E75' : isNao ? 'text-decoration:line-through' : ''}">${m.titular}</div>
+                  <span style="font-size:11px;padding:2px 8px;border-radius:999px;background:${sc.bg};color:${sc.text};border:1px solid ${sc.border};font-family:var(--mono);white-space:nowrap;flex-shrink:0">${Math.round(m.score)}%</span>
+                </div>
+                <div class="chips" style="margin-top:.5rem">
+                  ${m.alvara    ? chipHtml('Alvará ' + m.alvara, 'blue') : ''}
+                  ${m.ano       ? chipHtml(m.ano, 'teal') : ''}
+                  ${m.tipo      ? chipHtml(m.tipo, 'purple') : ''}
+                  ${m.inscricao ? chipHtml(m.inscricao, 'gray') : ''}
+                </div>
+              </div>
+              <div style="display:flex;gap:4px;flex-shrink:0;padding-top:2px">
+                <button onclick="marcarLive('${processId}','sim')" title="Relevante" style="width:26px;height:26px;border-radius:6px;border:1.5px solid ${isRel ? '#1D9E75' : 'var(--border2)'};background:${isRel ? '#EAF3DE' : 'transparent'};cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:${isRel ? '#1D9E75' : 'var(--text3)'}">✓</button>
+                <button onclick="marcarLive('${processId}','nao')" title="Não relevante" style="width:26px;height:26px;border-radius:6px;border:1.5px solid ${isNao ? '#E24B4A' : 'var(--border2)'};background:${isNao ? '#FCEBEB' : 'transparent'};cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:${isNao ? '#E24B4A' : 'var(--text3)'}">✕</button>
+              </div>
             </div>
           </div>`;
         });
@@ -676,6 +688,35 @@ function renderResults(inscricaoResults, nameResults) {
   }
 
   document.getElementById('resultsContainer').innerHTML = html;
+}
+
+function marcarLive(processId, valor) {
+  const atual = localStorage.getItem('proc_rel_' + processId);
+  if (atual === valor) {
+    localStorage.removeItem('proc_rel_' + processId);
+  } else {
+    localStorage.setItem('proc_rel_' + processId, valor);
+  }
+  // Atualiza visual sem re-renderizar tudo
+  const row = document.getElementById('prow_' + processId);
+  if (!row) return;
+  const novo = localStorage.getItem('proc_rel_' + processId);
+  const isRel = novo === 'sim';
+  const isNao = novo === 'nao';
+  row.style.opacity = isNao ? '.4' : '1';
+  const nameEl = row.querySelector('.result-name');
+  if (nameEl) nameEl.style.cssText = isRel ? 'color:#1D9E75' : isNao ? 'text-decoration:line-through' : '';
+  const btns = row.querySelectorAll('button');
+  if (btns[0]) {
+    btns[0].style.borderColor = isRel ? '#1D9E75' : 'var(--border2)';
+    btns[0].style.background  = isRel ? '#EAF3DE' : 'transparent';
+    btns[0].style.color       = isRel ? '#1D9E75' : 'var(--text3)';
+  }
+  if (btns[1]) {
+    btns[1].style.borderColor = isNao ? '#E24B4A' : 'var(--border2)';
+    btns[1].style.background  = isNao ? '#FCEBEB' : 'transparent';
+    btns[1].style.color       = isNao ? '#E24B4A' : 'var(--text3)';
+  }
 }
 
 // ─── SALVAR BUSCA (localStorage por enquanto) ─────────────────────────────────
@@ -812,24 +853,76 @@ function openDetalhe(id) {
     </div>
   </div>`;
 
+  // ── POR INSCRIÇÃO ──
   if (inscRes.length) {
-    html += `<div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.4rem">Por inscrição</div>`;
-    inscRes.forEach(m => {
-      html += `<div style="font-size:12px;font-family:var(--mono);padding:.4rem 0;border-bottom:1px solid var(--border)">${m.titular || ''} — Alvará ${m.alvara || ''} / ${m.ano || ''}</div>`;
+    html += `<div style="font-size:11px;color:#378ADD;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;display:flex;align-items:center;gap:5px"><i class="ti ti-map-pin"></i> Por inscrição</div>`;
+    inscRes.forEach((m, mi) => {
+      html += `<div style="display:flex;align-items:center;gap:8px;padding:.5rem 0;border-bottom:1px solid var(--border)">
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:500;font-family:var(--mono);color:var(--text)">${m.titular || ''}</div>
+          <div style="display:flex;gap:5px;margin-top:3px;flex-wrap:wrap">
+            ${m.alvara ? `<span style="font-size:10px;padding:1px 7px;border-radius:999px;background:#E6F1FB;color:#0C447C;border:1px solid #B5D4F4;font-family:var(--mono)">Alvará ${m.alvara}</span>` : ''}
+            ${m.ano    ? `<span style="font-size:10px;padding:1px 7px;border-radius:999px;background:#E1F5EE;color:#085041;border:1px solid #5DCAA5;font-family:var(--mono)">${m.ano}</span>` : ''}
+            ${m.tipo   ? `<span style="font-size:10px;padding:1px 7px;border-radius:999px;background:#EEEDFE;color:#3C3489;border:1px solid #AFA9EC;font-family:var(--mono)">${m.tipo}</span>` : ''}
+          </div>
+        </div>
+        <span style="font-size:10px;padding:1px 8px;border-radius:999px;background:#EAF3DE;color:#27500A;border:1px solid #C0DD97;font-family:var(--mono);white-space:nowrap">match exato</span>
+      </div>`;
     });
   }
 
+  // ── POR PROPRIETÁRIO (todos os processos expandidos) ──
   if (nomeRes.length) {
-    html += `<div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin:.75rem 0 .4rem">Por proprietário</div>`;
+    html += `<div style="font-size:11px;color:#EF9F27;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin:.875rem 0 .5rem;display:flex;align-items:center;gap:5px"><i class="ti ti-users"></i> Por proprietário</div>`;
     nomeRes.forEach(r => {
-      const total = r.matches ? r.matches.length : 0;
-      html += `<div style="font-size:12px;font-family:var(--mono);padding:.4rem 0;border-bottom:1px solid var(--border)">${r.name} — ${total} resultado(s)</div>`;
+      const matches = r.matches || [];
+      if (!matches.length) {
+        html += `<div style="font-size:12px;font-family:var(--mono);color:var(--text3);padding:.4rem 0;border-bottom:1px solid var(--border)">${r.name} — nenhum resultado</div>`;
+        return;
+      }
+      html += `<div style="margin-bottom:.25rem;padding:.4rem 0 0">
+        <div style="font-size:11px;font-weight:500;color:var(--text2);font-family:var(--mono);text-transform:uppercase;letter-spacing:.04em;margin-bottom:.35rem">${r.name}</div>`;
+      matches.forEach((m, mi) => {
+        const processId = b.id + '_' + r.name.replace(/\s/g,'_') + '_' + mi;
+        const saved = localStorage.getItem('proc_rel_' + processId);
+        const isRel = saved === 'sim';
+        const isNao = saved === 'nao';
+        html += `<div style="display:flex;align-items:center;gap:8px;padding:.45rem 0;border-bottom:1px solid var(--border)">
+          <div style="flex:1">
+            <div style="font-size:12px;font-weight:500;font-family:var(--mono);color:var(--text)">${m.titular || ''}</div>
+            <div style="display:flex;gap:5px;margin-top:3px;flex-wrap:wrap">
+              ${m.alvara ? `<span style="font-size:10px;padding:1px 7px;border-radius:999px;background:#E6F1FB;color:#0C447C;border:1px solid #B5D4F4;font-family:var(--mono)">Alvará ${m.alvara}</span>` : ''}
+              ${m.ano    ? `<span style="font-size:10px;padding:1px 7px;border-radius:999px;background:#E1F5EE;color:#085041;border:1px solid #5DCAA5;font-family:var(--mono)">${m.ano}</span>` : ''}
+              ${m.tipo   ? `<span style="font-size:10px;padding:1px 7px;border-radius:999px;background:#EEEDFE;color:#3C3489;border:1px solid #AFA9EC;font-family:var(--mono)">${m.tipo}</span>` : ''}
+              ${m.inscricao ? `<span style="font-size:10px;padding:1px 7px;border-radius:999px;background:#F1EFE8;color:#444441;border:1px solid #D3D1C7;font-family:var(--mono)">${m.inscricao}</span>` : ''}
+              <span style="font-size:10px;padding:1px 7px;border-radius:999px;background:var(--bg3);color:var(--text3);border:1px solid var(--border);font-family:var(--mono)">${Math.round(m.score || 0)}%</span>
+            </div>
+          </div>
+          <div style="display:flex;gap:4px;flex-shrink:0">
+            <button onclick="marcarProcesso('${processId}','sim')" title="Relevante" style="width:28px;height:28px;border-radius:6px;border:1.5px solid ${isRel ? '#1D9E75' : 'var(--border2)'};background:${isRel ? '#EAF3DE' : 'transparent'};cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:${isRel ? '#1D9E75' : 'var(--text3)'}">✓</button>
+            <button onclick="marcarProcesso('${processId}','nao')" title="Não relevante" style="width:28px;height:28px;border-radius:6px;border:1.5px solid ${isNao ? '#E24B4A' : 'var(--border2)'};background:${isNao ? '#FCEBEB' : 'transparent'};cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:${isNao ? '#E24B4A' : 'var(--text3)'}">✕</button>
+          </div>
+        </div>`;
+      });
+      html += `</div>`;
     });
   }
 
   document.getElementById('detalheBody').innerHTML = html;
   document.getElementById('btnCertidao').style.display = b.tem_resultado ? 'none' : 'inline-flex';
   document.getElementById('modalDetalhe').style.display = 'flex';
+}
+
+function marcarProcesso(processId, valor) {
+  const atual = localStorage.getItem('proc_rel_' + processId);
+  // Toggle: se clicar no mesmo, desmarca
+  if (atual === valor) {
+    localStorage.removeItem('proc_rel_' + processId);
+  } else {
+    localStorage.setItem('proc_rel_' + processId, valor);
+  }
+  // Re-abre o detalhe para atualizar visual
+  openDetalhe(buscaSelecionada.id);
 }
 
 // ─── CERTIDÃO NADA CONSTA ─────────────────────────────────────────────────────
