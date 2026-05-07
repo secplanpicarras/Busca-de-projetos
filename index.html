@@ -490,37 +490,78 @@ function fuzzyScore(query, target) {
   return score;
 }
 
-function renderResults(inscricaoResults, nameResults) {
-  const totalNomes   = nameResults.length;
-  const foundNomes   = nameResults.filter(r => r.matches.length > 0).length;
-  const foundInscr   = inscricaoResults.length;
+function scoreColor(score) {
+  if (score >= 90) return { bg: '#0F6E5618', text: '#1D9E75', border: '#1D9E7540' };
+  if (score >= 70) return { bg: '#185FA518', text: '#378ADD', border: '#378ADD40' };
+  return { bg: '#BA751718', text: '#EF9F27', border: '#EF9F2740' };
+}
 
-  let html = `<div class="card" style="margin-bottom:.75rem">
-    <div class="summary-bar">
-      <span>${totalNomes} proprietário(s) pesquisado(s)</span>
-      <span class="summary-found">${foundNomes} nome(s) com resultado · ${foundInscr} por inscrição</span>
+function chipHtml(label, color) {
+  const colors = {
+    blue:   { bg: '#E6F1FB', text: '#0C447C', border: '#B5D4F4' },
+    green:  { bg: '#EAF3DE', text: '#27500A', border: '#C0DD97' },
+    teal:   { bg: '#E1F5EE', text: '#085041', border: '#5DCAA5' },
+    amber:  { bg: '#FAEEDA', text: '#633806', border: '#FAC775' },
+    gray:   { bg: '#F1EFE8', text: '#444441', border: '#D3D1C7' },
+    purple: { bg: '#EEEDFE', text: '#3C3489', border: '#AFA9EC' },
+  };
+  const c = colors[color] || colors.gray;
+  return `<span style="font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid ${c.border};background:${c.bg};color:${c.text};font-family:var(--mono)">${label}</span>`;
+}
+
+function renderResults(inscricaoResults, nameResults) {
+  const totalNomes = nameResults.length;
+  const foundNomes = nameResults.filter(r => r.matches.length > 0).length;
+  const foundInscr = inscricaoResults.length;
+
+  // ── SUMMARY BAR ─────────────────────────────────────────────────────
+  let html = `<div class="card" style="margin-bottom:.75rem;background:var(--bg3)">
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem">
+      <div style="display:flex;gap:1.5rem">
+        <div>
+          <div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Proprietários</div>
+          <div style="font-size:20px;font-weight:500;color:var(--text)">${totalNomes}</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Com resultado</div>
+          <div style="font-size:20px;font-weight:500;color:${foundNomes > 0 ? '#1D9E75' : 'var(--text3)'}">${foundNomes}</div>
+        </div>
+        ${inscricao ? `<div>
+          <div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Por inscrição</div>
+          <div style="font-size:20px;font-weight:500;color:${foundInscr > 0 ? '#378ADD' : 'var(--text3)'}">${foundInscr}</div>
+        </div>` : ''}
+      </div>
+      ${(foundNomes === 0 && foundInscr === 0) ? `<span style="font-size:12px;padding:4px 12px;border-radius:999px;background:#FCEBEB;color:#791F1F;border:1px solid #F7C1C1;font-family:var(--mono)">nenhum resultado</span>` : `<span style="font-size:12px;padding:4px 12px;border-radius:999px;background:#E1F5EE;color:#085041;border:1px solid #5DCAA5;font-family:var(--mono)">busca concluída</span>`}
     </div>
   </div>`;
 
   // ── SEÇÃO INSCRIÇÃO ──────────────────────────────────────────────────
   if (inscricao) {
-    html += `<div class="card" style="border-color:${foundInscr > 0 ? 'rgba(79,124,255,.4)' : 'var(--border)'}">
-      <div class="result-section-header">
-        <div class="card-label" style="margin-bottom:0">🏠 Inscrição: ${inscricao}</div>
-        <span class="result-count ${foundInscr ? 'count-found' : 'count-none'}">${foundInscr} resultado(s)</span>
+    const borderColor = foundInscr > 0 ? '#378ADD' : 'var(--border)';
+    html += `<div style="margin-bottom:.5rem;font-size:11px;font-weight:500;color:#378ADD;text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);display:flex;align-items:center;gap:6px">
+      <i class="ti ti-map-pin" aria-hidden="true"></i> Busca por inscrição imobiliária
+    </div>
+    <div class="card" style="margin-bottom:1rem;border-color:${borderColor};border-width:${foundInscr > 0 ? '1.5px' : '1px'}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${foundInscr ? '.75rem' : '0'}">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;font-family:var(--mono);color:var(--text2)">${inscricao}</span>
+        </div>
+        <span style="font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid;font-family:var(--mono);${foundInscr > 0 ? 'background:#E6F1FB;color:#0C447C;border-color:#B5D4F4' : 'background:var(--bg3);color:var(--text3);border-color:var(--border)'}">${foundInscr} resultado(s)</span>
       </div>`;
     if (!foundInscr) {
-      html += `<div class="no-result">— Nenhum processo encontrado para esta inscrição</div>`;
+      html += `<div style="font-size:13px;color:var(--text3);font-family:var(--mono);padding:.25rem 0">— nenhum processo encontrado para esta inscrição</div>`;
     } else {
       inscricaoResults.forEach(m => {
         html += `<div class="result-item">
-          <div class="result-name">${m.titular}</div>
-          <div class="result-score" style="color:var(--success)">✓ match exato por inscrição</div>
-          <div class="chips">
-            ${m.alvara    ? `<span class="chip chip-blue">Alvará ${m.alvara}</span>` : ''}
-            ${m.ano       ? `<span class="chip chip-gray">${m.ano}</span>` : ''}
-            ${m.tipo      ? `<span class="chip chip-gray">${m.tipo}</span>` : ''}
-            ${m.inscricao ? `<span class="chip chip-gray">${m.inscricao}</span>` : ''}
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">
+            <div class="result-name">${m.titular}</div>
+            <span style="font-size:11px;padding:2px 8px;border-radius:999px;background:#EAF3DE;color:#27500A;border:1px solid #C0DD97;font-family:var(--mono);white-space:nowrap;flex-shrink:0">match exato</span>
+          </div>
+          <div class="chips" style="margin-top:.5rem">
+            ${m.alvara    ? chipHtml('Alvará ' + m.alvara, 'blue') : ''}
+            ${m.ano       ? chipHtml(m.ano, 'teal') : ''}
+            ${m.tipo      ? chipHtml(m.tipo, 'purple') : ''}
+            ${m.inscricao ? chipHtml(m.inscricao, 'gray') : ''}
           </div>
         </div>`;
       });
@@ -530,24 +571,30 @@ function renderResults(inscricaoResults, nameResults) {
 
   // ── SEÇÃO NOMES ──────────────────────────────────────────────────────
   if (nameResults.length) {
-    html += `<div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:.75rem 0 .5rem;font-family:var(--mono)">Busca por proprietários</div>`;
+    html += `<div style="margin-bottom:.5rem;font-size:11px;font-weight:500;color:#EF9F27;text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono);display:flex;align-items:center;gap:6px">
+      <i class="ti ti-users" aria-hidden="true"></i> Busca por proprietários
+    </div>`;
     nameResults.forEach(({ name, matches }) => {
-      html += `<div class="card"><div class="result-section-header">
-        <div class="card-label" style="margin-bottom:0">${name}</div>
-        <span class="result-count ${matches.length ? 'count-found' : 'count-none'}">${matches.length} resultado(s)</span>
-      </div>`;
+      html += `<div class="card" style="margin-bottom:.75rem">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${matches.length ? '.75rem' : '0'}">
+          <div style="font-size:12px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)">${name}</div>
+          <span style="font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid;font-family:var(--mono);${matches.length > 0 ? 'background:#FAEEDA;color:#633806;border-color:#FAC775' : 'background:var(--bg3);color:var(--text3);border-color:var(--border)'}">${matches.length} resultado(s)</span>
+        </div>`;
       if (!matches.length) {
-        html += `<div class="no-result">— Nenhum processo encontrado</div>`;
+        html += `<div style="font-size:13px;color:var(--text3);font-family:var(--mono)">— nenhum processo encontrado</div>`;
       } else {
         matches.forEach(m => {
+          const sc = scoreColor(m.score);
           html += `<div class="result-item">
-            <div class="result-name">${m.titular}</div>
-            <div class="result-score">correspondência: ${Math.round(m.score)}%</div>
-            <div class="chips">
-              ${m.alvara    ? `<span class="chip chip-blue">Alvará ${m.alvara}</span>` : ''}
-              ${m.ano       ? `<span class="chip chip-gray">${m.ano}</span>` : ''}
-              ${m.tipo      ? `<span class="chip chip-gray">${m.tipo}</span>` : ''}
-              ${m.inscricao ? `<span class="chip chip-gray">${m.inscricao}</span>` : ''}
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem">
+              <div class="result-name">${m.titular}</div>
+              <span style="font-size:11px;padding:2px 8px;border-radius:999px;background:${sc.bg};color:${sc.text};border:1px solid ${sc.border};font-family:var(--mono);white-space:nowrap;flex-shrink:0">${Math.round(m.score)}%</span>
+            </div>
+            <div class="chips" style="margin-top:.5rem">
+              ${m.alvara    ? chipHtml('Alvará ' + m.alvara, 'blue') : ''}
+              ${m.ano       ? chipHtml(m.ano, 'teal') : ''}
+              ${m.tipo      ? chipHtml(m.tipo, 'purple') : ''}
+              ${m.inscricao ? chipHtml(m.inscricao, 'gray') : ''}
             </div>
           </div>`;
         });
