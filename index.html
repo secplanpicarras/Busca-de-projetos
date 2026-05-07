@@ -181,6 +181,14 @@
           <div id="highlightPanel"><div class="empty-note">Nenhum PDF carregado.</div></div>
         </div>
       </div>
+      <div class="card" style="margin-top:-.25rem">
+        <div class="card-label">Inscrição imobiliária</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input type="text" id="inscricaoInput" placeholder="Ex: 01.07.015.0556.001.001" style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none">
+          <span style="font-size:11px;color:var(--text3);white-space:nowrap">opcional</span>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:.4rem">Se informada, busca exata por inscrição + busca por nomes simultaneamente.</div>
+      </div>
       <div class="btn-row">
         <button class="btn" onclick="goTo(1)">← Voltar</button>
         <button class="btn btn-primary" onclick="startSearch()">🔍 Buscar na planilha</button>
@@ -215,6 +223,7 @@ const pdfjsLib = window['pdfjs-dist/build/pdf'];
 if (pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
 let names = [], namesMeta = [], sheetData = null, pdfDoc = null, pdfPages = [];
+let inscricao = '';
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
 function checkLogin() {
@@ -387,8 +396,9 @@ async function renderHighlights() {
 
 // ─── SEARCH ───────────────────────────────────────────────────────────────────
 async function startSearch() {
+  inscricao = document.getElementById('inscricaoInput').value.trim();
   const cleaned = names.filter(n => n.trim());
-  if (!cleaned.length) { alert('Adicione pelo menos um nome para buscar.'); return; }
+  if (!cleaned.length && !inscricao) { alert('Informe a inscrição imobiliária ou adicione pelo menos um nome.'); return; }
   goTo(3);
   document.getElementById('searchStatusCard').style.display = 'block';
   document.getElementById('resultsContainer').innerHTML = '';
@@ -400,12 +410,32 @@ async function startSearch() {
       const csv  = await resp.text();
       const rows = csv.split('\n').map(parseCSV);
       const hdrs = rows[0];
-      sheetData  = rows.slice(1).filter(r => r.length > 1 && r[5]).map(r => {
+      sheetData  = rows.slice(1).filter(r => r.length > 1).map(r => {
         const o = {}; hdrs.forEach((h, i) => { o[h.trim()] = r[i] ? r[i].trim() : ''; }); return o;
       });
     }
-    setSearchProgress(60, `Buscando em ${sheetData.length.toLocaleString('pt-BR')} processos...`);
-    const results = cleaned.map(name => {
+    setSearchProgress(50, `Buscando em ${sheetData.length.toLocaleString('pt-BR')} processos...`);
+
+    // Busca por inscrição (exata, normalizada — ignora pontos e traços)
+    let inscricaoResults = [];
+    if (inscricao) {
+      const normInsc = inscricao.replace(/[^0-9]/g, '');
+      sheetData.forEach(row => {
+        const rowInsc = (row['Cadastro Imobiliário - Inscrição Imobiliária'] || '').replace(/[^0-9]/g, '');
+        if (rowInsc && rowInsc === normInsc) {
+          inscricaoResults.push({
+            titular:   row['Titular da Obra - Nome'] || row['Álvará - Nome da Obra'] || '',
+            alvara:    row['Alvará'] || '',
+            ano:       row['Ano'] || '',
+            tipo:      row['Álvará - Tipo de Alvará'] || '',
+            inscricao: row['Cadastro Imobiliário - Inscrição Imobiliária'] || ''
+          });
+        }
+      });
+    }
+
+    // Busca por nomes (fuzzy)
+    const nameResults = cleaned.map(name => {
       const matches = [];
       sheetData.forEach(row => {
         const titular = row['Titular da Obra - Nome'] || row['Álvará - Nome da Obra'] || '';
@@ -415,10 +445,11 @@ async function startSearch() {
       matches.sort((a, b) => b.score - a.score);
       return { name, matches: matches.slice(0, 10) };
     });
+
     setSearchProgress(100, 'Concluído!');
     setTimeout(() => { document.getElementById('searchStatusCard').style.display = 'none'; }, 700);
-    renderResults(results);
-    saveSearch(results);
+    renderResults(inscricaoResults, nameResults);
+    saveSearch(nameResults, inscricao, inscricaoResults);
   } catch (err) {
     setSearchProgress(0, 'Erro ao carregar planilha. Verifique se ela está pública.');
     console.error(err);
@@ -459,35 +490,84 @@ function fuzzyScore(query, target) {
   return score;
 }
 
-function renderResults(results) {
-  const foundCount = results.filter(r => r.matches.length > 0).length;
-  let html = `<div class="card" style="margin-bottom:.75rem"><div class="summary-bar"><span>${results.length} proprietário(s) pesquisado(s)</span><span class="summary-found">${foundCount} com resultado(s)</span></div></div>`;
-  results.forEach(({ name, matches }) => {
-    html += `<div class="card"><div class="result-section-header"><div class="card-label" style="margin-bottom:0">${name}</div><span class="result-count ${matches.length ? 'count-found' : 'count-none'}">${matches.length} resultado(s)</span></div>`;
-    if (!matches.length) {
-      html += `<div class="no-result">— Nenhum processo encontrado</div>`;
+function renderResults(inscricaoResults, nameResults) {
+  const totalNomes   = nameResults.length;
+  const foundNomes   = nameResults.filter(r => r.matches.length > 0).length;
+  const foundInscr   = inscricaoResults.length;
+
+  let html = `<div class="card" style="margin-bottom:.75rem">
+    <div class="summary-bar">
+      <span>${totalNomes} proprietário(s) pesquisado(s)</span>
+      <span class="summary-found">${foundNomes} nome(s) com resultado · ${foundInscr} por inscrição</span>
+    </div>
+  </div>`;
+
+  // ── SEÇÃO INSCRIÇÃO ──────────────────────────────────────────────────
+  if (inscricao) {
+    html += `<div class="card" style="border-color:${foundInscr > 0 ? 'rgba(79,124,255,.4)' : 'var(--border)'}">
+      <div class="result-section-header">
+        <div class="card-label" style="margin-bottom:0">🏠 Inscrição: ${inscricao}</div>
+        <span class="result-count ${foundInscr ? 'count-found' : 'count-none'}">${foundInscr} resultado(s)</span>
+      </div>`;
+    if (!foundInscr) {
+      html += `<div class="no-result">— Nenhum processo encontrado para esta inscrição</div>`;
     } else {
-      matches.forEach(m => {
-        html += `<div class="result-item"><div class="result-name">${m.titular}</div><div class="result-score">correspondência: ${Math.round(m.score)}%</div><div class="chips">
-          ${m.alvara    ? `<span class="chip chip-blue">Alvará ${m.alvara}</span>` : ''}
-          ${m.ano       ? `<span class="chip chip-gray">${m.ano}</span>` : ''}
-          ${m.tipo      ? `<span class="chip chip-gray">${m.tipo}</span>` : ''}
-          ${m.inscricao ? `<span class="chip chip-gray">${m.inscricao}</span>` : ''}
-        </div></div>`;
+      inscricaoResults.forEach(m => {
+        html += `<div class="result-item">
+          <div class="result-name">${m.titular}</div>
+          <div class="result-score" style="color:var(--success)">✓ match exato por inscrição</div>
+          <div class="chips">
+            ${m.alvara    ? `<span class="chip chip-blue">Alvará ${m.alvara}</span>` : ''}
+            ${m.ano       ? `<span class="chip chip-gray">${m.ano}</span>` : ''}
+            ${m.tipo      ? `<span class="chip chip-gray">${m.tipo}</span>` : ''}
+            ${m.inscricao ? `<span class="chip chip-gray">${m.inscricao}</span>` : ''}
+          </div>
+        </div>`;
       });
     }
     html += `</div>`;
-  });
+  }
+
+  // ── SEÇÃO NOMES ──────────────────────────────────────────────────────
+  if (nameResults.length) {
+    html += `<div style="font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin:.75rem 0 .5rem;font-family:var(--mono)">Busca por proprietários</div>`;
+    nameResults.forEach(({ name, matches }) => {
+      html += `<div class="card"><div class="result-section-header">
+        <div class="card-label" style="margin-bottom:0">${name}</div>
+        <span class="result-count ${matches.length ? 'count-found' : 'count-none'}">${matches.length} resultado(s)</span>
+      </div>`;
+      if (!matches.length) {
+        html += `<div class="no-result">— Nenhum processo encontrado</div>`;
+      } else {
+        matches.forEach(m => {
+          html += `<div class="result-item">
+            <div class="result-name">${m.titular}</div>
+            <div class="result-score">correspondência: ${Math.round(m.score)}%</div>
+            <div class="chips">
+              ${m.alvara    ? `<span class="chip chip-blue">Alvará ${m.alvara}</span>` : ''}
+              ${m.ano       ? `<span class="chip chip-gray">${m.ano}</span>` : ''}
+              ${m.tipo      ? `<span class="chip chip-gray">${m.tipo}</span>` : ''}
+              ${m.inscricao ? `<span class="chip chip-gray">${m.inscricao}</span>` : ''}
+            </div>
+          </div>`;
+        });
+      }
+      html += `</div>`;
+    });
+  }
+
   document.getElementById('resultsContainer').innerHTML = html;
 }
 
 // ─── SALVAR BUSCA (localStorage por enquanto) ─────────────────────────────────
-function saveSearch(results) {
+function saveSearch(nameResults, inscricao, inscricaoResults) {
   const record = {
     id: Date.now(),
     data: new Date().toLocaleDateString('pt-BR'),
     hora: new Date().toLocaleTimeString('pt-BR'),
-    proprietarios: results.map(r => ({
+    inscricao: inscricao || '',
+    inscricaoProcessos: inscricaoResults || [],
+    proprietarios: nameResults.map(r => ({
       nome: r.name,
       encontrado: r.matches.length > 0,
       processos: r.matches.map(m => ({ alvara: m.alvara, ano: m.ano, tipo: m.tipo, titular: m.titular, score: Math.round(m.score) }))
