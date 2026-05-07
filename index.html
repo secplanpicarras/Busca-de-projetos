@@ -748,6 +748,7 @@ async function salvarBusca() {
 
 // ─── HISTÓRICO ────────────────────────────────────────────────────────────────
 let buscaSelecionada = null;
+let buscasCache = {};
 
 async function openHistory() {
   document.getElementById('modalHistorico').style.display = 'flex';
@@ -758,17 +759,20 @@ async function openHistory() {
   });
   const data = await resp.json();
 
-  if (!data.length) {
+  if (!Array.isArray(data) || !data.length) {
     document.getElementById('histList').innerHTML = '<div style="text-align:center;color:var(--text3);font-size:13px;padding:1.5rem 0">Nenhuma busca salva ainda.</div>';
     return;
   }
+
+  buscasCache = {};
+  data.forEach(b => { buscasCache[b.id] = b; });
 
   document.getElementById('histList').innerHTML = data.map(b => {
     const dt = new Date(b.criado_em).toLocaleString('pt-BR');
     const badge = b.tem_resultado
       ? `<span style="font-size:10px;padding:1px 7px;border-radius:999px;background:#EAF3DE;color:#27500A;border:1px solid #C0DD97;font-family:var(--mono)">resultado</span>`
       : `<span style="font-size:10px;padding:1px 7px;border-radius:999px;background:#FCEBEB;color:#791F1F;border:1px solid #F7C1C1;font-family:var(--mono)">nada consta</span>`;
-    return `<div class="hist-item" onclick='openDetalhe(${JSON.stringify(JSON.stringify(b))})'>
+    return `<div class="hist-item" onclick="openDetalhe('${b.id}')">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem">
         <span style="font-size:13px;font-weight:500;color:var(--text);font-family:var(--mono)">${b.protocolo || '—'}</span>
         ${badge}
@@ -778,8 +782,9 @@ async function openHistory() {
   }).join('');
 }
 
-function openDetalhe(jsonStr) {
-  const b = JSON.parse(jsonStr);
+function openDetalhe(id) {
+  const b = buscasCache[id];
+  if (!b) return;
   buscaSelecionada = b;
   closeModal('modalHistorico');
   document.getElementById('detalheTitle').textContent = 'Protocolo ' + (b.protocolo || '—');
