@@ -258,9 +258,18 @@ document.getElementById('pdfInput').addEventListener('change', async function ()
   const buf = await file.arrayBuffer();
   document.getElementById('progressWrap').style.display = 'block';
   setProgress(10, 'Lendo PDF...');
-  const text = await extractPdfText(buf);
+
+  // Converte para base64
+  const bytes = new Uint8Array(buf);
+  let binary = '';
+  for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+  const pdfBase64 = btoa(binary);
+
+  // Extrai texto com pdf.js como fallback
+  const pdfText = await extractPdfText(buf.slice(0));
+
   setProgress(50, 'Enviando para análise da IA...');
-  const extracted = await callEdgeFunction(text);
+  const extracted = await callEdgeFunction(pdfBase64, pdfText);
   setProgress(95, 'Pronto!');
   names     = extracted.map(e => e.name);
   namesMeta = extracted;
@@ -298,7 +307,7 @@ async function extractPdfText(buffer) {
   } catch (e) { return ''; }
 }
 
-async function callEdgeFunction(pdfText) {
+async function callEdgeFunction(pdfBase64, pdfText) {
   try {
     const resp = await fetch(`${SUPABASE_URL}/functions/v1/extrair-nomes`, {
       method: 'POST',
@@ -306,10 +315,10 @@ async function callEdgeFunction(pdfText) {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${SUPABASE_ANON}`,
       },
-      body: JSON.stringify({ pdfText }),
+      body: JSON.stringify({ pdfBase64, pdfText }),
     });
     const data = await resp.json();
-    if (data.error) { console.error(data.error); return []; }
+    if (data.error) { console.error('Edge function error:', data.error, data.detail); return []; }
     return data.names || [];
   } catch (e) { console.error(e); return []; }
 }
