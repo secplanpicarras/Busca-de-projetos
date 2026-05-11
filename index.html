@@ -133,9 +133,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     <div class="login-logo">S</div>
     <h1>Busca de Projeto</h1>
     <p>SEPLAN · Balneário Piçarras</p>
-    <input type="password" id="loginInput" placeholder="Senha de acesso" onkeydown="if(event.key==='Enter')checkLogin()">
-    <div class="login-error" id="loginError">Senha incorreta.</div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="checkLogin()">Entrar</button>
+    <input type="email" id="loginEmail" placeholder="E-mail" style="margin-bottom:.5rem" onkeydown="if(event.key==='Enter')checkLogin()">
+    <input type="password" id="loginInput" placeholder="Senha" onkeydown="if(event.key==='Enter')checkLogin()">
+    <div class="login-error" id="loginError">E-mail ou senha incorretos.</div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.25rem" onclick="checkLogin()" id="loginBtn">Entrar</button>
   </div>
 </div>
 
@@ -162,6 +163,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
       </button>
     </div>
     <div class="sidebar-footer">
+      <div style="padding:6px 10px;margin-bottom:4px">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Logado como</div>
+        <div id="usuarioLogado" style="font-size:12px;color:var(--text2);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+      </div>
       <button class="nav-item" onclick="logout()" style="color:var(--red)">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"/></svg>
         Sair
@@ -352,18 +357,59 @@ if(pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.co
 let names=[],namesMeta=[],sheetData=null,pdfDoc=null,pdfPages=[];
 let inscricao='',currentSearch=null,buscaSelecionada=null,buscasCache={};
 
-// AUTH
-function checkLogin(){
-  if(document.getElementById('loginInput').value===PASSWORD){
-    sessionStorage.setItem('seplan_auth','1');
-    document.getElementById('loginScreen').style.display='none';
-    document.getElementById('app').style.display='block';
-  } else { document.getElementById('loginError').style.display='block'; }
+// AUTH — Supabase Auth
+let currentUser = null;
+
+async function checkLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginInput').value;
+  if(!email||!password){document.getElementById('loginError').style.display='block';return;}
+  const btn = document.getElementById('loginBtn');
+  btn.textContent='Entrando...';btn.disabled=true;
+  try{
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON},
+      body:JSON.stringify({email,password})
+    });
+    const data = await resp.json();
+    if(data.error||!data.access_token){
+      document.getElementById('loginError').style.display='block';
+      btn.textContent='Entrar';btn.disabled=false;
+      return;
+    }
+    sessionStorage.setItem('seplan_token', data.access_token);
+    sessionStorage.setItem('seplan_email', data.user.email);
+    currentUser = data.user;
+    showApp();
+  }catch(e){
+    document.getElementById('loginError').style.display='block';
+    btn.textContent='Entrar';btn.disabled=false;
+  }
 }
-function logout(){ sessionStorage.removeItem('seplan_auth'); location.reload(); }
-if(sessionStorage.getItem('seplan_auth')==='1'){
+
+function showApp(){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('app').style.display='block';
+  const email = sessionStorage.getItem('seplan_email')||'';
+  const nome = email.split('@')[0];
+  document.getElementById('usuarioLogado').textContent=nome;
+}
+
+function logout(){
+  sessionStorage.removeItem('seplan_token');
+  sessionStorage.removeItem('seplan_email');
+  location.reload();
+}
+
+function getAuthHeaders(){
+  const token = sessionStorage.getItem('seplan_token')||SUPABASE_ANON;
+  return {'apikey':SUPABASE_ANON,'Authorization':`Bearer ${token}`};
+}
+
+// Verifica sessão ao carregar
+if(sessionStorage.getItem('seplan_token')){
+  showApp();
 }
 
 // NAV
@@ -649,21 +695,34 @@ function marcarLive(pid,valor){
 function openSalvar(){
   if(!currentSearch) return;
   const confirmados=[];
+
+  // Inscrição = match exato, entra automaticamente
+  (currentSearch.inscricao_resultados||[]).forEach(m=>{
+    confirmados.push({fonte:'inscricao',nome_buscado:'Inscrição '+currentSearch.inscricao,titular:m.titular,alvara:m.alvara,ano:m.ano,tipo:m.tipo,inscricao:m.inscricao,score:100});
+  });
+
+  // Nomes = só os marcados com ✓
   (currentSearch.nome_resultados||[]).forEach(r=>{
     (r.matches||[]).forEach((m,mi)=>{
       const pid='live_'+r.name.replace(/[^A-Z0-9]/gi,'_')+'_'+mi;
       if(localStorage.getItem('proc_rel_'+pid)==='sim'){
-        confirmados.push({nome_buscado:r.name,titular:m.titular,alvara:m.alvara,ano:m.ano,tipo:m.tipo,inscricao:m.inscricao,score:Math.round(m.score)});
+        confirmados.push({fonte:'nome',nome_buscado:r.name,titular:m.titular,alvara:m.alvara,ano:m.ano,tipo:m.tipo,inscricao:m.inscricao,score:Math.round(m.score)});
       }
     });
   });
+
   currentSearch._confirmados=confirmados;
   document.getElementById('fInscricao').value=currentSearch.inscricao||'';
   document.getElementById('fProtocolo').value='';
   document.getElementById('fMatricula').value='';
   document.getElementById('fProcessosPreview').innerHTML=confirmados.length
-    ? confirmados.map(p=>`<div style="padding:3px 0;border-bottom:1px solid var(--border)">✓ ${p.titular} — Alvará ${p.alvara||'—'} / ${p.ano||'—'}</div>`).join('')
-    : '<span style="color:var(--text3)">Nenhum processo marcado como ✓ ainda. Você pode salvar assim mesmo.</span>';
+    ? confirmados.map(p=>{
+        const badge=p.fonte==='inscricao'
+          ?`<span style="font-size:10px;padding:1px 6px;border-radius:999px;background:#E6F1FB;color:#0C447C;border:1px solid #B5D4F4;font-family:var(--mono)">inscrição</span>`
+          :`<span style="font-size:10px;padding:1px 6px;border-radius:999px;background:#EAF3DE;color:#27500A;border:1px solid #C0DD97;font-family:var(--mono)">✓ confirmado</span>`;
+        return `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)">${badge} <span>${p.titular} — Alvará ${p.alvara||'—'} / ${p.ano||'—'}</span></div>`;
+      }).join('')
+    : '<span style="color:var(--text3)">Nenhum processo encontrado ou confirmado.</span>';
   document.getElementById('fResultadoPreview').innerHTML=currentSearch.tem_resultado
     ?`<span style="color:#1D9E75">✓ Resultado encontrado</span>`
     :`<span style="color:#E24B4A">— Nada consta</span>`;
@@ -677,9 +736,11 @@ async function salvarBusca(){
   const confirmados=currentSearch._confirmados||[];
   const temRes=confirmados.length>0||(currentSearch.inscricao_resultados||[]).length>0;
   const payload={protocolo,matricula,inscricao:currentSearch.inscricao,proprietarios:currentSearch.proprietarios,inscricao_resultados:currentSearch.inscricao_resultados,nome_resultados:confirmados,tem_resultado:temRes};
+  const email=sessionStorage.getItem('seplan_email')||'';
+  payload.usuario_email=email;
   const resp=await fetch(`${SUPABASE_URL}/rest/v1/buscas`,{
     method:'POST',
-    headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`,'Prefer':'return=representation'},
+    headers:{'Content-Type':'application/json',...getAuthHeaders(),'Prefer':'return=representation'},
     body:JSON.stringify(payload)
   });
   if(resp.ok){closeModal('modalCadastro');alert('Busca salva com sucesso!');}
@@ -691,7 +752,7 @@ async function loadHistoricoPage(){
   const el=document.getElementById('histListPage');
   el.innerHTML='<div class="empty-note">Carregando...</div>';
   const resp=await fetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=100`,{
-    headers:{'apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`}
+    headers:{...getAuthHeaders()}
   });
   const data=await resp.json();
   if(!Array.isArray(data)||!data.length){el.innerHTML='<div class="empty-note">Nenhuma busca salva ainda.</div>';return;}
@@ -763,7 +824,7 @@ async function salvarEdicao(){
   const payload={protocolo:document.getElementById('eProtocolo').value.trim(),matricula:document.getElementById('eMatricula').value.trim(),inscricao:document.getElementById('eInscricao').value.trim()};
   const resp=await fetch(`${SUPABASE_URL}/rest/v1/buscas?id=eq.${buscaSelecionada.id}`,{
     method:'PATCH',
-    headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`},
+    headers:{'Content-Type':'application/json',...getAuthHeaders()},
     body:JSON.stringify(payload)
   });
   if(resp.ok){
