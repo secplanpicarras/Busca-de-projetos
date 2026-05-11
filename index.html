@@ -2,1168 +2,870 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Notas SEPLAN</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔍</text></svg>">
+<title>Busca de Projeto — SEPLAN</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-:root {
-  --bg: #F4F3EF;
-  --bg2: #FAFAF7;
-  --bg3: #EEECEA;
-  --border: #E2E0D8;
-  --border2: #D4D1C8;
-  --text: #1A1A1A;
-  --text2: #6B6860;
-  --text3: #A09D96;
-  --green: #1D9E75;
-  --green2: #E1F5EE;
-  --green3: #9FE1CB;
-  --blue: #1A66CC;
-  --blue2: #E3F0FF;
-  --red: #C0392B;
-  --red2: #FFECEC;
-  --purple: #5E3DB3;
-  --purple2: #EDE8FF;
-  --amber: #B95B00;
-  --amber2: #FFF3E0;
-  --radius: 10px;
-  --radius2: 14px;
-  --font: 'DM Sans', sans-serif;
-  --mono: 'DM Mono', monospace;
-  --shadow: 0 2px 12px rgba(0,0,0,.08);
-  --shadow2: 0 8px 32px rgba(0,0,0,.14);
+:root{
+  --bg:#0f1117;--bg2:#171b26;--bg3:#1e2333;
+  --border:rgba(255,255,255,.08);--border2:rgba(255,255,255,.14);
+  --text:#e8eaf0;--text2:#8b90a0;--text3:#555b6e;
+  --accent:#4f7cff;--accent2:#3d6be8;
+  --green:#1D9E75;--red:#E24B4A;--amber:#EF9F27;--blue:#378ADD;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+  --sidebar:220px;
 }
-
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html, body { height: 100%; overflow: hidden; font-family: var(--font); background: var(--bg); color: var(--text); }
-
-/* ── LAYOUT ─────────────────────────────────────── */
-.app { display: flex; height: 100vh; }
-
-/* ── SIDEBAR ────────────────────────────────────── */
-.sidebar {
-  width: 230px; flex-shrink: 0;
-  background: var(--bg2);
-  border-right: 1px solid var(--border);
-  display: flex; flex-direction: column;
-}
-.sb-top { padding: 18px 14px 12px; border-bottom: 1px solid var(--border); }
-.sb-logo { display: flex; align-items: center; gap: 8px; }
-.sb-logo-icon { width: 32px; height: 32px; background: var(--green); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; }
-.sb-logo-text h1 { font-size: 14px; font-weight: 600; color: var(--text); }
-.sb-logo-text p { font-size: 11px; color: var(--text3); }
-
-.sb-nav { padding: 10px 10px 0; display: flex; flex-direction: column; gap: 2px; }
-.sb-nav-btn {
-  display: flex; align-items: center; gap: 9px;
-  padding: 9px 10px; border-radius: var(--radius);
-  border: none; background: transparent; cursor: pointer;
-  font-family: var(--font); font-size: 13px; color: var(--text2);
-  transition: all .15s; text-align: left; width: 100%;
-}
-.sb-nav-btn:hover { background: var(--bg3); color: var(--text); }
-.sb-nav-btn.active { background: var(--green2); color: var(--green); font-weight: 500; }
-.sb-nav-btn svg { flex-shrink: 0; }
-.sb-nav-count {
-  margin-left: auto; font-size: 10px; font-weight: 600;
-  background: var(--bg3); color: var(--text3);
-  padding: 1px 6px; border-radius: 10px;
-}
-.sb-nav-btn.active .sb-nav-count { background: var(--green3); color: var(--green); }
-
-.sb-divider { height: 1px; background: var(--border); margin: 10px 14px; }
-
-.sb-section-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--text3); padding: 0 14px 6px; }
-
-.notes-list { flex: 1; overflow-y: auto; padding: 4px 10px; }
-.note-row {
-  padding: 9px 10px; border-radius: var(--radius); cursor: pointer;
-  margin-bottom: 1px; border: 1px solid transparent; transition: all .15s;
-}
-.note-row:hover { background: var(--bg3); }
-.note-row.active { background: var(--green2); border-color: var(--green3); }
-.note-row-title { font-size: 13px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.note-row-meta { font-size: 10px; color: var(--text3); margin-top: 3px; display: flex; align-items: center; gap: 5px; }
-.badge { font-size: 9px; padding: 1px 6px; border-radius: 8px; font-weight: 600; }
-.b-busca { background: var(--blue2); color: var(--blue); }
-.b-reuniao { background: var(--purple2); color: var(--purple); }
-.b-tarefa { background: var(--green2); color: var(--green); }
-.b-croqui { background: var(--amber2); color: var(--amber); }
-
-.new-btn {
-  margin: 10px; padding: 10px 14px;
-  border: 1.5px dashed var(--border2); border-radius: var(--radius);
-  background: transparent; cursor: pointer; font-size: 13px;
-  color: var(--text3); font-family: var(--font);
-  display: flex; align-items: center; justify-content: center; gap: 7px;
-  transition: all .15s;
-}
-.new-btn:hover { background: var(--bg3); color: var(--text); border-color: var(--text3); }
-
-/* ── MAIN ───────────────────────────────────────── */
-.main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
-
-.toolbar {
-  padding: 10px 16px; background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-}
-.note-title-inp {
-  flex: 1; min-width: 80px; font-size: 15px; font-weight: 600;
-  border: none; background: transparent; color: var(--text);
-  font-family: var(--font); outline: none;
-}
-.note-title-inp::placeholder { color: var(--text3); }
-select.tag-sel {
-  font-size: 12px; border: 1px solid var(--border2); border-radius: 8px;
-  padding: 5px 8px; background: var(--bg2); color: var(--text2);
-  font-family: var(--font); cursor: pointer; outline: none;
-}
-.tbar-btn {
-  padding: 6px 12px; border: 1px solid var(--border2); border-radius: 8px;
-  background: transparent; cursor: pointer; font-size: 12px; color: var(--text2);
-  font-family: var(--font); display: flex; align-items: center; gap: 5px;
-  transition: all .15s; white-space: nowrap;
-}
-.tbar-btn:hover { background: var(--bg3); color: var(--text); }
-.tbar-btn.mode-active { background: var(--text); color: #fff; border-color: var(--text); }
-.tbar-btn.green { background: var(--green2); border-color: var(--green3); color: var(--green); font-weight: 500; }
-.tbar-btn.green:hover { background: var(--green3); }
-
-/* ── EDITOR AREA ────────────────────────────────── */
-.editor { flex: 1; display: flex; overflow: hidden; }
-
-/* TEXT MODE */
-.mode-text {
-  flex: 1; display: flex; flex-direction: column;
-  padding: 16px; gap: 12px; overflow-y: auto;
-}
-.sec-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; color: var(--text3); margin-bottom: 5px; }
-.note-ta {
-  width: 100%; min-height: 140px; border: 1px solid var(--border);
-  border-radius: var(--radius); padding: 12px 14px;
-  font-size: 14px; font-family: var(--font); color: var(--text);
-  background: #fff; resize: none; outline: none; line-height: 1.7;
-}
-.note-ta:focus { border-color: var(--green3); box-shadow: 0 0 0 3px rgba(29,158,117,.08); }
-.checklist-box { border: 1px solid var(--border); border-radius: var(--radius); background: #fff; overflow: hidden; }
-.ci { display: flex; align-items: center; gap: 9px; padding: 9px 13px; border-bottom: 1px solid var(--border); }
-.ci:last-child { border-bottom: none; }
-.ci input[type=checkbox] { width: 16px; height: 16px; cursor: pointer; accent-color: var(--green); flex-shrink: 0; }
-.ci span { font-size: 13px; color: var(--text); flex: 1; }
-.ci span.done { text-decoration: line-through; color: var(--text3); }
-.add-ci {
-  display: flex; align-items: center; gap: 9px; padding: 9px 13px;
-  border: 1px solid var(--border); border-radius: var(--radius);
-  margin-top: 5px; background: #fff;
-}
-.add-ci input { flex: 1; border: none; background: transparent; font-size: 13px; font-family: var(--font); color: var(--text); outline: none; }
-.add-ci input::placeholder { color: var(--text3); }
-
-/* CANVAS MODE */
-.mode-canvas { flex: 1; display: flex; flex-direction: column; background: #fff; }
-.canvas-tools {
-  padding: 8px 12px; background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
-}
-.tool-btn {
-  width: 34px; height: 34px; border-radius: 8px;
-  border: 1px solid var(--border2); background: transparent;
-  cursor: pointer; display: flex; align-items: center; justify-content: center;
-  font-size: 16px; transition: all .15s;
-}
-.tool-btn:hover { background: var(--bg3); }
-.tool-btn.t-active { background: var(--text); border-color: var(--text); }
-.tool-btn.t-active svg { stroke: #fff !important; }
-.color-dot { width: 20px; height: 20px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: all .15s; flex-shrink: 0; }
-.color-dot.sel { border-color: var(--text); transform: scale(1.2); }
-.vdiv { width: 1px; height: 26px; background: var(--border); margin: 0 2px; }
-.size-sl { width: 70px; height: 4px; cursor: pointer; accent-color: var(--green); }
-.canvas-wrap { flex: 1; position: relative; overflow: hidden; background: #fff; }
-canvas#cv { position: absolute; top: 0; left: 0; width: 100%; height: 100%; touch-action: none; cursor: crosshair; }
-.canvas-footer {
-  padding: 8px 12px; background: var(--bg2); border-top: 1px solid var(--border);
-  display: flex; align-items: center; gap: 8px;
-}
-.ca-btn {
-  padding: 7px 13px; border: 1px solid var(--border2); border-radius: 8px;
-  background: transparent; cursor: pointer; font-size: 12px; font-family: var(--font);
-  color: var(--text2); display: flex; align-items: center; gap: 5px; transition: all .15s;
-}
-.ca-btn:hover { background: var(--bg3); color: var(--text); }
-.ca-btn.primary { background: var(--text); color: #fff; border-color: var(--text); }
-.ca-btn.primary:hover { background: #333; }
-.ca-btn.danger { background: var(--red2); border-color: #FFB3B3; color: var(--red); }
-.ca-btn:disabled { opacity: .4; cursor: not-allowed; }
-.ocr-msg { flex: 1; font-size: 12px; color: var(--green); font-style: italic; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-
-/* ── STATUS BAR ─────────────────────────────────── */
-.statusbar {
-  padding: 5px 16px; background: var(--bg2); border-top: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.statusbar span { font-size: 10px; color: var(--text3); }
-
-/* ── MODAL BASE ─────────────────────────────────── */
-.modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,.45);
-  display: flex; align-items: center; justify-content: center;
-  z-index: 100; backdrop-filter: blur(3px);
-  opacity: 0; pointer-events: none; transition: opacity .2s;
-}
-.modal-overlay.open { opacity: 1; pointer-events: all; }
-.modal {
-  background: var(--bg2); border-radius: var(--radius2);
-  box-shadow: var(--shadow2); display: flex; flex-direction: column;
-  transform: translateY(20px) scale(.97); transition: transform .2s;
-}
-.modal-overlay.open .modal { transform: translateY(0) scale(1); }
-.modal-header {
-  padding: 14px 18px; border-bottom: 1px solid var(--border);
-  display: flex; align-items: center; justify-content: space-between; flex-shrink: 0;
-}
-.modal-title { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 8px; }
-.modal-close {
-  width: 28px; height: 28px; border-radius: 50%; border: none;
-  background: var(--bg3); cursor: pointer; font-size: 18px; color: var(--text2);
-  display: flex; align-items: center; justify-content: center; transition: all .15s;
-}
-.modal-close:hover { background: var(--border2); }
-
-/* ── BUSCA MODAL ────────────────────────────────── */
-#modalBusca .modal { width: 92vw; max-width: 1100px; height: 85vh; }
-.busca-modal-body { flex: 1; display: flex; overflow: hidden; }
-.busca-iframe-wrap { flex: 1; overflow: hidden; border-right: 1px solid var(--border); }
-.busca-iframe-wrap iframe { width: 100%; height: 100%; border: none; }
-.busca-side { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; overflow: hidden; }
-.busca-side-top { padding: 14px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
-.busca-side-top p { font-size: 12px; color: var(--text2); line-height: 1.5; }
-.cadastro-form { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-.form-group { display: flex; flex-direction: column; gap: 4px; }
-.form-label { font-size: 11px; font-weight: 500; color: var(--text2); }
-.form-inp {
-  padding: 8px 10px; border: 1px solid var(--border2); border-radius: 8px;
-  font-size: 13px; font-family: var(--font); color: var(--text);
-  background: #fff; outline: none; transition: border-color .15s;
-}
-.form-inp:focus { border-color: var(--green3); box-shadow: 0 0 0 3px rgba(29,158,117,.08); }
-textarea.form-inp { resize: vertical; min-height: 70px; line-height: 1.6; }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.status-sel { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 26px; cursor: pointer; }
-.busca-side-footer { padding: 12px 14px; border-top: 1px solid var(--border); display: flex; gap: 8px; flex-shrink: 0; }
-.btn-salvar { flex: 1; padding: 9px; background: var(--green); border: none; border-radius: 9px; color: #fff; font-size: 13px; font-family: var(--font); font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background .15s; }
-.btn-salvar:hover { background: #0F6E56; }
-.btn-salvar:disabled { background: var(--bg3); color: var(--text3); cursor: not-allowed; }
-
-/* ── HISTÓRICO MODAL ────────────────────────────── */
-#modalHistorico .modal { width: 92vw; max-width: 900px; height: 82vh; }
-.hist-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-.hist-toolbar { padding: 12px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 10px; flex-shrink: 0; flex-wrap: wrap; }
-.hist-search { flex: 1; min-width: 150px; padding: 7px 12px; border: 1px solid var(--border2); border-radius: 8px; font-size: 13px; font-family: var(--font); color: var(--text); background: #fff; outline: none; }
-.hist-search:focus { border-color: var(--green3); }
-.btn-export { padding: 7px 14px; background: var(--blue2); border: 1px solid #B3D1FF; border-radius: 8px; color: var(--blue); font-size: 12px; font-family: var(--font); font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all .15s; }
-.btn-export:hover { background: #B3D1FF; }
-.hist-table-wrap { flex: 1; overflow: auto; }
-table { width: 100%; border-collapse: collapse; }
-thead { position: sticky; top: 0; z-index: 1; }
-th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--text2); background: var(--bg2); border-bottom: 1px solid var(--border); white-space: nowrap; }
-td { padding: 10px 14px; font-size: 13px; color: var(--text); border-bottom: 1px solid var(--border); vertical-align: top; }
-tr:hover td { background: var(--bg3); }
-.status-pill { display: inline-block; padding: 2px 8px; border-radius: 8px; font-size: 11px; font-weight: 600; }
-.s-tramitando { background: var(--green2); color: var(--green); }
-.s-analise { background: var(--blue2); color: var(--blue); }
-.s-concluido { background: var(--bg3); color: var(--text3); }
-.s-paralisado { background: var(--red2); color: var(--red); }
-.td-obs { max-width: 180px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text2); font-size: 12px; }
-.action-btns { display: flex; gap: 5px; }
-.act-btn { padding: 4px 8px; border-radius: 6px; border: 1px solid var(--border2); background: transparent; font-size: 11px; font-family: var(--font); cursor: pointer; color: var(--text2); transition: all .15s; }
-.act-btn:hover { background: var(--bg3); }
-.act-btn.del:hover { background: var(--red2); color: var(--red); border-color: #FFB3B3; }
-.empty-state { text-align: center; padding: 60px 20px; color: var(--text3); }
-.empty-state p { font-size: 14px; margin-top: 8px; }
-
-/* ── DETALHE MODAL ──────────────────────────────── */
-#modalDetalhe .modal { width: 90vw; max-width: 560px; }
-.detalhe-body { padding: 18px; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; max-height: 70vh; }
-.detalhe-row { display: flex; flex-direction: column; gap: 3px; }
-.detalhe-lbl { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--text3); }
-.detalhe-val { font-size: 14px; color: var(--text); line-height: 1.5; }
-.detalhe-footer { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
-
-/* SPINNER */
-.spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.3); border-top-color: #fff; border-radius: 50%; animation: spin .6s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
-.spinner.dark { border-color: rgba(0,0,0,.12); border-top-color: var(--green); }
-
-/* TOAST */
-.toast {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-  background: var(--text); color: #fff; padding: 10px 20px; border-radius: 10px;
-  font-size: 13px; font-weight: 500; box-shadow: var(--shadow2);
-  transition: transform .3s; z-index: 999; white-space: nowrap;
-}
-.toast.show { transform: translateX(-50%) translateY(0); }
-.toast.success { background: var(--green); }
-.toast.error { background: var(--red); }
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh}
+/* LOGIN */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center}
+.login-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:2.5rem;width:100%;max-width:360px;text-align:center}
+.login-logo{width:48px;height:48px;background:var(--accent);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:20px;color:#fff;margin:0 auto 1.25rem}
+.login-card h1{font-size:18px;font-weight:500;margin-bottom:.25rem}
+.login-card p{font-size:13px;color:var(--text2);margin-bottom:1.5rem}
+.login-card input{width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:14px;font-family:var(--mono);margin-bottom:.75rem;outline:none}
+.login-card input:focus{border-color:var(--accent)}
+.login-error{font-size:12px;color:var(--red);margin-bottom:.75rem;display:none}
+/* SIDEBAR */
+#app{display:none;min-height:100vh}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:50}
+.sidebar-header{padding:1.25rem 1rem 1rem;border-bottom:1px solid var(--border)}
+.sidebar-logo{display:flex;align-items:center;gap:10px}
+.s-logo-icon{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:500;font-size:13px;color:#fff;flex-shrink:0}
+.s-logo-text{font-size:13px;font-weight:500;line-height:1.2}
+.s-logo-sub{font-size:11px;color:var(--text3)}
+.sidebar-nav{flex:1;padding:.75rem .5rem;overflow-y:auto}
+.nav-section{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;padding:8px 10px 4px;font-family:var(--mono)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;cursor:pointer;font-size:13px;color:var(--text2);transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--accent);color:#fff}
+.sidebar-footer{padding:.75rem .5rem;border-top:1px solid var(--border)}
+/* CONTENT */
+.content{margin-left:var(--sidebar);min-height:100vh;padding:2rem}
+.content-inner{max-width:740px;margin:0 auto}
+/* STEPS */
+.steps{display:flex;gap:6px;margin-bottom:1.75rem;flex-wrap:wrap}
+.step-pill{display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:999px;border:1px solid var(--border2);font-size:12px;color:var(--text2);font-family:var(--mono)}
+.step-pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.step-pill.done{border-color:var(--accent);color:var(--accent)}
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1rem}
+.card-label{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:1rem;font-family:var(--mono)}
+/* UPLOAD */
+.upload-zone{border:1px dashed var(--border2);border-radius:10px;padding:2.5rem 1rem;text-align:center;cursor:pointer;transition:all .2s}
+.upload-zone:hover{border-color:var(--accent);background:rgba(79,124,255,.04)}
+.upload-zone svg{display:block;margin:0 auto .75rem;color:var(--text3)}
+.upload-zone p{font-size:14px;color:var(--text2);margin-bottom:.25rem}
+.upload-zone span{font-size:12px;color:var(--text3)}
+/* PROGRESS */
+.progress-wrap{margin-top:.75rem;display:none}
+.progress-bar{height:2px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.progress-fill{height:100%;background:var(--accent);border-radius:2px;transition:width .4s}
+.progress-msg{font-size:12px;color:var(--text2);margin-top:.5rem;font-family:var(--mono)}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;border:1px solid var(--border2);background:transparent;cursor:pointer;font-size:13px;font-weight:500;color:var(--text);font-family:var(--sans);transition:all .15s}
+.btn:hover{background:var(--bg3)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent2)}
+.btn-green{border-color:var(--green);color:var(--green)}
+.btn-green:hover{background:rgba(29,158,117,.08)}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-ghost{border-color:transparent}
+.btn-ghost:hover{border-color:var(--border2)}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+/* NAMES */
+.name-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)}
+.name-row:last-of-type{border-bottom:none}
+.name-row input{flex:1;padding:5px 8px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none}
+.name-row input:focus{border-color:var(--accent)}
+.conf-badge{font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid;white-space:nowrap;font-family:var(--mono)}
+.conf-alta{color:#2ecc71;border-color:#2ecc7140;background:#2ecc7110}
+.conf-media{color:#f39c12;border-color:#f39c1240;background:#f39c1210}
+.conf-baixa{color:#e74c3c;border-color:#e74c3c40;background:#e74c3c10}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;padding:2px 4px;transition:color .15s}
+.del-btn:hover{color:var(--red)}
+.add-row{display:flex;gap:8px;margin-top:.75rem}
+.add-row input{flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none}
+.add-row input:focus{border-color:var(--accent)}
+.empty-note{font-size:13px;color:var(--text3);text-align:center;padding:1.5rem 0}
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:1rem}
+.tab{padding:5px 14px;border-radius:999px;border:1px solid var(--border);font-size:12px;cursor:pointer;color:var(--text2);background:transparent;font-family:var(--sans);transition:all .15s}
+.tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+/* PDF HIGHLIGHT */
+.highlight-item{margin-bottom:.75rem;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.highlight-header{padding:8px 12px;background:var(--bg3);font-size:12px;font-family:var(--mono);color:var(--text2);display:flex;justify-content:space-between}
+.highlight-canvas-wrap{position:relative;background:#525659}
+.highlight-canvas-wrap canvas{display:block;width:100%}
+.page-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+/* RESULTS */
+.result-item{padding:.875rem 0;border-bottom:1px solid var(--border)}
+.result-item:last-child{border-bottom:none}
+.result-name{font-size:14px;font-weight:500;color:var(--text);font-family:var(--mono)}
+/* HISTORY */
+.hist-item{padding:.875rem 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;border-radius:6px;padding-left:.5rem;padding-right:.5rem}
+.hist-item:last-child{border-bottom:none}
+.hist-item:hover{background:var(--bg3)}
+.hist-meta{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:3px}
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;padding:1.75rem}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem}
+.modal-title{font-size:15px;font-weight:500}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--text2);font-size:20px;padding:2px 6px;border-radius:6px}
+.modal-close:hover{background:var(--bg3)}
+.form-group{margin-bottom:1rem}
+.form-label{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono);display:block;margin-bottom:.4rem}
+.form-input{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none}
+.form-input:focus{border-color:var(--accent)}
+.form-input[readonly]{opacity:.6;cursor:default}
+.page-header{margin-bottom:1.75rem}
+.page-header h1{font-size:20px;font-weight:500;margin-bottom:.25rem}
+.page-header p{font-size:13px;color:var(--text2)}
 </style>
 </head>
 <body>
 
-<!-- ══ TOAST ══════════════════════════════════════ -->
-<div class="toast" id="toast"></div>
-
-<!-- ══ MODAL: BUSCA ═══════════════════════════════ -->
-<div class="modal-overlay" id="modalBusca">
-  <div class="modal" style="width:92vw;max-width:1100px;height:85vh;">
-    <div class="modal-header">
-      <div class="modal-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        Busca de Projetos — SEPLAN
-      </div>
-      <button class="modal-close" onclick="closeModal('modalBusca')">×</button>
-    </div>
-    <div class="busca-modal-body">
-      <div class="busca-iframe-wrap">
-        <iframe id="buscaIframe" src="about:blank" title="Busca de Projetos SEPLAN"></iframe>
-      </div>
-      <div class="busca-side">
-        <div class="busca-side-top">
-          <p style="font-weight:600;font-size:13px;color:var(--text);margin-bottom:4px;">📋 Cadastrar busca</p>
-          <p>Preencha os dados após realizar a busca ao lado. Será salvo no histórico da SEPLAN.</p>
-        </div>
-        <div class="cadastro-form">
-          <div class="form-group">
-            <label class="form-label">Nº Protocolo / Ano</label>
-            <div class="form-row">
-              <input class="form-inp" id="fProtocolo" placeholder="Ex: 15762">
-              <input class="form-inp" id="fAno" placeholder="2026" value="2026">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Nome do Requerente / Proprietário</label>
-            <input class="form-inp" id="fRequerente" placeholder="Nome completo">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Matrícula do Imóvel</label>
-            <input class="form-inp" id="fMatricula" placeholder="Ex: 12345">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Inscrição Imobiliária</label>
-            <input class="form-inp" id="fInscricao" placeholder="Ex: 0000.00.00.0000-0">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Endereço do Imóvel</label>
-            <input class="form-inp" id="fEndereco" placeholder="Rua, nº, bairro">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Analista Responsável</label>
-            <input class="form-inp" id="fAnalista" placeholder="Nome do analista">
-          </div>
-          <div class="form-group">
-            <label class="form-label">Situação no Sistema</label>
-            <select class="form-inp status-sel" id="fSituacao">
-              <option value="Tramitando">Tramitando</option>
-              <option value="Em Análise">Em Análise</option>
-              <option value="Concluído">Concluído</option>
-              <option value="Paralisado">Paralisado</option>
-              <option value="Não encontrado">Não encontrado</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Resultado da Busca</label>
-            <select class="form-inp status-sel" id="fResultado">
-              <option value="Encontrado">Encontrado ✓</option>
-              <option value="Não encontrado">Não encontrado ✗</option>
-              <option value="Parcial">Resultado parcial</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Observações / Anotações</label>
-            <textarea class="form-inp" id="fObs" placeholder="Anote o que foi verificado, pendências, encaminhamentos…"></textarea>
-          </div>
-        </div>
-        <div class="busca-side-footer">
-          <button class="btn-salvar" id="btnSalvarCadastro" onclick="salvarCadastro()">
-            💾 Salvar cadastro
-          </button>
-        </div>
-      </div>
-    </div>
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <div class="login-logo">S</div>
+    <h1>Busca de Projeto</h1>
+    <p>SEPLAN · Balneário Piçarras</p>
+    <input type="email" id="loginEmail" placeholder="E-mail" style="margin-bottom:.5rem" onkeydown="if(event.key==='Enter')checkLogin()">
+    <input type="password" id="loginInput" placeholder="Senha" onkeydown="if(event.key==='Enter')checkLogin()">
+    <div class="login-error" id="loginError">E-mail ou senha incorretos.</div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.25rem" onclick="checkLogin()" id="loginBtn">Entrar</button>
   </div>
 </div>
 
-<!-- ══ MODAL: HISTÓRICO ═══════════════════════════ -->
-<div class="modal-overlay" id="modalHistorico">
-  <div class="modal" style="width:92vw;max-width:960px;height:82vh;">
-    <div class="modal-header">
-      <div class="modal-title">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        Histórico de Buscas
-      </div>
-      <button class="modal-close" onclick="closeModal('modalHistorico')">×</button>
-    </div>
-    <div class="hist-body">
-      <div class="hist-toolbar">
-        <input class="hist-search" id="histSearch" placeholder="Buscar por nome, protocolo, endereço…" oninput="filtrarHistorico()">
-        <select class="form-inp status-sel" id="histFiltroStatus" onchange="filtrarHistorico()" style="width:160px;">
-          <option value="">Todas as situações</option>
-          <option value="Tramitando">Tramitando</option>
-          <option value="Em Análise">Em Análise</option>
-          <option value="Concluído">Concluído</option>
-          <option value="Paralisado">Paralisado</option>
-          <option value="Não encontrado">Não encontrado</option>
-        </select>
-        <button class="btn-export" onclick="exportarPDF()">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
-          Exportar PDF
-        </button>
-      </div>
-      <div class="hist-table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Protocolo</th>
-              <th>Requerente</th>
-              <th>Matrícula</th>
-              <th>Endereço</th>
-              <th>Analista</th>
-              <th>Situação</th>
-              <th>Resultado</th>
-              <th>Data</th>
-              <th>Observações</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
-          <tbody id="histBody"></tbody>
-        </table>
-        <div class="empty-state" id="histEmpty" style="display:none;">
-          <div style="font-size:32px;">🔍</div>
-          <p>Nenhuma busca cadastrada ainda.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- ══ MODAL: DETALHE ════════════════════════════ -->
-<div class="modal-overlay" id="modalDetalhe">
-  <div class="modal" style="width:90vw;max-width:560px;">
-    <div class="modal-header">
-      <div class="modal-title">📄 Detalhes da Busca</div>
-      <button class="modal-close" onclick="closeModal('modalDetalhe')">×</button>
-    </div>
-    <div class="detalhe-body" id="detalheBody"></div>
-    <div class="detalhe-footer">
-      <button class="tbar-btn" onclick="closeModal('modalDetalhe')">Fechar</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ APP ════════════════════════════════════════ -->
-<div class="app">
+<!-- APP -->
+<div id="app">
 
   <!-- SIDEBAR -->
   <div class="sidebar">
-    <div class="sb-top">
-      <div class="sb-logo">
-        <div class="sb-logo-icon">📋</div>
-        <div class="sb-logo-text">
-          <h1>Notas SEPLAN</h1>
-          <p>Balneário Piçarras</p>
-        </div>
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="s-logo-icon">S</div>
+        <div><div class="s-logo-text">Busca de Projeto</div><div class="s-logo-sub">SEPLAN · Piçarras</div></div>
       </div>
     </div>
-
-    <div class="sb-nav" style="padding-top:14px;">
-      <button class="sb-nav-btn active" id="navNotas" onclick="setView('notas',this)">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14,2 14,8 20,8"/></svg>
-        Minhas Notas
-        <span class="sb-nav-count" id="countNotas">0</span>
+    <div class="sidebar-nav">
+      <div class="nav-section">Menu</div>
+      <button class="nav-item active" id="nav-busca" onclick="navTo('busca')">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
+        Nova busca
       </button>
-      <button class="sb-nav-btn" id="navBusca" onclick="openModal('modalBusca');loadIframe()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        Busca de Projetos
-      </button>
-      <button class="sb-nav-btn" id="navHistorico" onclick="openHistorico()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h5l2 9h9l2-9h5"/><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/></svg>
-        Histórico de Buscas
-        <span class="sb-nav-count" id="countHistorico">0</span>
+      <button class="nav-item" id="nav-historico" onclick="navTo('historico')">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+        Histórico
       </button>
     </div>
-
-    <div class="sb-divider"></div>
-    <div class="sb-section-label">Notas Recentes</div>
-
-    <div class="notes-list" id="notesList"></div>
-    <button class="new-btn" onclick="newNote()">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-      Nova nota
-    </button>
+    <div class="sidebar-footer">
+      <div style="padding:6px 10px;margin-bottom:4px">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Logado como</div>
+        <div id="usuarioLogado" style="font-size:12px;color:var(--text2);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+      </div>
+      <button class="nav-item" onclick="logout()" style="color:var(--red)">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"/></svg>
+        Sair
+      </button>
+    </div>
   </div>
 
-  <!-- MAIN -->
-  <div class="main">
-    <div class="toolbar">
-      <input class="note-title-inp" id="noteTitle" placeholder="Título da nota…" oninput="saveNote()">
-      <select class="tag-sel" id="noteTag" onchange="saveNote()">
-        <option value="reuniao">Reunião</option>
-        <option value="busca">Consulta busca</option>
-        <option value="tarefa">Tarefa</option>
-        <option value="croqui">Croqui</option>
-      </select>
-      <button class="tbar-btn" id="btnModeText" onclick="setMode('text')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-        Texto
-      </button>
-      <button class="tbar-btn mode-active" id="btnModeCanvas" onclick="setMode('canvas')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-        Apple Pencil
-      </button>
-      <button class="tbar-btn green" onclick="openModal('modalBusca');loadIframe()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-        Buscar projeto
-      </button>
-    </div>
+  <!-- MAIN CONTENT -->
+  <div class="content">
+    <div class="content-inner">
 
-    <div class="editor">
-      <!-- TEXT -->
-      <div class="mode-text" id="modeText" style="display:none;">
-        <div>
-          <div class="sec-label">Anotações</div>
-          <textarea class="note-ta" id="noteText" placeholder="Escreva suas anotações…" oninput="saveNote()"></textarea>
+      <!-- PAGE BUSCA -->
+      <div id="page-busca">
+        <div class="steps">
+          <div class="step-pill active" id="pill1"><span>01</span> Matrícula</div>
+          <div class="step-pill" id="pill2"><span>02</span> Proprietários</div>
+          <div class="step-pill" id="pill3"><span>03</span> Resultados</div>
         </div>
-        <div>
-          <div class="sec-label">Checklist</div>
-          <div class="checklist-box" id="checklist"></div>
-          <div class="add-ci">
-            <span style="font-size:16px;color:var(--text3);">+</span>
-            <input id="newCheckInp" placeholder="Adicionar item…" onkeydown="addCheck(event)">
+
+        <div id="pane1">
+          <div class="card">
+            <div class="card-label">Upload da matrícula</div>
+            <div class="upload-zone" id="dropzone" onclick="document.getElementById('pdfInput').click()">
+              <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"/></svg>
+              <p>Clique ou arraste o arquivo aqui</p>
+              <span>PDF, JPG ou PNG · Matrícula com até 90 dias de emissão</span>
+            </div>
+            <input type="file" id="pdfInput" accept=".pdf,.jpg,.jpeg,.png" style="display:none">
+            <div class="progress-wrap" id="progressWrap">
+              <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+              <div class="progress-msg" id="progressMsg">Processando...</div>
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn" onclick="goManual()">✏️ Digitar nomes manualmente</button>
+          </div>
+        </div>
+
+        <div id="pane2" style="display:none">
+          <div class="card">
+            <div class="tabs">
+              <button class="tab active" id="tabNames" onclick="showTab('names')">Nomes extraídos</button>
+              <button class="tab" id="tabPDF" onclick="showTab('pdf')">Conferir no PDF</button>
+            </div>
+            <div id="tabNamesContent">
+              <div class="card-label" style="margin-bottom:.5rem">Edite antes de buscar</div>
+              <div id="namesRows"></div>
+              <div class="add-row">
+                <input type="text" id="newNameInput" placeholder="Adicionar nome manualmente..." onkeydown="if(event.key==='Enter')addName()">
+                <button class="btn btn-sm" onclick="addName()">+ Adicionar</button>
+              </div>
+            </div>
+            <div id="tabPDFContent" style="display:none">
+              <div class="card-label" style="margin-bottom:.5rem">Nomes destacados no documento</div>
+              <div id="highlightPanel"><div class="empty-note">Nenhum PDF carregado.</div></div>
+            </div>
+          </div>
+          <div class="card" style="margin-top:-.25rem">
+            <div class="card-label">Inscrição imobiliária</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input type="text" id="inscricaoInput" placeholder="Ex: 01.07.015.0556.001.001" style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none">
+              <span style="font-size:11px;color:var(--text3);white-space:nowrap">opcional</span>
+            </div>
+            <div style="font-size:11px;color:var(--text3);margin-top:.4rem">Busca exata por inscrição + busca por nomes simultaneamente.</div>
+          </div>
+          <div class="btn-row">
+            <button class="btn" onclick="goTo(1)">← Voltar</button>
+            <button class="btn btn-primary" onclick="startSearch()">🔍 Buscar na planilha</button>
+          </div>
+        </div>
+
+        <div id="pane3" style="display:none">
+          <div class="card" id="searchStatusCard" style="display:none">
+            <div class="progress-bar"><div class="progress-fill" id="searchFill" style="width:0%"></div></div>
+            <div class="progress-msg" id="searchMsg">Carregando planilha...</div>
+          </div>
+          <div id="resultsContainer"></div>
+          <div class="btn-row" style="margin-top:1rem">
+            <button class="btn" onclick="goTo(2)">← Voltar</button>
+            <button class="btn btn-green" id="btnSalvarBusca" style="display:none" onclick="openSalvar()">💾 Salvar busca</button>
+            <button class="btn btn-primary" onclick="startSearch()">↺ Buscar novamente</button>
           </div>
         </div>
       </div>
 
-      <!-- CANVAS -->
-      <div class="mode-canvas" id="modeCanvas">
-        <div class="canvas-tools">
-          <button class="tool-btn t-active" id="tPen" onclick="setTool('pen')" title="Caneta">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-          </button>
-          <button class="tool-btn" id="tHighlight" onclick="setTool('highlight')" title="Marcador">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l-6 6v3h3l6-6"/><path d="M22 2L9 15"/></svg>
-          </button>
-          <button class="tool-btn" id="tEraser" onclick="setTool('eraser')" title="Borracha">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 20H7L3 16l10-10 7 7-3 3"/><path d="M6 11l4 4"/></svg>
-          </button>
-          <div class="vdiv"></div>
-          <div class="color-dot sel" style="background:#1A1A1A" onclick="setColor('#1A1A1A',this)"></div>
-          <div class="color-dot" style="background:#C0392B" onclick="setColor('#C0392B',this)"></div>
-          <div class="color-dot" style="background:#1A66CC" onclick="setColor('#1A66CC',this)"></div>
-          <div class="color-dot" style="background:#1D9E75" onclick="setColor('#1D9E75',this)"></div>
-          <div class="color-dot" style="background:#B95B00" onclick="setColor('#B95B00',this)"></div>
-          <div class="color-dot" style="background:#5E3DB3" onclick="setColor('#5E3DB3',this)"></div>
-          <div class="vdiv"></div>
-          <span style="font-size:11px;color:var(--text3);">Esp:</span>
-          <input type="range" class="size-sl" id="brushSz" min="1" max="18" value="2">
+      <!-- PAGE HISTÓRICO -->
+      <div id="page-historico" style="display:none">
+        <div class="page-header">
+          <h1>Histórico de buscas</h1>
+          <p>Todas as buscas salvas da secretaria</p>
         </div>
-        <div class="canvas-wrap" id="canvasWrap">
-          <canvas id="cv"></canvas>
-        </div>
-        <div class="canvas-footer">
-          <button class="ca-btn danger" onclick="clearCanvas()">🗑 Limpar</button>
-          <button class="ca-btn" onclick="undoCanvas()">↩ Desfazer</button>
-          <button class="ca-btn primary" onclick="recognizeHandwriting()" id="ocrBtn">✨ Converter escrita</button>
-          <span class="ocr-msg" id="ocrMsg"></span>
+        <div class="card">
+          <div id="histListPage"><div class="empty-note">Carregando...</div></div>
         </div>
       </div>
-    </div>
 
-    <div class="statusbar">
-      <span id="statusTxt">Pronto</span>
-      <span id="noteCountBar">0 notas</span>
     </div>
   </div>
+
+  <!-- MODAL SALVAR -->
+  <div id="modalCadastro" class="modal-overlay" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">💾 Salvar busca</span>
+        <button class="modal-close" onclick="closeModal('modalCadastro')">×</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Número / Ano do protocolo *</label>
+        <input class="form-input" id="fProtocolo" placeholder="Ex: 151/2026">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Matrícula do imóvel</label>
+        <input class="form-input" id="fMatricula" placeholder="Ex: 59.838">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Inscrição imobiliária</label>
+        <input class="form-input" id="fInscricao" readonly>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Processos confirmados (✓) — serão salvos</label>
+        <div id="fProcessosPreview" style="padding:.75rem;background:var(--bg3);border-radius:8px;font-size:12px;color:var(--text2);font-family:var(--mono);line-height:1.8">Nenhum processo confirmado ainda.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Resultado</label>
+        <div id="fResultadoPreview" style="padding:.75rem;background:var(--bg3);border-radius:8px;font-size:12px;font-family:var(--mono)">—</div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn" onclick="closeModal('modalCadastro')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarBusca()">💾 Salvar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DETALHE -->
+  <div id="modalDetalhe" class="modal-overlay" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title" id="detalheTitle">Detalhes</span>
+        <button class="modal-close" onclick="closeModal('modalDetalhe')">×</button>
+      </div>
+      <div id="detalheBody"></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;flex-wrap:wrap">
+        <button class="btn" onclick="closeModal('modalDetalhe')">Fechar</button>
+        <button class="btn" onclick="abrirEdicao()">✏️ Editar</button>
+        <button class="btn btn-primary" id="btnCertidao" onclick="gerarCertidao()" style="display:none">📄 Gerar certidão</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL EDITAR -->
+  <div id="modalEditar" class="modal-overlay" style="display:none">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">✏️ Editar busca</span>
+        <button class="modal-close" onclick="closeModal('modalEditar')">×</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Número / Ano do protocolo</label>
+        <input class="form-input" id="eProtocolo" placeholder="Ex: 151/2026">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Matrícula do imóvel</label>
+        <input class="form-input" id="eMatricula" placeholder="Ex: 59.838">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Inscrição imobiliária</label>
+        <input class="form-input" id="eInscricao">
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn" onclick="closeModal('modalEditar')">Cancelar</button>
+        <button class="btn btn-primary" onclick="salvarEdicao()">Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
-// ══ SUPABASE ══════════════════════════════════════
-const SB_URL = 'https://oqmiwgnxltfgmdmhmxmq.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xbWl3Z254bHRmZ21kbWhteG1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNDQzMDksImV4cCI6MjA5MzcyMDMwOX0.XClbKEYt-DJezINAydYPn8enQoNT8Ub-J0xVeY3dfQE';
+const PASSWORD='@Ma07nu209970';
+const SUPABASE_URL='https://oqmiwgnxltfgmdmhmxmq.supabase.co';
+const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xbWl3Z254bHRmZ21kbWhteG1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNDQzMDksImV4cCI6MjA5MzcyMDMwOX0.XClbKEYt-DJezINAydYPn8enQoNT8Ub-J0xVeY3dfQE';
+const SHEET_ID='1AGrwH3KW1dgtvUr8H2uPlaj_Vleq7mwYDGoW6JHkOFI';
 
-async function sbFetch(path, opts={}) {
-  const r = await fetch(SB_URL + path, {
-    ...opts,
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SB_KEY,
-      'Authorization': 'Bearer ' + SB_KEY,
-      'Prefer': 'return=representation',
-      ...(opts.headers||{})
-    }
-  });
-  if (!r.ok) { const e = await r.text(); throw new Error(e); }
-  return r.status === 204 ? null : r.json();
-}
+const pdfjsLib=window['pdfjs-dist/build/pdf'];
+if(pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// CREATE TABLE IF NEEDED (via REST won't work, just try insert)
-// Table: seplan_cadastro_buscas
-// Columns: id (uuid default), protocolo, ano, requerente, matricula, inscricao,
-//          endereco, analista, situacao, resultado, observacoes, created_at
+let names=[],namesMeta=[],sheetData=null,pdfDoc=null,pdfPages=[];
+let inscricao='',currentSearch=null,buscaSelecionada=null,buscasCache={};
 
-// ══ ADMIN ═════════════════════════════════════════
-const ADMIN_ID = '558d70ea-701f-4191-b91c-08d782a133f2';
-let isAdmin = false;
+// AUTH — Supabase Auth
+let currentUser = null;
 
-async function checkAdmin() {
-  try {
-    const r = await fetch(SB_URL + '/auth/v1/user', {
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
-    });
-    if(r.ok) {
-      const u = await r.json();
-      isAdmin = u && u.id === ADMIN_ID;
-    }
-  } catch(e) { isAdmin = false; }
-  aplicarPermissoes();
-}
-
-function aplicarPermissoes() {
-  // Sidebar: esconde botão histórico se não for admin
-  const btnHist = document.getElementById('navHistorico');
-  const btnBusca = document.getElementById('navBusca');
-  if(btnHist) btnHist.style.display = isAdmin ? '' : 'none';
-  // Formulário de cadastro no modal: esconde se não for admin
-  const buscaSide = document.querySelector('.busca-side');
-  if(buscaSide) buscaSide.style.display = isAdmin ? 'flex' : 'none';
-}
-
-// ══ NOTES (localStorage) ═════════════════════════
-let notes = JSON.parse(localStorage.getItem('seplan_notes3') || 'null') || [
-  {id:1,title:'Boas-vindas',tag:'reuniao',text:'App de notas SEPLAN com Apple Pencil e integração ao buscador de projetos.',checks:[{t:'Explorar busca de projetos',d:false},{t:'Cadastrar primeira busca',d:false}],canvasData:null,date:today()},
-];
-let currentId = notes[0].id;
-let currentMode = 'canvas';
-let currentTool = 'pen';
-let currentColor = '#1A1A1A';
-let currentSize = 2;
-let isDrawing = false;
-let history = [];
-let ctx, canvas;
-let cadastros = [];
-let cadastrosFiltrados = [];
-
-function today() {
-  const d = new Date();
-  return `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
-}
-function now() { return new Date().toLocaleDateString('pt-BR'); }
-function saveNotes() { localStorage.setItem('seplan_notes3', JSON.stringify(notes)); }
-function current() { return notes.find(n=>n.id===currentId); }
-
-// ══ SIDEBAR ═══════════════════════════════════════
-function renderSidebar() {
-  const list = document.getElementById('notesList');
-  list.innerHTML = notes.map(n => `
-    <div class="note-row ${n.id===currentId?'active':''}" onclick="openNote(${n.id})">
-      <div class="note-row-title">${n.title||'Sem título'}</div>
-      <div class="note-row-meta">
-        <span class="badge b-${n.tag}">${tagLabel(n.tag)}</span>
-        <span>${n.date}</span>
-        ${n.canvasData?'✏️':''}
-      </div>
-    </div>`).join('');
-  document.getElementById('countNotas').textContent = notes.length;
-  document.getElementById('noteCountBar').textContent = `${notes.length} nota${notes.length!==1?'s':''}`;
-}
-function tagLabel(t){return{reuniao:'Reunião',busca:'Busca',tarefa:'Tarefa',croqui:'Croqui'}[t]||t;}
-
-function setView(v,btn) {
-  document.querySelectorAll('.sb-nav-btn').forEach(b=>b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-}
-
-function newNote() {
-  const id = Date.now();
-  notes.unshift({id,title:'',tag:'reuniao',text:'',checks:[],canvasData:null,date:today()});
-  saveNotes(); openNote(id);
-  document.getElementById('noteTitle').focus();
-}
-
-// ══ NOTE OPEN/SAVE ════════════════════════════════
-function openNote(id) {
-  const prev = current();
-  if(prev && canvas) prev.canvasData = canvas.toDataURL();
-  currentId = id;
-  const n = current();
-  document.getElementById('noteTitle').value = n.title;
-  document.getElementById('noteTag').value = n.tag;
-  document.getElementById('noteText').value = n.text;
-  renderChecklist(n);
-  renderSidebar();
-  if(currentMode === 'canvas') loadCanvas(n);
-  document.querySelectorAll('.sb-nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('navNotas').classList.add('active');
-}
-
-function saveNote() {
-  const n = current(); if(!n) return;
-  n.title = document.getElementById('noteTitle').value;
-  n.tag = document.getElementById('noteTag').value;
-  n.text = document.getElementById('noteText').value;
-  saveNotes(); renderSidebar();
-}
-
-// ══ CHECKLIST ═════════════════════════════════════
-function renderChecklist(n) {
-  document.getElementById('checklist').innerHTML = (n.checks||[]).map((c,i)=>`
-    <div class="ci">
-      <input type="checkbox" ${c.d?'checked':''} onchange="toggleCheck(${i})">
-      <span class="${c.d?'done':''}">${c.t}</span>
-    </div>`).join('');
-}
-function toggleCheck(i){const n=current();n.checks[i].d=!n.checks[i].d;saveNotes();renderChecklist(n);}
-function addCheck(e){
-  if(e.key!=='Enter')return;
-  const inp=document.getElementById('newCheckInp');
-  const t=inp.value.trim(); if(!t)return;
-  const n=current(); n.checks.push({t,d:false});
-  inp.value=''; saveNotes(); renderChecklist(n);
-}
-
-// ══ MODES ═════════════════════════════════════════
-function setMode(m) {
-  currentMode = m;
-  document.getElementById('modeText').style.display = m==='text'?'flex':'none';
-  document.getElementById('modeCanvas').style.display = m==='canvas'?'flex':'none';
-  document.getElementById('btnModeText').className = 'tbar-btn'+(m==='text'?' mode-active':'');
-  document.getElementById('btnModeCanvas').className = 'tbar-btn'+(m==='canvas'?' mode-active':'');
-  if(m==='canvas') setTimeout(initCanvas, 60);
-}
-
-// ══ CANVAS ════════════════════════════════════════
-function initCanvas() {
-  canvas = document.getElementById('cv');
-  const wrap = document.getElementById('canvasWrap');
-  canvas.width = wrap.offsetWidth;
-  canvas.height = wrap.offsetHeight;
-  ctx = canvas.getContext('2d');
-  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-  drawLines();
-  const n = current();
-  if(n && n.canvasData) {
-    const img = new Image(); img.src = n.canvasData;
-    img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  }
-  canvas.onpointerdown = startDraw;
-  canvas.onpointermove = draw;
-  canvas.onpointerup = endDraw;
-  canvas.onpointercancel = endDraw;
-}
-
-function drawLines() {
-  ctx.save(); ctx.strokeStyle = '#F0EEE8'; ctx.lineWidth = .8;
-  for(let y=32; y<canvas.height; y+=32) {
-    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(canvas.width,y); ctx.stroke();
-  }
-  ctx.restore();
-}
-
-function loadCanvas(n) {
-  if(!canvas||!ctx) return;
-  ctx.clearRect(0,0,canvas.width,canvas.height); drawLines();
-  if(n.canvasData) {
-    const img = new Image(); img.src = n.canvasData;
-    img.onload = () => ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-  }
-  history = [];
-}
-
-function getPos(e) {
-  e.preventDefault();
-  const r = canvas.getBoundingClientRect();
-  const t = e.touches ? e.touches[0] : e;
-  return {x:(t.clientX-r.left)*(canvas.width/r.width), y:(t.clientY-r.top)*(canvas.height/r.height)};
-}
-
-function startDraw(e) {
-  e.preventDefault();
-  if(!ctx) return;
-  const p = getPos(e);
-  isDrawing = true;
-  history.push(ctx.getImageData(0,0,canvas.width,canvas.height));
-  if(history.length>40) history.shift();
-  ctx.beginPath(); ctx.moveTo(p.x, p.y);
-}
-
-function draw(e) {
-  e.preventDefault();
-  if(!isDrawing||!ctx) return;
-  const p = getPos(e);
-  const pressure = (e.pressure!==undefined && e.pressure>0) ? e.pressure : 0.5;
-  const sz = currentTool==='eraser' ? 22 : currentSize*(0.4+pressure*0.9);
-  ctx.lineWidth = sz;
-  if(currentTool==='highlight') { ctx.globalAlpha=.3; ctx.strokeStyle=currentColor; }
-  else if(currentTool==='eraser') { ctx.globalAlpha=1; ctx.strokeStyle='#fff'; }
-  else { ctx.globalAlpha=1; ctx.strokeStyle=currentColor; }
-  ctx.lineTo(p.x, p.y); ctx.stroke();
-  ctx.beginPath(); ctx.moveTo(p.x, p.y);
-}
-
-function endDraw(e) {
-  if(!isDrawing) return;
-  isDrawing = false; ctx.globalAlpha = 1;
-  const n = current(); if(n) { n.canvasData = canvas.toDataURL(); saveNotes(); }
-}
-
-function setTool(t) {
-  currentTool = t;
-  ['Pen','Highlight','Eraser'].forEach(x => {
-    document.getElementById('t'+x).className = 'tool-btn'+(t===x.toLowerCase()?' t-active':'');
-  });
-}
-
-function setColor(c, el) {
-  currentColor = c;
-  document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('sel'));
-  el.classList.add('sel');
-  if(currentTool==='eraser') setTool('pen');
-}
-
-function clearCanvas() {
-  if(!ctx) return;
-  history.push(ctx.getImageData(0,0,canvas.width,canvas.height));
-  ctx.clearRect(0,0,canvas.width,canvas.height); drawLines();
-  const n = current(); if(n){n.canvasData=null; saveNotes();}
-}
-
-function undoCanvas() {
-  if(!ctx||!history.length) return;
-  ctx.putImageData(history.pop(),0,0);
-  const n = current(); if(n){n.canvasData=canvas.toDataURL(); saveNotes();}
-}
-
-document.getElementById('brushSz').addEventListener('input', e => currentSize = parseInt(e.target.value));
-
-// ══ HANDWRITING OCR ═══════════════════════════════
-async function recognizeHandwriting() {
-  if(!canvas) return;
-  const b64 = canvas.toDataURL('image/png').split(',')[1];
-  const btn = document.getElementById('ocrBtn');
-  const msg = document.getElementById('ocrMsg');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Reconhecendo…';
-  msg.textContent = '';
-  try {
-    const resp = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1000,
-        messages: [{role:'user', content:[
-          {type:'image', source:{type:'base64', media_type:'image/png', data:b64}},
-          {type:'text', text:'Esta imagem contém texto escrito à mão em português. Transcreva APENAS o texto visível mantendo a estrutura e parágrafos. Se for croqui sem texto, responda: [croqui]. Responda somente com o texto transcrito, sem comentários adicionais.'}
-        ]}]
-      })
+async function checkLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginInput').value;
+  if(!email||!password){document.getElementById('loginError').style.display='block';return;}
+  const btn = document.getElementById('loginBtn');
+  btn.textContent='Entrando...';btn.disabled=true;
+  try{
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON},
+      body:JSON.stringify({email,password})
     });
     const data = await resp.json();
-    const text = data.content.map(i=>i.text||'').join('').trim();
-    if(text && text !== '[croqui]') {
-      const n = current();
-      const ta = document.getElementById('noteText');
-      ta.value += (ta.value?'\n\n':'') + text;
-      n.text = ta.value; saveNotes();
-      setMode('text');
-      msg.style.color = 'var(--green)';
-      msg.textContent = '✓ Texto inserido!';
-      setTimeout(()=>msg.textContent='', 3000);
-    } else {
-      msg.style.color = 'var(--text3)';
-      msg.textContent = 'Nenhum texto detectado.';
-      setTimeout(()=>msg.textContent='', 3000);
+    if(data.error||!data.access_token){
+      document.getElementById('loginError').style.display='block';
+      btn.textContent='Entrar';btn.disabled=false;
+      return;
     }
-  } catch(err) {
-    msg.style.color = 'var(--red)';
-    msg.textContent = 'Erro ao reconhecer.';
+    sessionStorage.setItem('seplan_token', data.access_token);
+    sessionStorage.setItem('seplan_email', data.user.email);
+    currentUser = data.user;
+    showApp();
+  }catch(e){
+    document.getElementById('loginError').style.display='block';
+    btn.textContent='Entrar';btn.disabled=false;
   }
-  btn.disabled = false;
-  btn.innerHTML = '✨ Converter escrita';
 }
 
-// ══ MODAL HELPERS ═════════════════════════════════
-function openModal(id) {
-  document.getElementById(id).classList.add('open');
+function showApp(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  const email = sessionStorage.getItem('seplan_email')||'';
+  const nome = email.split('@')[0];
+  document.getElementById('usuarioLogado').textContent=nome;
 }
-function closeModal(id) {
-  document.getElementById(id).classList.remove('open');
+
+function logout(){
+  sessionStorage.removeItem('seplan_token');
+  sessionStorage.removeItem('seplan_email');
+  location.reload();
 }
-document.querySelectorAll('.modal-overlay').forEach(el => {
-  el.addEventListener('click', e => { if(e.target===el) closeModal(el.id); });
+
+function getAuthHeaders(){
+  const token = sessionStorage.getItem('seplan_token')||SUPABASE_ANON;
+  return {'apikey':SUPABASE_ANON,'Authorization':`Bearer ${token}`};
+}
+
+// Verifica sessão ao carregar
+if(sessionStorage.getItem('seplan_token')){
+  showApp();
+}
+
+// NAV
+function navTo(page){
+  ['busca','historico'].forEach(p=>{
+    document.getElementById('page-'+p).style.display=p===page?'block':'none';
+    const btn=document.getElementById('nav-'+p);
+    if(btn) btn.className='nav-item'+(p===page?' active':'');
+  });
+  if(page==='historico') loadHistoricoPage();
+}
+
+// STEPS
+function goTo(step){
+  ['pane1','pane2','pane3'].forEach((id,i)=>{
+    document.getElementById(id).style.display=i+1===step?'block':'none';
+  });
+  ['pill1','pill2','pill3'].forEach((id,i)=>{
+    const el=document.getElementById(id);
+    el.className='step-pill'+(i+1<step?' done':i+1===step?' active':'');
+  });
+}
+function goManual(){ names=[]; namesMeta=[]; renderNames(); goTo(2); }
+function showTab(t){
+  document.getElementById('tabNamesContent').style.display=t==='names'?'block':'none';
+  document.getElementById('tabPDFContent').style.display=t==='pdf'?'block':'none';
+  document.getElementById('tabNames').className='tab'+(t==='names'?' active':'');
+  document.getElementById('tabPDF').className='tab'+(t==='pdf'?' active':'');
+  if(t==='pdf') renderHighlights();
+}
+
+// PDF
+document.getElementById('pdfInput').addEventListener('change',async function(){
+  const file=this.files[0]; if(!file) return;
+  const buf=await file.arrayBuffer();
+  document.getElementById('progressWrap').style.display='block';
+  const isImage=file.type.startsWith('image/');
+  setProgress(10, isImage?'Lendo imagem...':'Lendo PDF...');
+  const bytes=new Uint8Array(buf);
+  let binary=''; for(let i=0;i<bytes.length;i++) binary+=String.fromCharCode(bytes[i]);
+  const b64=btoa(binary);
+  setProgress(50,'Enviando para análise da IA...');
+  let extracted=[];
+  if(isImage){
+    extracted=await callEdgeFunction(null,null,b64,file.type);
+  } else {
+    const pdfText=await extractPdfText(buf.slice(0));
+    extracted=await callEdgeFunction(b64,pdfText,null,null);
+  }
+  setProgress(95,'Pronto!');
+  names=extracted.map(e=>e.name); namesMeta=extracted;
+  renderNames(); setTimeout(()=>goTo(2),500);
 });
 
-// ══ BUSCA IFRAME ══════════════════════════════════
-let iframeLoaded = false;
-function loadIframe() {
-  if(iframeLoaded) return;
-  document.getElementById('buscaIframe').src = 'https://secplanpicarras.github.io/Busca-de-projetos/';
-  iframeLoaded = true;
-  // Garante que permissões são aplicadas ao abrir o modal
-  setTimeout(aplicarPermissoes, 300);
+const dz=document.getElementById('dropzone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.style.borderColor='var(--accent)';});
+dz.addEventListener('dragleave',()=>{dz.style.borderColor='';});
+dz.addEventListener('drop',e=>{
+  e.preventDefault();dz.style.borderColor='';
+  const f=e.dataTransfer.files[0];
+  if(f){const dt=new DataTransfer();dt.items.add(f);document.getElementById('pdfInput').files=dt.files;document.getElementById('pdfInput').dispatchEvent(new Event('change'));}
+});
+
+function setProgress(pct,msg){ document.getElementById('progressFill').style.width=pct+'%'; document.getElementById('progressMsg').textContent=msg; }
+
+async function extractPdfText(buffer){
+  try{
+    pdfDoc=await pdfjsLib.getDocument({data:buffer.slice(0)}).promise;
+    let full=''; pdfPages=[];
+    for(let i=1;i<=Math.min(pdfDoc.numPages,15);i++){
+      const page=await pdfDoc.getPage(i);
+      const content=await page.getTextContent();
+      const items=content.items.map(s=>({str:s.str,transform:s.transform,width:s.width,height:s.height}));
+      const pageText=items.map(s=>s.str).join(' ');
+      pdfPages.push({pageNum:i,page,items,text:pageText});
+      full+=pageText+'\n';
+    }
+    return full;
+  }catch(e){return '';}
 }
 
-// ══ CADASTRO SUPABASE ═════════════════════════════
-async function salvarCadastro() {
-  const btn = document.getElementById('btnSalvarCadastro');
-  const protocolo = document.getElementById('fProtocolo').value.trim();
-  const requerente = document.getElementById('fRequerente').value.trim();
-  if(!protocolo && !requerente) {
-    showToast('Informe ao menos o protocolo ou requerente.', 'error'); return;
-  }
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span> Salvando…';
-  const payload = {
-    protocolo: protocolo || null,
-    ano: document.getElementById('fAno').value || '2026',
-    requerente: requerente || null,
-    matricula: document.getElementById('fMatricula').value.trim() || null,
-    inscricao: document.getElementById('fInscricao').value.trim() || null,
-    endereco: document.getElementById('fEndereco').value.trim() || null,
-    analista: document.getElementById('fAnalista').value.trim() || null,
-    situacao: document.getElementById('fSituacao').value,
-    resultado: document.getElementById('fResultado').value,
-    observacoes: document.getElementById('fObs').value.trim() || null,
-  };
-  try {
-    await sbFetch('/rest/v1/seplan_cadastro_buscas', {
-      method: 'POST',
-      body: JSON.stringify(payload)
+async function callEdgeFunction(pdfBase64,pdfText,imageBase64,mediaType){
+  try{
+    const body={};
+    if(imageBase64){body.imageBase64=imageBase64;body.mediaType=mediaType||'image/jpeg';}
+    else if(pdfBase64){body.pdfBase64=pdfBase64;}
+    if(pdfText) body.pdfText=pdfText;
+    const resp=await fetch(`${SUPABASE_URL}/functions/v1/extrair-nomes`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
+      body:JSON.stringify(body)
     });
-    showToast('Cadastro salvo com sucesso! ✓', 'success');
-    limparForm();
-    await carregarCadastros();
-    document.getElementById('countHistorico').textContent = cadastros.length;
-  } catch(err) {
-    // Tabela pode não existir ainda — mostrar instrução
-    showToast('Erro ao salvar. Verifique a tabela no Supabase.', 'error');
-    console.error(err);
+    const data=await resp.json();
+    if(data.error){console.error('Edge fn:',data.error);return[];}
+    return data.names||[];
+  }catch(e){console.error(e);return[];}
+}
+
+// NAMES
+function renderNames(){
+  const c=document.getElementById('namesRows');
+  if(!names.length){c.innerHTML='<div class="empty-note">Nenhum nome extraído. Adicione manualmente.</div>';return;}
+  c.innerHTML=names.map((n,i)=>{
+    const conf=(namesMeta[i]||{}).confidence||'';
+    const cls=conf==='alta'?'conf-alta':conf==='media'?'conf-media':conf==='baixa'?'conf-baixa':'';
+    const lbl=conf==='alta'?'leitura segura':conf==='media'?'verificar':conf==='baixa'?'conferir no PDF':'';
+    return `<div class="name-row"><input type="text" value="${n}" onchange="names[${i}]=this.value.toUpperCase();this.value=this.value.toUpperCase()">${cls?`<span class="conf-badge ${cls}">${lbl}</span>`:''}<button class="del-btn" onclick="removeName(${i})">×</button></div>`;
+  }).join('');
+}
+function removeName(i){names.splice(i,1);namesMeta.splice(i,1);renderNames();}
+function addName(){
+  const inp=document.getElementById('newNameInput');
+  const v=inp.value.trim().toUpperCase();
+  if(v){names.push(v);namesMeta.push({confidence:''});renderNames();inp.value='';}
+}
+
+// HIGHLIGHTS
+async function renderHighlights(){
+  const panel=document.getElementById('highlightPanel');
+  if(!pdfDoc||!names.length){panel.innerHTML='<div class="empty-note">Faça upload de um PDF para ver os destaques.</div>';return;}
+  panel.innerHTML='<div class="empty-note">Renderizando páginas...</div>';
+  const found=pdfPages.filter(pg=>names.some(n=>n.length>3&&pg.text.toUpperCase().includes(n.substring(0,Math.min(n.length,7)))));
+  if(!found.length){panel.innerHTML='<div class="empty-note">Nomes não encontrados visualmente.</div>';return;}
+  panel.innerHTML='';
+  for(const pg of found){
+    const hits=names.filter(n=>n.length>3&&pg.text.toUpperCase().includes(n.substring(0,Math.min(n.length,7))));
+    const wrap=document.createElement('div');wrap.className='highlight-item';
+    const hdr=document.createElement('div');hdr.className='highlight-header';
+    hdr.innerHTML=`<span>Página ${pg.pageNum}</span><span style="color:var(--text3)">${hits.join(' · ')}</span>`;
+    wrap.appendChild(hdr);
+    const cWrap=document.createElement('div');cWrap.className='highlight-canvas-wrap';
+    const canvas=document.createElement('canvas');
+    const scale=1.5;const vp=pg.page.getViewport({scale});
+    canvas.width=vp.width;canvas.height=vp.height;cWrap.appendChild(canvas);
+    const overlay=document.createElement('canvas');
+    overlay.width=vp.width;overlay.height=vp.height;overlay.className='page-overlay';
+    cWrap.appendChild(overlay);wrap.appendChild(cWrap);panel.appendChild(wrap);
+    await pg.page.render({canvasContext:canvas.getContext('2d'),viewport:vp}).promise;
+    const octx=overlay.getContext('2d');octx.fillStyle='rgba(255,210,0,0.38)';
+    for(const item of pg.items){
+      const hit=names.some(n=>{const parts=n.split(' ').filter(w=>w.length>3);return parts.some(p=>item.str.toUpperCase().includes(p.substring(0,Math.min(p.length,5))));});
+      if(hit&&item.str.trim().length>2){
+        const[,,,, e,f]=item.transform;
+        octx.fillRect(e*scale,vp.height-(f*scale)-(item.height||12)*scale*.9,item.width*scale,(item.height||12)*scale*1.15);
+      }
+    }
   }
-  btn.disabled = false;
-  btn.innerHTML = '💾 Salvar cadastro';
 }
 
-function limparForm() {
-  ['fProtocolo','fAno','fRequerente','fMatricula','fInscricao','fEndereco','fAnalista','fObs'].forEach(id => {
-    const el = document.getElementById(id);
-    if(el) el.value = id==='fAno'?'2026':'';
-  });
-  document.getElementById('fSituacao').value = 'Tramitando';
-  document.getElementById('fResultado').value = 'Encontrado';
-}
-
-// ══ HISTÓRICO ═════════════════════════════════════
-async function carregarCadastros() {
-  try {
-    const data = await sbFetch('/rest/v1/seplan_cadastro_buscas?order=created_at.desc');
-    cadastros = Array.isArray(data) ? data : [];
-    cadastrosFiltrados = [...cadastros];
-    document.getElementById('countHistorico').textContent = cadastros.length;
-  } catch(e) {
-    cadastros = [];
-  }
-}
-
-function openHistorico() {
-  if(!isAdmin) { showToast('Acesso restrito.', 'error'); return; }
-  openModal('modalHistorico');
-  filtrarHistorico();
-  document.querySelectorAll('.sb-nav-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('navHistorico').classList.add('active');
-}
-
-function filtrarHistorico() {
-  const q = document.getElementById('histSearch').value.toLowerCase();
-  const st = document.getElementById('histFiltroStatus').value;
-  cadastrosFiltrados = cadastros.filter(c => {
-    const matchQ = !q || [c.protocolo,c.requerente,c.endereco,c.matricula,c.analista,c.observacoes].some(v=>v&&v.toLowerCase().includes(q));
-    const matchSt = !st || c.situacao===st;
-    return matchQ && matchSt;
-  });
-  renderHistorico();
-}
-
-function renderHistorico() {
-  const tbody = document.getElementById('histBody');
-  const empty = document.getElementById('histEmpty');
-  if(!cadastrosFiltrados.length) {
-    tbody.innerHTML = '';
-    empty.style.display = 'block'; return;
-  }
-  empty.style.display = 'none';
-  const statusClass = {
-    'Tramitando':'s-tramitando','Em Análise':'s-analise',
-    'Concluído':'s-concluido','Paralisado':'s-paralisado',
-    'Não encontrado':'s-paralisado'
-  };
-  tbody.innerHTML = cadastrosFiltrados.map(c => `
-    <tr>
-      <td><span style="font-family:var(--mono);font-size:12px;font-weight:500;">${c.protocolo||'—'}/${c.ano||'—'}</span></td>
-      <td>${c.requerente||'—'}</td>
-      <td style="font-family:var(--mono);font-size:12px;">${c.matricula||'—'}</td>
-      <td style="max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.endereco||'—'}</td>
-      <td>${c.analista||'—'}</td>
-      <td><span class="status-pill ${statusClass[c.situacao]||'s-concluido'}">${c.situacao||'—'}</span></td>
-      <td>${c.resultado||'—'}</td>
-      <td style="white-space:nowrap;font-size:12px;">${c.created_at ? new Date(c.created_at).toLocaleDateString('pt-BR') : '—'}</td>
-      <td class="td-obs" title="${c.observacoes||''}">${c.observacoes||'—'}</td>
-      <td>
-        <div class="action-btns">
-          <button class="act-btn" onclick='verDetalhe(${JSON.stringify(c).replace(/'/g,"&#39;")})'>Ver</button>
-          <button class="act-btn del" onclick="deletarCadastro('${c.id}')">Del</button>
-        </div>
-      </td>
-    </tr>`).join('');
-}
-
-function verDetalhe(c) {
-  const statusClass = {
-    'Tramitando':'s-tramitando','Em Análise':'s-analise',
-    'Concluído':'s-concluido','Paralisado':'s-paralisado','Não encontrado':'s-paralisado'
-  };
-  document.getElementById('detalheBody').innerHTML = `
-    <div class="detalhe-row"><div class="detalhe-lbl">Protocolo / Ano</div><div class="detalhe-val" style="font-family:var(--mono);font-weight:600;">${c.protocolo||'—'}/${c.ano||'—'}</div></div>
-    <div class="detalhe-row"><div class="detalhe-lbl">Requerente / Proprietário</div><div class="detalhe-val">${c.requerente||'—'}</div></div>
-    <div class="detalhe-row"><div class="detalhe-lbl">Matrícula do Imóvel</div><div class="detalhe-val" style="font-family:var(--mono);">${c.matricula||'—'}</div></div>
-    <div class="detalhe-row"><div class="detalhe-lbl">Inscrição Imobiliária</div><div class="detalhe-val" style="font-family:var(--mono);">${c.inscricao||'—'}</div></div>
-    <div class="detalhe-row"><div class="detalhe-lbl">Endereço do Imóvel</div><div class="detalhe-val">${c.endereco||'—'}</div></div>
-    <div class="detalhe-row"><div class="detalhe-lbl">Analista Responsável</div><div class="detalhe-val">${c.analista||'—'}</div></div>
-    <div class="detalhe-row"><div class="detalhe-lbl">Situação no Sistema</div><div class="detalhe-val"><span class="status-pill ${statusClass[c.situacao]||'s-concluido'}">${c.situacao||'—'}</span></div></div>
-    <div class="detalhe-row"><div class="detalhe-lbl">Resultado da Busca</div><div class="detalhe-val">${c.resultado||'—'}</div></div>
-    <div class="detalhe-row"><div class="detalhe-lbl">Data do Cadastro</div><div class="detalhe-val">${c.created_at?new Date(c.created_at).toLocaleString('pt-BR'):'—'}</div></div>
-    <div class="detalhe-row"><div class="detalhe-lbl">Observações</div><div class="detalhe-val" style="white-space:pre-wrap;">${c.observacoes||'—'}</div></div>
-  `;
-  openModal('modalDetalhe');
-}
-
-async function deletarCadastro(id) {
-  if(!confirm('Deseja remover este cadastro?')) return;
-  try {
-    await sbFetch(`/rest/v1/seplan_cadastro_buscas?id=eq.${id}`, {method:'DELETE'});
-    await carregarCadastros();
-    filtrarHistorico();
-    showToast('Cadastro removido.', '');
-  } catch(e) { showToast('Erro ao remover.', 'error'); }
-}
-
-// ══ EXPORTAR PDF ══════════════════════════════════
-async function exportarPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-  const W = doc.internal.pageSize.getWidth();
-
-  // Header
-  doc.setFillColor(29, 158, 117);
-  doc.rect(0, 0, W, 22, 'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(14); doc.setFont(undefined,'bold');
-  doc.text('PREFEITURA MUNICIPAL DE BALNEÁRIO PIÇARRAS', 14, 10);
-  doc.setFontSize(10); doc.setFont(undefined,'normal');
-  doc.text('SEPLAN — Histórico de Buscas de Projetos', 14, 17);
-  doc.text(`Emitido em: ${new Date().toLocaleString('pt-BR')}`, W-14, 17, {align:'right'});
-
-  // Tabela
-  const cols = ['Protocolo','Requerente','Matrícula','Endereço','Analista','Situação','Resultado','Data','Observações'];
-  const colW = [28, 38, 26, 42, 30, 26, 26, 22, 52];
-  let y = 30;
-
-  // Header row
-  doc.setFillColor(240,238,234);
-  doc.rect(10, y-5, W-20, 8, 'F');
-  doc.setTextColor(80,80,80); doc.setFontSize(8); doc.setFont(undefined,'bold');
-  let x = 10;
-  cols.forEach((c,i) => { doc.text(c, x+1, y); x+=colW[i]; });
-  y += 6;
-
-  // Rows
-  doc.setFont(undefined,'normal'); doc.setTextColor(30,30,30);
-  cadastrosFiltrados.forEach((c, idx) => {
-    if(y > 185) { doc.addPage(); y = 20; }
-    if(idx%2===0) { doc.setFillColor(248,247,244); doc.rect(10, y-4, W-20, 7, 'F'); }
-    doc.setFontSize(7.5);
-    const vals = [
-      `${c.protocolo||'—'}/${c.ano||'—'}`,
-      c.requerente||'—',
-      c.matricula||'—',
-      c.endereco||'—',
-      c.analista||'—',
-      c.situacao||'—',
-      c.resultado||'—',
-      c.created_at?new Date(c.created_at).toLocaleDateString('pt-BR'):'—',
-      c.observacoes||'—'
-    ];
-    x = 10;
-    vals.forEach((v,i) => {
-      const txt = doc.splitTextToSize(String(v), colW[i]-2);
-      doc.text(txt[0], x+1, y);
-      x += colW[i];
+// SEARCH
+async function startSearch(){
+  inscricao=document.getElementById('inscricaoInput').value.trim();
+  const cleaned=names.filter(n=>n.trim());
+  if(!cleaned.length&&!inscricao){alert('Informe a inscrição ou adicione pelo menos um nome.');return;}
+  goTo(3);
+  document.getElementById('searchStatusCard').style.display='block';
+  document.getElementById('resultsContainer').innerHTML='';
+  document.getElementById('btnSalvarBusca').style.display='none';
+  setSearchProgress(10,'Carregando planilha...');
+  try{
+    if(!sheetData){
+      const resp=await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`);
+      const csv=await resp.text();
+      const rows=csv.split('\n').map(parseCSV);
+      const hdrs=rows[0];
+      sheetData=rows.slice(1).filter(r=>r.length>1).map(r=>{
+        const o={};hdrs.forEach((h,i)=>{o[h.trim()]=r[i]?r[i].trim():'';});return o;
+      });
+    }
+    setSearchProgress(50,`Buscando em ${sheetData.length.toLocaleString('pt-BR')} processos...`);
+    let inscricaoResults=[];
+    if(inscricao){
+      const normInsc=inscricao.replace(/[^0-9]/g,'');
+      sheetData.forEach(row=>{
+        const rowInsc=(row['Cadastro Imobiliário - Inscrição Imobiliária']||'').replace(/[^0-9]/g,'');
+        if(rowInsc&&rowInsc===normInsc) inscricaoResults.push({titular:row['Titular da Obra - Nome']||row['Álvará - Nome da Obra']||'',alvara:row['Alvará']||'',ano:row['Ano']||'',tipo:row['Álvará - Tipo de Alvará']||'',inscricao:row['Cadastro Imobiliário - Inscrição Imobiliária']||''});
+      });
+    }
+    const nameResults=cleaned.map(name=>{
+      const matches=[];
+      sheetData.forEach(row=>{
+        const titular=row['Titular da Obra - Nome']||row['Álvará - Nome da Obra']||'';
+        const score=fuzzyScore(name,titular);
+        if(score>=50) matches.push({score,titular,alvara:row['Alvará']||'',ano:row['Ano']||'',tipo:row['Álvará - Tipo de Alvará']||'',inscricao:row['Cadastro Imobiliário - Inscrição Imobiliária']||''});
+      });
+      matches.sort((a,b)=>b.score-a.score);
+      return{name,matches:matches.slice(0,10)};
     });
-    y += 7;
-  });
+    setSearchProgress(100,'Concluído!');
+    setTimeout(()=>{document.getElementById('searchStatusCard').style.display='none';},700);
+    currentSearch={inscricao,inscricao_resultados:inscricaoResults,nome_resultados:nameResults,proprietarios:cleaned,tem_resultado:inscricaoResults.length>0||nameResults.some(r=>r.matches.length>0)};
+    renderResults(inscricaoResults,nameResults);
+    document.getElementById('btnSalvarBusca').style.display='inline-flex';
+  }catch(err){setSearchProgress(0,'Erro ao carregar planilha.');console.error(err);}
+}
 
-  // Footer
-  const pages = doc.internal.getNumberOfPages();
-  for(let i=1;i<=pages;i++){
-    doc.setPage(i);
-    doc.setFontSize(7); doc.setTextColor(150,150,150);
-    doc.text(`Página ${i} de ${pages}`, W/2, 205, {align:'center'});
+function setSearchProgress(pct,msg){ document.getElementById('searchFill').style.width=pct+'%'; document.getElementById('searchMsg').textContent=msg; }
+
+function parseCSV(row){
+  const res=[];let cur='',inQ=false;
+  for(const c of row){if(c==='"'){inQ=!inQ;}else if(c===','&&!inQ){res.push(cur);cur='';}else{cur+=c;}}
+  res.push(cur);return res;
+}
+function normalize(s){return(s||'').toUpperCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^A-Z0-9 ]/g,' ').replace(/\s+/g,' ').trim();}
+function fuzzyScore(query,target){
+  const q=normalize(query),t=normalize(target);
+  if(!q||!t) return 0; if(t===q) return 100; if(t.includes(q)) return 90;
+  const qP=q.split(' ').filter(w=>w.length>2),tW=t.split(' ');
+  let m=0; qP.forEach(qw=>{if(tW.some(tw=>tw===qw||(tw.length>3&&qw.length>3&&(tw.startsWith(qw.slice(0,4))||qw.startsWith(tw.slice(0,4)))))) m++;});
+  if(!qP.length) return 0;
+  let s=(m/qP.length)*80;
+  if(qP.length>=2&&m>=2){const l=qP[qP.length-1];if(tW.includes(l)) s=Math.max(s,70);}
+  return s;
+}
+
+// RENDER RESULTS
+function scoreColor(score){
+  if(score>=90) return{bg:'#0F6E5618',text:'#1D9E75',border:'#1D9E7540'};
+  if(score>=70) return{bg:'#185FA518',text:'#378ADD',border:'#378ADD40'};
+  return{bg:'#BA751718',text:'#EF9F27',border:'#EF9F2740'};
+}
+function chipHtml(label,color){
+  const C={blue:{bg:'#E6F1FB',text:'#0C447C',border:'#B5D4F4'},teal:{bg:'#E1F5EE',text:'#085041',border:'#5DCAA5'},amber:{bg:'#FAEEDA',text:'#633806',border:'#FAC775'},gray:{bg:'#F1EFE8',text:'#444441',border:'#D3D1C7'},purple:{bg:'#EEEDFE',text:'#3C3489',border:'#AFA9EC'},green:{bg:'#EAF3DE',text:'#27500A',border:'#C0DD97'}};
+  const c=C[color]||C.gray;
+  return `<span style="font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid ${c.border};background:${c.bg};color:${c.text};font-family:var(--mono)">${label}</span>`;
+}
+
+function renderResults(inscricaoResults,nameResults){
+  const totalNomes=nameResults.length,foundNomes=nameResults.filter(r=>r.matches.length>0).length,foundInscr=inscricaoResults.length;
+  let html=`<div class="card" style="margin-bottom:.75rem;background:var(--bg3)"><div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.5rem"><div style="display:flex;gap:1.5rem">
+    <div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Proprietários</div><div style="font-size:20px;font-weight:500">${totalNomes}</div></div>
+    <div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Com resultado</div><div style="font-size:20px;font-weight:500;color:${foundNomes>0?'#1D9E75':'var(--text3)'}">${foundNomes}</div></div>
+    ${inscricao?`<div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Por inscrição</div><div style="font-size:20px;font-weight:500;color:${foundInscr>0?'#378ADD':'var(--text3)'}">${foundInscr}</div></div>`:''}
+  </div>${(foundNomes===0&&foundInscr===0)?`<span style="font-size:12px;padding:4px 12px;border-radius:999px;background:#FCEBEB;color:#791F1F;border:1px solid #F7C1C1;font-family:var(--mono)">nenhum resultado</span>`:`<span style="font-size:12px;padding:4px 12px;border-radius:999px;background:#E1F5EE;color:#085041;border:1px solid #5DCAA5;font-family:var(--mono)">busca concluída</span>`}</div></div>`;
+
+  if(inscricao){
+    html+=`<div style="margin-bottom:.5rem;font-size:11px;font-weight:500;color:#378ADD;text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">📍 Busca por inscrição imobiliária</div>
+    <div class="card" style="margin-bottom:1rem;border-color:${foundInscr>0?'#378ADD':'var(--border)'};border-width:${foundInscr>0?'1.5px':'1px'}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${foundInscr?'.75rem':'0'}">
+        <span style="font-size:13px;font-family:var(--mono);color:var(--text2)">${inscricao}</span>
+        <span style="font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid;font-family:var(--mono);${foundInscr>0?'background:#E6F1FB;color:#0C447C;border-color:#B5D4F4':'background:var(--bg3);color:var(--text3);border-color:var(--border)'}">${foundInscr} resultado(s)</span>
+      </div>`;
+    if(!foundInscr){html+=`<div style="font-size:13px;color:var(--text3);font-family:var(--mono)">— nenhum processo encontrado para esta inscrição</div>`;}
+    else{inscricaoResults.forEach(m=>{html+=`<div class="result-item"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem"><div class="result-name">${m.titular}</div><span style="font-size:11px;padding:2px 8px;border-radius:999px;background:#EAF3DE;color:#27500A;border:1px solid #C0DD97;font-family:var(--mono);white-space:nowrap;flex-shrink:0">match exato</span></div><div style="display:flex;gap:5px;margin-top:.5rem;flex-wrap:wrap">${m.alvara?chipHtml('Alvará '+m.alvara,'blue'):''}${m.ano?chipHtml(m.ano,'teal'):''}${m.tipo?chipHtml(m.tipo,'purple'):''}${m.inscricao?chipHtml(m.inscricao,'gray'):''}</div></div>`;});}
+    html+=`</div>`;
   }
 
-  doc.save(`historico-buscas-seplan-${new Date().toISOString().slice(0,10)}.pdf`);
-  showToast('PDF exportado! ✓', 'success');
+  if(nameResults.length){
+    html+=`<div style="margin-bottom:.5rem;font-size:11px;font-weight:500;color:#EF9F27;text-transform:uppercase;letter-spacing:.08em;font-family:var(--mono)">👤 Busca por proprietários</div>`;
+    nameResults.forEach(({name,matches})=>{
+      html+=`<div class="card" style="margin-bottom:.75rem"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:${matches.length?'.75rem':'0'}"><div style="font-size:12px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)">${name}</div><span style="font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid;font-family:var(--mono);${matches.length>0?'background:#FAEEDA;color:#633806;border-color:#FAC775':'background:var(--bg3);color:var(--text3);border-color:var(--border)'}">${matches.length} resultado(s)</span></div>`;
+      if(!matches.length){html+=`<div style="font-size:13px;color:var(--text3);font-family:var(--mono)">— nenhum processo encontrado</div>`;}
+      else{
+        matches.forEach((m,mi)=>{
+          const sc=scoreColor(m.score);
+          const pid='live_'+name.replace(/[^A-Z0-9]/gi,'_')+'_'+mi;
+          const saved=localStorage.getItem('proc_rel_'+pid);
+          const isRel=saved==='sim',isNao=saved==='nao';
+          html+=`<div class="result-item" id="prow_${pid}" style="${isNao?'opacity:.4':''}"><div style="display:flex;align-items:flex-start;gap:8px"><div style="flex:1"><div style="display:flex;justify-content:space-between;align-items:flex-start;gap:.5rem"><div class="result-name" style="${isRel?'color:#1D9E75':isNao?'text-decoration:line-through':''}">${m.titular}</div><span style="font-size:11px;padding:2px 8px;border-radius:999px;background:${sc.bg};color:${sc.text};border:1px solid ${sc.border};font-family:var(--mono);white-space:nowrap;flex-shrink:0">${Math.round(m.score)}%</span></div><div style="display:flex;gap:5px;margin-top:.5rem;flex-wrap:wrap">${m.alvara?chipHtml('Alvará '+m.alvara,'blue'):''}${m.ano?chipHtml(m.ano,'teal'):''}${m.tipo?chipHtml(m.tipo,'purple'):''}${m.inscricao?chipHtml(m.inscricao,'gray'):''}</div></div><div style="display:flex;gap:4px;flex-shrink:0;padding-top:2px"><button onclick="marcarLive('${pid}','sim')" title="Relevante" style="width:26px;height:26px;border-radius:6px;border:1.5px solid ${isRel?'#1D9E75':'var(--border2)'};background:${isRel?'#EAF3DE':'transparent'};cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:${isRel?'#1D9E75':'var(--text3)'}">✓</button><button onclick="marcarLive('${pid}','nao')" title="Não relevante" style="width:26px;height:26px;border-radius:6px;border:1.5px solid ${isNao?'#E24B4A':'var(--border2)'};background:${isNao?'#FCEBEB':'transparent'};cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;color:${isNao?'#E24B4A':'var(--text3)'}">✕</button></div></div></div>`;
+        });
+      }
+      html+=`</div>`;
+    });
+  }
+  document.getElementById('resultsContainer').innerHTML=html;
 }
 
-// ══ TOAST ═════════════════════════════════════════
-function showToast(msg, type='') {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (type?' '+type:'');
-  setTimeout(() => t.className = 'toast', 3200);
+function marcarLive(pid,valor){
+  const atual=localStorage.getItem('proc_rel_'+pid);
+  if(atual===valor){localStorage.removeItem('proc_rel_'+pid);}else{localStorage.setItem('proc_rel_'+pid,valor);}
+  const novo=localStorage.getItem('proc_rel_'+pid);
+  const isRel=novo==='sim',isNao=novo==='nao';
+  const row=document.getElementById('prow_'+pid); if(!row) return;
+  row.style.opacity=isNao?'.4':'1';
+  const nameEl=row.querySelector('.result-name');
+  if(nameEl) nameEl.style.cssText=isRel?'color:#1D9E75':isNao?'text-decoration:line-through':'';
+  const btns=row.querySelectorAll('button');
+  if(btns[0]){btns[0].style.borderColor=isRel?'#1D9E75':'var(--border2)';btns[0].style.background=isRel?'#EAF3DE':'transparent';btns[0].style.color=isRel?'#1D9E75':'var(--text3)';}
+  if(btns[1]){btns[1].style.borderColor=isNao?'#E24B4A':'var(--border2)';btns[1].style.background=isNao?'#FCEBEB':'transparent';btns[1].style.color=isNao?'#E24B4A':'var(--text3)';}
 }
 
-// ══ STATUS ════════════════════════════════════════
-function setStatus(msg, ms=0) {
-  document.getElementById('statusTxt').textContent = msg;
-  if(ms) setTimeout(()=>document.getElementById('statusTxt').textContent='Pronto', ms);
+// SALVAR — apenas processos confirmados ✓
+function openSalvar(){
+  if(!currentSearch) return;
+  const confirmados=[];
+
+  // Inscrição = match exato, entra automaticamente
+  (currentSearch.inscricao_resultados||[]).forEach(m=>{
+    confirmados.push({fonte:'inscricao',nome_buscado:'Inscrição '+currentSearch.inscricao,titular:m.titular,alvara:m.alvara,ano:m.ano,tipo:m.tipo,inscricao:m.inscricao,score:100});
+  });
+
+  // Nomes = só os marcados com ✓
+  (currentSearch.nome_resultados||[]).forEach(r=>{
+    (r.matches||[]).forEach((m,mi)=>{
+      const pid='live_'+r.name.replace(/[^A-Z0-9]/gi,'_')+'_'+mi;
+      if(localStorage.getItem('proc_rel_'+pid)==='sim'){
+        confirmados.push({fonte:'nome',nome_buscado:r.name,titular:m.titular,alvara:m.alvara,ano:m.ano,tipo:m.tipo,inscricao:m.inscricao,score:Math.round(m.score)});
+      }
+    });
+  });
+
+  currentSearch._confirmados=confirmados;
+  document.getElementById('fInscricao').value=currentSearch.inscricao||'';
+  document.getElementById('fProtocolo').value='';
+  document.getElementById('fMatricula').value='';
+  document.getElementById('fProcessosPreview').innerHTML=confirmados.length
+    ? confirmados.map(p=>{
+        const badge=p.fonte==='inscricao'
+          ?`<span style="font-size:10px;padding:1px 6px;border-radius:999px;background:#E6F1FB;color:#0C447C;border:1px solid #B5D4F4;font-family:var(--mono)">inscrição</span>`
+          :`<span style="font-size:10px;padding:1px 6px;border-radius:999px;background:#EAF3DE;color:#27500A;border:1px solid #C0DD97;font-family:var(--mono)">✓ confirmado</span>`;
+        return `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)">${badge} <span>${p.titular} — Alvará ${p.alvara||'—'} / ${p.ano||'—'}</span></div>`;
+      }).join('')
+    : '<span style="color:var(--text3)">Nenhum processo encontrado ou confirmado.</span>';
+  document.getElementById('fResultadoPreview').innerHTML=currentSearch.tem_resultado
+    ?`<span style="color:#1D9E75">✓ Resultado encontrado</span>`
+    :`<span style="color:#E24B4A">— Nada consta</span>`;
+  document.getElementById('modalCadastro').style.display='flex';
 }
 
-// ══ INIT ══════════════════════════════════════════
-setMode('canvas');
-openNote(currentId);
-checkAdmin().then(() => { if(isAdmin) carregarCadastros(); });
-window.addEventListener('resize', () => { if(currentMode==='canvas') initCanvas(); });
+async function salvarBusca(){
+  const protocolo=document.getElementById('fProtocolo').value.trim();
+  const matricula=document.getElementById('fMatricula').value.trim();
+  if(!protocolo){alert('Informe o número/ano do protocolo.');return;}
+  const confirmados=currentSearch._confirmados||[];
+  const temRes=confirmados.length>0||(currentSearch.inscricao_resultados||[]).length>0;
+  const payload={protocolo,matricula,inscricao:currentSearch.inscricao,proprietarios:currentSearch.proprietarios,inscricao_resultados:currentSearch.inscricao_resultados,nome_resultados:confirmados,tem_resultado:temRes};
+  const email=sessionStorage.getItem('seplan_email')||'';
+  payload.usuario_email=email;
+  const resp=await fetch(`${SUPABASE_URL}/rest/v1/buscas`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json',...getAuthHeaders(),'Prefer':'return=representation'},
+    body:JSON.stringify(payload)
+  });
+  if(resp.ok){closeModal('modalCadastro');alert('Busca salva com sucesso!');}
+  else{const err=await resp.json();alert('Erro ao salvar: '+JSON.stringify(err));}
+}
+
+// HISTÓRICO
+async function loadHistoricoPage(){
+  const el=document.getElementById('histListPage');
+  el.innerHTML='<div class="empty-note">Carregando...</div>';
+  const resp=await fetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=100`,{
+    headers:{...getAuthHeaders()}
+  });
+  const data=await resp.json();
+  if(!Array.isArray(data)||!data.length){el.innerHTML='<div class="empty-note">Nenhuma busca salva ainda.</div>';return;}
+  buscasCache={};data.forEach(b=>{buscasCache[b.id]=b;});
+  el.innerHTML=data.map(b=>{
+    const dt=new Date(b.criado_em).toLocaleString('pt-BR');
+    const badge=b.tem_resultado
+      ?`<span style="font-size:10px;padding:2px 9px;border-radius:999px;background:#EAF3DE;color:#27500A;border:1px solid #C0DD97;font-family:var(--mono)">resultado</span>`
+      :`<span style="font-size:10px;padding:2px 9px;border-radius:999px;background:#FCEBEB;color:#791F1F;border:1px solid #F7C1C1;font-family:var(--mono)">nada consta</span>`;
+    return `<div class="hist-item" onclick="openDetalhe('${b.id}')"><div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap"><span style="font-size:14px;font-weight:500;font-family:var(--mono)">${b.protocolo||'—'}</span>${badge}</div><div class="hist-meta">${b.matricula?'Mat. '+b.matricula+' · ':''}${b.inscricao||''} · ${dt}</div></div>`;
+  }).join('');
+}
+
+// DETALHE
+function openDetalhe(id){
+  const b=buscasCache[id]; if(!b) return;
+  buscaSelecionada=b;
+  document.getElementById('detalheTitle').textContent='Protocolo '+(b.protocolo||'—');
+  const dt=new Date(b.criado_em).toLocaleString('pt-BR');
+  const nomeRes=Array.isArray(b.nome_resultados)?b.nome_resultados:[];
+  const inscRes=Array.isArray(b.inscricao_resultados)?b.inscricao_resultados:[];
+
+  let html=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem">
+    <div style="padding:.75rem;background:var(--bg3);border-radius:8px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase">Matrícula</div><div style="font-size:13px;font-weight:500;font-family:var(--mono)">${b.matricula||'—'}</div></div>
+    <div style="padding:.75rem;background:var(--bg3);border-radius:8px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase">Inscrição</div><div style="font-size:13px;font-weight:500;font-family:var(--mono)">${b.inscricao||'—'}</div></div>
+    <div style="padding:.75rem;background:var(--bg3);border-radius:8px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase">Data</div><div style="font-size:13px;font-weight:500;font-family:var(--mono)">${dt}</div></div>
+    <div style="padding:.75rem;background:var(--bg3);border-radius:8px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase">Resultado</div><div style="font-size:13px;font-weight:500;color:${b.tem_resultado?'#1D9E75':'#E24B4A'}">${b.tem_resultado?'Encontrado':'Nada consta'}</div></div>
+  </div>`;
+
+  if(inscRes.length){
+    html+=`<div style="font-size:11px;color:#378ADD;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem">📍 Por inscrição</div>`;
+    inscRes.forEach(m=>{html+=`<div style="display:flex;align-items:center;gap:8px;padding:.5rem 0;border-bottom:1px solid var(--border)"><div style="flex:1"><div style="font-size:12px;font-weight:500;font-family:var(--mono)">${m.titular||''}</div><div style="display:flex;gap:5px;margin-top:3px;flex-wrap:wrap">${m.alvara?chipHtml('Alvará '+m.alvara,'blue'):''}${m.ano?chipHtml(m.ano,'teal'):''}${m.tipo?chipHtml(m.tipo,'purple'):''}</div></div><span style="font-size:10px;padding:1px 8px;border-radius:999px;background:#EAF3DE;color:#27500A;border:1px solid #C0DD97;font-family:var(--mono);white-space:nowrap">match exato</span></div>`;});
+  }
+
+  if(nomeRes.length){
+    html+=`<div style="font-size:11px;color:#EF9F27;font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em;margin:.875rem 0 .5rem">✓ Processos confirmados</div>`;
+    nomeRes.forEach(r=>{
+      if(r.titular){
+        html+=`<div style="padding:.5rem 0;border-bottom:1px solid var(--border)"><div style="font-size:12px;font-weight:500;font-family:var(--mono);color:#1D9E75">✓ ${r.titular}</div>${r.nome_buscado?`<div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:2px">Buscado por: ${r.nome_buscado}</div>`:''}<div style="display:flex;gap:5px;margin-top:3px;flex-wrap:wrap">${r.alvara?chipHtml('Alvará '+r.alvara,'blue'):''}${r.ano?chipHtml(r.ano,'teal'):''}${r.tipo?chipHtml(r.tipo,'purple'):''}${r.inscricao?chipHtml(r.inscricao,'gray'):''}</div></div>`;
+      } else if(r.name){
+        const matches=r.matches||[];
+        html+=`<div style="font-size:11px;color:var(--text2);font-family:var(--mono);padding:.4rem 0">${r.name} — ${matches.length} resultado(s)</div>`;
+        matches.forEach(m=>{html+=`<div style="font-size:12px;font-family:var(--mono);padding:.3rem 0 .3rem 1rem;border-bottom:1px solid var(--border);color:var(--text2)">${m.titular||''} — Alvará ${m.alvara||''} / ${m.ano||''}</div>`;});
+      }
+    });
+  }
+
+  if(!inscRes.length&&!nomeRes.length){
+    html+=`<div style="font-size:13px;color:var(--text3);font-family:var(--mono);padding:.5rem 0">Nenhum processo encontrado nesta busca.</div>`;
+  }
+
+  document.getElementById('detalheBody').innerHTML=html;
+  document.getElementById('btnCertidao').style.display=b.tem_resultado?'none':'inline-flex';
+  document.getElementById('modalDetalhe').style.display='flex';
+}
+
+// EDITAR
+function abrirEdicao(){
+  if(!buscaSelecionada) return;
+  document.getElementById('eProtocolo').value=buscaSelecionada.protocolo||'';
+  document.getElementById('eMatricula').value=buscaSelecionada.matricula||'';
+  document.getElementById('eInscricao').value=buscaSelecionada.inscricao||'';
+  closeModal('modalDetalhe');
+  document.getElementById('modalEditar').style.display='flex';
+}
+
+async function salvarEdicao(){
+  if(!buscaSelecionada) return;
+  const payload={protocolo:document.getElementById('eProtocolo').value.trim(),matricula:document.getElementById('eMatricula').value.trim(),inscricao:document.getElementById('eInscricao').value.trim()};
+  const resp=await fetch(`${SUPABASE_URL}/rest/v1/buscas?id=eq.${buscaSelecionada.id}`,{
+    method:'PATCH',
+    headers:{'Content-Type':'application/json',...getAuthHeaders()},
+    body:JSON.stringify(payload)
+  });
+  if(resp.ok){
+    Object.assign(buscasCache[buscaSelecionada.id],payload);
+    buscaSelecionada=buscasCache[buscaSelecionada.id];
+    closeModal('modalEditar');
+    loadHistoricoPage();
+    alert('Alterações salvas!');
+  } else { alert('Erro ao salvar alterações.'); }
+}
+
+function closeModal(id){ document.getElementById(id).style.display='none'; }
+
+// CERTIDÃO
+function gerarCertidao(){
+  if(!buscaSelecionada) return;
+  const b=buscaSelecionada;
+  const dt=new Date(b.criado_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  const props=Array.isArray(b.proprietarios)?b.proprietarios:[];
+  const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Certidão de Nada Consta</title>
+<style>body{font-family:Arial,sans-serif;font-size:12pt;line-height:1.6;margin:0;padding:0}.page{max-width:700px;margin:60px auto;padding:0 40px}.header{text-align:center;border-bottom:2px solid #333;padding-bottom:16px;margin-bottom:32px}.header h2{font-size:13pt;font-weight:700;margin:0 0 4px;text-transform:uppercase}.header p{font-size:10pt;margin:0;color:#555}h1{font-size:14pt;text-align:center;font-weight:700;text-transform:uppercase;margin:0 0 32px}.corpo{text-align:justify;margin-bottom:24px}.destaque{font-weight:700}.rodape{margin-top:60px;text-align:center;font-size:10pt;color:#555;border-top:1px solid #ccc;padding-top:12px}.assinatura{margin-top:80px;text-align:center}.assinatura .linha{width:280px;border-top:1px solid #333;margin:0 auto 6px}.assinatura p{font-size:10pt;margin:2px 0}@media print{.page{margin:20px auto}}</style>
+</head><body><div class="page">
+<div class="header"><h2>Prefeitura Municipal de Balneário Piçarras</h2><p>Secretaria de Planejamento Urbano — SEPLAN</p></div>
+<h1>Certidão de Nada Consta</h1>
+<div class="corpo">
+<p>A <span class="destaque">Secretaria de Planejamento Urbano — SEPLAN</span> do Município de Balneário Piçarras, Estado de Santa Catarina, em resposta ao protocolo <span class="destaque">${b.protocolo||'N/A'}</span>, certifica que:</p>
+<p>Após pesquisa realizada nos registros físicos e digitais desta Secretaria, <span class="destaque">não foram encontrados projetos arquitetônicos, alvarás de construção ou documentos de aprovação</span> vinculados ao imóvel identificado abaixo:</p>
+<ul style="margin:16px 0 16px 24px">${b.matricula?`<li><strong>Matrícula do imóvel:</strong> ${b.matricula}</li>`:''}${b.inscricao?`<li><strong>Inscrição imobiliária:</strong> ${b.inscricao}</li>`:''}</ul>
+<p>Proprietários pesquisados:</p><ul style="margin:0 0 16px 24px">${props.map(p=>`<li>${p}</li>`).join('')}</ul>
+<p>Esta certidão é válida exclusivamente para os fins a que se destina.</p>
+</div>
+<p style="text-align:right">Balneário Piçarras, ${dt}.</p>
+<div class="assinatura"><div class="linha"></div><p><strong>Responsável pela busca</strong></p><p>Secretaria de Planejamento Urbano — SEPLAN</p><p>Prefeitura Municipal de Balneário Piçarras</p></div>
+<div class="rodape">Documento gerado pelo sistema de Busca de Projetos — SEPLAN · Protocolo ${b.protocolo||'N/A'}</div>
+</div></body></html>`;
+  const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download=`certidao-nada-consta-${(b.protocolo||'busca').replace(/\//g,'-')}.html`;
+  a.click();URL.revokeObjectURL(url);
+}
 </script>
-
-<!-- ══ SQL PARA CRIAR A TABELA ══════════════════════
-Execute no Supabase SQL Editor:
-
-create table if not exists seplan_cadastro_buscas (
-  id uuid default gen_random_uuid() primary key,
-  protocolo text,
-  ano text default '2026',
-  requerente text,
-  matricula text,
-  inscricao text,
-  endereco text,
-  analista text,
-  situacao text default 'Tramitando',
-  resultado text default 'Encontrado',
-  observacoes text,
-  created_at timestamptz default now()
-);
-
-alter table seplan_cadastro_buscas enable row level security;
-create policy "allow all" on seplan_cadastro_buscas for all using (true);
-══════════════════════════════════════════════════ -->
 </body>
 </html>
