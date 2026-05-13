@@ -57,11 +57,11 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
 @keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
 /* LOGIN */
 #loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--content-grad)}
-.login-card{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:2.5rem;width:100%;max-width:380px;text-align:center;animation:fadeIn .5s ease;box-shadow:var(--shadow)}
+.login-card{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:2.5rem;width:100%;max-width:380px;text-align:center;animation:fadeIn .5s ease;box-shadow:var(--shadow);transition:background .3s,border-color .3s}
 .login-logo{width:52px;height:52px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:var(--accent-text);margin:0 auto 1.25rem;animation:pulse 2.5s ease infinite}
 .login-card h1{font-size:20px;font-weight:700;margin-bottom:.25rem;letter-spacing:-.3px}
 .login-card p{font-size:13px;color:var(--text2);margin-bottom:1.5rem}
-.login-card input{width:100%;padding:11px 14px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);color:var(--text);font-size:14px;font-family:var(--mono);margin-bottom:.75rem;outline:none;transition:border-color .15s}
+.login-card input{width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:14px;font-family:var(--mono);margin-bottom:.75rem;outline:none;transition:border-color .15s}
 .login-card input:focus{border-color:var(--accent)}
 .login-error{font-size:12px;color:var(--red);margin-bottom:.75rem;display:none}
 /* SIDEBAR */
@@ -85,7 +85,7 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
 /* STEPS */
 .steps{display:flex;gap:6px;margin-bottom:1.75rem;flex-wrap:wrap}
 .step-pill{display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:999px;border:1px solid var(--border2);font-size:12px;font-weight:600;color:var(--text2);font-family:var(--mono);transition:all .2s}
-.step-pill.active{background:var(--accent);color:#1D1721;border-color:var(--accent);animation:fadeIn .3s ease}
+.step-pill.active{background:var(--accent);color:var(--accent-text);border-color:var(--accent);animation:fadeIn .3s ease}
 .step-pill.done{border-color:var(--accent);color:var(--accent)}
 /* CARDS */
 .card{background:var(--card-grad);border:1px solid var(--border);border-radius:var(--radius-card);padding:1.5rem;margin-bottom:1rem;transition:border-color .2s,background .3s,box-shadow .2s;box-shadow:var(--shadow)}
@@ -110,6 +110,8 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
 .btn-primary:hover{background:var(--accent2);transform:translateX(-2px)}
 .btn-green{border-color:rgba(213,255,149,.4);color:var(--accent)}
 .btn-green:hover{background:rgba(213,255,149,.08);transform:translateX(-2px)}
+[data-theme="light"] .btn-green{border-color:rgba(0,0,0,.2);color:var(--accent)}
+[data-theme="light"] .btn-green:hover{background:rgba(0,0,0,.05)}
 .btn-sm{padding:5px 12px;font-size:12px}
 .btn-ghost{border-color:transparent}
 .btn-ghost:hover{border-color:var(--border2);transform:none}
@@ -135,7 +137,7 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
 /* TABS */
 .tabs{display:flex;gap:4px;margin-bottom:1rem}
 .tab{padding:6px 16px;border-radius:999px;border:1px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);background:transparent;font-family:'Nunito',var(--sans);transition:all .2s}
-.tab:hover{border-color:rgba(213,255,149,.3);color:var(--accent);transform:translateX(-2px)}
+.tab:hover{border-color:var(--border2);color:var(--text);transform:translateX(-2px)}
 .tab.active{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
 .tab.active:hover{transform:none}
 /* PDF HIGHLIGHT */
@@ -205,6 +207,10 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
       <button class="nav-item" id="nav-historico" onclick="navTo('historico')">
         <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
         Histórico
+      </button>
+      <button class="nav-item" id="nav-digitalizacao" onclick="abrirDigitalizacao()">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+        Digitalização
       </button>
     </div>
     <div class="sidebar-footer">
@@ -387,6 +393,65 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
       <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
         <button class="btn" onclick="closeModal('modalEditar')">Cancelar</button>
         <button class="btn btn-primary" onclick="salvarEdicao()">Salvar alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DIGITALIZAÇÃO -->
+  <div id="modalDigitalizacao" class="modal-overlay" style="display:none">
+    <div class="modal" style="max-width:660px">
+      <div class="modal-header">
+        <span class="modal-title">📄 Controle de Digitalização</span>
+        <button class="modal-close" onclick="closeModal('modalDigitalizacao')">×</button>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem">
+        <div>
+          <label class="form-label">Nº do processo *</label>
+          <input class="form-input" id="dg-processo" placeholder="Ex: 2024.001234-0">
+        </div>
+        <div>
+          <label class="form-label">Data da solicitação *</label>
+          <input class="form-input" id="dg-data" type="date">
+        </div>
+        <div>
+          <label class="form-label">Solicitado por</label>
+          <select class="form-input" id="dg-solicitante">
+            <option value="Emanuel">Emanuel</option>
+            <option value="Carol">Carol</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Motivo</label>
+          <div style="display:flex;gap:6px">
+            <button id="dg-btn-analista" onclick="dgSetMotivo('analista')" style="flex:1;padding:8px 6px;border-radius:var(--radius);border:1px solid var(--accent);background:var(--accent);color:var(--accent-text);font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',var(--sans);transition:all .15s">👤 Analista</button>
+            <button id="dg-btn-busca" onclick="dgSetMotivo('busca')" style="flex:1;padding:8px 6px;border-radius:var(--radius);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Nunito',var(--sans);transition:all .15s">🔍 Busca</button>
+          </div>
+        </div>
+        <div id="dg-field-analista" style="grid-column:1/-1">
+          <label class="form-label">Analista</label>
+          <select class="form-input" id="dg-analista">
+            <option value="">Selecione o analista</option>
+            <option>Gabriela</option><option>Ruy</option><option>Sabrina</option>
+            <option>Vera</option><option>Marco</option><option>Julia</option>
+            <option>Anderson</option><option>Chris</option><option>Maurício</option><option>Bruna</option>
+          </select>
+        </div>
+        <div id="dg-field-busca" style="grid-column:1/-1;display:none">
+          <label class="form-label">Descrição da busca</label>
+          <input class="form-input" id="dg-busca" placeholder="Descreva a busca...">
+        </div>
+        <div style="grid-column:1/-1">
+          <label class="form-label">Observação <span style="text-transform:none;font-weight:400;letter-spacing:0;opacity:.6">(opcional)</span></label>
+          <textarea class="form-input" id="dg-obs" rows="2" placeholder="Informações adicionais..." style="resize:vertical;line-height:1.5"></textarea>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-bottom:1.25rem">
+        <div id="dg-status" style="flex:1;font-size:12px;color:var(--green);align-self:center;font-family:var(--mono)"></div>
+        <button class="btn btn-primary" onclick="dgAdicionar()">+ Registrar</button>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:1rem">
+        <div style="font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);margin-bottom:.75rem">Registros <span id="dg-count"></span></div>
+        <div id="dg-lista" style="max-height:280px;overflow-y:auto"></div>
       </div>
     </div>
   </div>
@@ -940,6 +1005,100 @@ function gerarCertidao(){
   const a=document.createElement('a');
   a.href=url;a.download=`certidao-nada-consta-${(b.protocolo||'busca').replace(/\//g,'-')}.html`;
   a.click();URL.revokeObjectURL(url);
+}
+
+// ── DIGITALIZAÇÃO ─────────────────────────────────────────────────────────
+let dgMotivo = 'analista';
+let dgRegistros = JSON.parse(localStorage.getItem('dg_registros') || '[]');
+
+function abrirDigitalizacao() {
+  document.getElementById('dg-data').value = new Date().toISOString().slice(0,10);
+  dgRenderLista();
+  document.getElementById('modalDigitalizacao').style.display = 'flex';
+}
+
+function dgSetMotivo(m) {
+  dgMotivo = m;
+  const btnA = document.getElementById('dg-btn-analista');
+  const btnB = document.getElementById('dg-btn-busca');
+  const fA = document.getElementById('dg-field-analista');
+  const fB = document.getElementById('dg-field-busca');
+  const accentStyle = 'border:1px solid var(--accent);background:var(--accent);color:var(--accent-text);font-weight:700';
+  const neutralStyle = 'border:1px solid var(--border2);background:transparent;color:var(--text2);font-weight:600';
+  btnA.setAttribute('style', btnA.getAttribute('style').replace(/border:[^;]+;background:[^;]+;color:[^;]+;font-weight:\d+/, ''));
+  if(m === 'analista'){
+    btnA.style.cssText += ';border:1px solid var(--accent);background:var(--accent);color:var(--accent-text);font-weight:700';
+    btnB.style.cssText = btnB.style.cssText.replace('background:var(--accent)', 'background:transparent').replace('color:var(--accent-text)', 'color:var(--text2)');
+    fA.style.display = ''; fB.style.display = 'none';
+  } else {
+    btnB.style.cssText += ';border:1px solid var(--accent);background:var(--accent);color:var(--accent-text);font-weight:700';
+    btnA.style.cssText = btnA.style.cssText.replace('background:var(--accent)', 'background:transparent').replace('color:var(--accent-text)', 'color:var(--text2)');
+    fA.style.display = 'none'; fB.style.display = '';
+  }
+}
+
+function dgAdicionar() {
+  const processo = document.getElementById('dg-processo').value.trim();
+  const data = document.getElementById('dg-data').value;
+  const solicitante = document.getElementById('dg-solicitante').value;
+  const obs = document.getElementById('dg-obs').value.trim();
+  if(!processo){ alert('Informe o número do processo.'); return; }
+  if(!data){ alert('Informe a data.'); return; }
+  let detalhe = '';
+  if(dgMotivo === 'analista'){
+    detalhe = document.getElementById('dg-analista').value;
+    if(!detalhe){ alert('Selecione o analista.'); return; }
+  } else {
+    detalhe = document.getElementById('dg-busca').value.trim();
+    if(!detalhe){ alert('Descreva a busca.'); return; }
+  }
+  dgRegistros.unshift({ id: Date.now(), processo, data, solicitante, motivo: dgMotivo, detalhe, obs });
+  localStorage.setItem('dg_registros', JSON.stringify(dgRegistros));
+  document.getElementById('dg-processo').value = '';
+  document.getElementById('dg-obs').value = '';
+  document.getElementById('dg-analista').value = '';
+  document.getElementById('dg-busca').value = '';
+  const st = document.getElementById('dg-status');
+  st.textContent = '✓ Registrado com sucesso!';
+  setTimeout(() => st.textContent = '', 3000);
+  dgRenderLista();
+}
+
+function dgRemover(id) {
+  if(!confirm('Remover este registro?')) return;
+  dgRegistros = dgRegistros.filter(r => r.id !== id);
+  localStorage.setItem('dg_registros', JSON.stringify(dgRegistros));
+  dgRenderLista();
+}
+
+function dgFmtData(d) {
+  if(!d) return '—';
+  const [y,mo,dd] = d.split('-');
+  return dd+'/'+mo+'/'+y;
+}
+
+function dgRenderLista() {
+  const lista = document.getElementById('dg-lista');
+  const count = document.getElementById('dg-count');
+  count.textContent = dgRegistros.length ? '(' + dgRegistros.length + ')' : '';
+  if(!dgRegistros.length){
+    lista.innerHTML = '<div style="font-size:13px;color:var(--text3);text-align:center;padding:1.5rem 0;font-family:var(--mono)">Nenhum registro ainda.</div>';
+    return;
+  }
+  lista.innerHTML = dgRegistros.map(r => {
+    const badgeColor = r.motivo === 'analista' ? 'var(--green)' : 'var(--amber)';
+    const badgeLabel = r.motivo === 'analista' ? 'Analista' : 'Busca';
+    return `<div style="padding:.75rem 0;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start">
+      <div style="flex:1">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--text)">${r.processo}</span>
+          <span style="font-size:10px;padding:1px 8px;border-radius:999px;border:1px solid;color:${badgeColor};border-color:${badgeColor};opacity:.8;font-family:var(--mono)">${badgeLabel}</span>
+        </div>
+        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:3px">${dgFmtData(r.data)} · ${r.solicitante} · ${r.detalhe}${r.obs ? ' · ' + r.obs : ''}</div>
+      </div>
+      <button onclick="dgRemover(${r.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:2px 4px;line-height:1;border-radius:4px;flex-shrink:0" title="Remover">×</button>
+    </div>`;
+  }).join('');
 }
 </script>
 </body>
