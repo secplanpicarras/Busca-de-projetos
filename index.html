@@ -10,6 +10,7 @@
 /* ── DARK THEME (Bruno Simon) ── */
 :root,[data-theme="dark"]{
   --bg:#1D1721;--bg2:#251F2B;--bg3:#1a1520;
+  --input-bg:#1a1520;
   --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
   --text:#FFFFFF;--text2:rgba(255,255,255,.55);--text3:rgba(255,255,255,.25);
   --accent:#D5FF95;--accent2:#bfef7a;
@@ -32,6 +33,7 @@
 /* ── LIGHT THEME (Unseen Studio) ── */
 [data-theme="light"]{
   --bg:#ffffff;--bg2:#f1eded;--bg3:#efded9;
+  --input-bg:#f7f5f5;
   --border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.12);
   --text:#000000;--text2:#424242;--text3:#9a9a9a;
   --accent:#212121;--accent2:#424242;
@@ -61,7 +63,7 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
 .login-logo{width:52px;height:52px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:var(--accent-text);margin:0 auto 1.25rem;animation:pulse 2.5s ease infinite}
 .login-card h1{font-size:20px;font-weight:700;margin-bottom:.25rem;letter-spacing:-.3px}
 .login-card p{font-size:13px;color:var(--text2);margin-bottom:1.5rem}
-.login-card input{width:100%;padding:11px 14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:14px;font-family:var(--mono);margin-bottom:.75rem;outline:none;transition:border-color .15s}
+.login-card input{width:100%;padding:11px 14px;background:var(--input-bg);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:14px;font-family:var(--mono);margin-bottom:.75rem;outline:none;transition:border-color .15s}
 .login-card input:focus{border-color:var(--accent)}
 .login-error{font-size:12px;color:var(--red);margin-bottom:.75rem;display:none}
 /* SIDEBAR */
@@ -119,7 +121,7 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
 /* NAMES */
 .name-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);transition:background .15s;animation:fadeIn .2s ease}
 .name-row:last-of-type{border-bottom:none}
-.name-row input{flex:1;padding:6px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s}
+.name-row input{flex:1;padding:6px 10px;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s}
 .name-row input:focus{border-color:var(--accent)}
 .conf-badge{font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid;white-space:nowrap;font-family:var(--mono);font-weight:600}
 [data-theme="dark"] .conf-alta{color:#D5FF95;border-color:rgba(213,255,149,.3);background:rgba(213,255,149,.08)}
@@ -131,7 +133,7 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
 .del-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;padding:2px 4px;transition:all .15s;border-radius:4px}
 .del-btn:hover{color:var(--red);transform:scale(1.2)}
 .add-row{display:flex;gap:8px;margin-top:.75rem}
-.add-row input{flex:1;padding:9px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s}
+.add-row input{flex:1;padding:9px 12px;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s}
 .add-row input:focus{border-color:var(--accent)}
 .empty-note{font-size:13px;color:var(--text3);text-align:center;padding:1.5rem 0}
 /* TABS */
@@ -164,7 +166,7 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
 .modal-close:hover{color:var(--red);transform:scale(1.2)}
 .form-group{margin-bottom:1rem}
 .form-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);display:block;margin-bottom:.4rem}
-.form-input{width:100%;padding:10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s}
+.form-input{width:100%;padding:10px 12px;background:var(--input-bg);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s}
 .form-input:focus{border-color:var(--accent)}
 .form-input[readonly]{opacity:.5;cursor:default}
 .page-header{margin-bottom:1.75rem;animation:fadeIn .3s ease}
@@ -181,7 +183,10 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
     <h1>Busca de Projeto</h1>
     <p>SEPLAN · Balneário Piçarras</p>
     <input type="email" id="loginEmail" placeholder="E-mail" style="margin-bottom:.5rem" onkeydown="if(event.key==='Enter')checkLogin()">
-    <input type="password" id="loginInput" placeholder="Senha" onkeydown="if(event.key==='Enter')checkLogin()">
+    <div style="position:relative;margin-bottom:.75rem">
+      <input type="password" id="loginInput" placeholder="Senha" style="margin-bottom:0;padding-right:40px;width:100%" onkeydown="if(event.key==='Enter')checkLogin()">
+      <button type="button" onclick="toggleSenha()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;line-height:1;font-size:16px" title="Mostrar/ocultar senha" id="btnOlho">👁</button>
+    </div>
     <div class="login-error" id="loginError">E-mail ou senha incorretos.</div>
     <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.25rem;color:#1D1721" onclick="checkLogin()" id="loginBtn">Entrar</button>
   </div>
@@ -282,7 +287,7 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
           <div class="card" style="margin-top:-.25rem">
             <div class="card-label">Inscrição imobiliária</div>
             <div style="display:flex;gap:8px;align-items:center">
-              <input type="text" id="inscricaoInput" placeholder="Ex: 01.07.015.0556.001.001" style="flex:1;padding:8px 10px;background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none">
+              <input type="text" id="inscricaoInput" placeholder="Ex: 01.07.015.0556.001.001" style="flex:1;padding:8px 10px;background:var(--input-bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none">
               <span style="font-size:11px;color:var(--text3);white-space:nowrap">opcional</span>
             </div>
             <div style="font-size:11px;color:var(--text3);margin-top:.4rem">Busca exata por inscrição + busca por nomes simultaneamente.</div>
@@ -1099,6 +1104,18 @@ function dgRenderLista() {
       <button onclick="dgRemover(${r.id})" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:2px 4px;line-height:1;border-radius:4px;flex-shrink:0" title="Remover">×</button>
     </div>`;
   }).join('');
+}
+
+function toggleSenha() {
+  const inp = document.getElementById('loginInput');
+  const btn = document.getElementById('btnOlho');
+  if(inp.type === 'password'){
+    inp.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁';
+  }
 }
 </script>
 </body>
