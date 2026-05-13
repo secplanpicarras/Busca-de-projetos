@@ -583,8 +583,8 @@ function applyTheme(theme){
 })();
 
 function getAuthHeaders(){
-  // Sempre usa anon key para REST API — Supabase Auth é só para identificar o usuário
-  return {'apikey':SUPABASE_ANON,'Authorization':`Bearer ${SUPABASE_ANON}`,'Content-Type':'application/json'};
+  const token = sessionStorage.getItem('seplan_token') || SUPABASE_ANON;
+  return {'apikey':SUPABASE_ANON,'Authorization':`Bearer ${token}`,'Content-Type':'application/json'};
 }
 
 // Verifica sessão ao carregar
