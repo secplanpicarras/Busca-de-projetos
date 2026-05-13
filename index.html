@@ -443,11 +443,19 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
         </div>
         <div id="dg-field-busca" style="grid-column:1/-1;display:none">
           <label class="form-label">Vincular busca do histórico</label>
-          <select class="form-input" id="dg-busca-select" onchange="dgOnBuscaSelect()">
-            <option value="">Carregando buscas...</option>
-          </select>
+          <div style="position:relative">
+            <div id="dg-busca-trigger" onclick="dgToggleDropdown()" class="form-input" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none">
+              <span id="dg-busca-label" style="color:var(--text3)">Selecione uma busca...</span>
+              <span id="dg-busca-arrow" style="font-size:12px;color:var(--text3);transition:transform .2s">▼</span>
+            </div>
+            <div id="dg-busca-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;z-index:999;max-height:260px;overflow-y:auto;animation:fadeIn .15s ease">
+              <div id="dg-busca-list"></div>
+              <div onclick="dgSelecionarBusca('__manual__','✏️ Digitar manualmente')" style="padding:10px 14px;cursor:pointer;border-top:1px solid var(--border);font-size:12px;color:var(--text2);font-family:var(--mono);transition:background .15s" onmouseover="this.style.background='var(--nav-hover-bg)'" onmouseout="this.style.background='transparent'">✏️ Digitar manualmente</div>
+            </div>
+          </div>
+          <input type="hidden" id="dg-busca-select">
           <div id="dg-field-busca-manual" style="display:none;margin-top:8px">
-            <input class="form-input" id="dg-busca" placeholder="Descreva a busca manualmente...">
+            <input class="form-input" id="dg-busca" placeholder="Descreva a busca...">
           </div>
         </div>
         <div style="grid-column:1/-1">
@@ -1049,33 +1057,59 @@ function dgSetMotivo(m) {
 }
 
 async function dgCarregarBuscas() {
-  const sel = document.getElementById('dg-busca-select');
-  sel.innerHTML = '<option value="">Carregando...</option>';
+  const list = document.getElementById('dg-busca-list');
+  list.innerHTML = '<div style="padding:14px;font-size:12px;color:var(--text3);font-family:var(--mono);text-align:center">Carregando...</div>';
   try {
     const resp = await fetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=100`, {
       headers: {...getAuthHeaders()}
     });
     const data = await resp.json();
     if(!Array.isArray(data) || !data.length) {
-      sel.innerHTML = '<option value="">Nenhuma busca salva</option><option value="__manual__">✏️ Digitar manualmente</option>';
+      list.innerHTML = '<div style="padding:14px;font-size:12px;color:var(--text3);font-family:var(--mono);text-align:center">Nenhuma busca salva</div>';
       return;
     }
-    sel.innerHTML = '<option value="">Selecione uma busca...</option>' +
-      data.map(b => {
-        const label = [b.protocolo, b.matricula ? 'Mat. '+b.matricula : '', b.inscricao].filter(Boolean).join(' · ');
-        return `<option value="${b.protocolo||b.id}">${label}</option>`;
-      }).join('') +
-      '<option value="__manual__">✏️ Digitar manualmente</option>';
+    list.innerHTML = data.map(b => {
+      const sub = [b.matricula ? 'Mat. '+b.matricula : '', b.inscricao].filter(Boolean).join(' · ');
+      return `<div onclick="dgSelecionarBusca('${b.protocolo||b.id}','${b.protocolo||'—'}')"
+        style="padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);transition:background .15s"
+        onmouseover="this.style.background='var(--nav-hover-bg)'" onmouseout="this.style.background='transparent'">
+        <div style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--text)">${b.protocolo||'—'}</div>
+        ${sub ? `<div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px">${sub}</div>` : ''}
+      </div>`;
+    }).join('');
   } catch(e) {
-    sel.innerHTML = '<option value="">Erro ao carregar</option><option value="__manual__">✏️ Digitar manualmente</option>';
+    list.innerHTML = '<div style="padding:14px;font-size:12px;color:var(--red);font-family:var(--mono)">Erro ao carregar buscas</div>';
   }
 }
 
-function dgOnBuscaSelect() {
-  const val = document.getElementById('dg-busca-select').value;
+function dgToggleDropdown() {
+  const dd = document.getElementById('dg-busca-dropdown');
+  const arrow = document.getElementById('dg-busca-arrow');
+  const open = dd.style.display === 'none';
+  dd.style.display = open ? '' : 'none';
+  arrow.style.transform = open ? 'rotate(180deg)' : '';
+  if(open) dd.scrollTop = 0;
+}
+
+function dgSelecionarBusca(val, label) {
+  document.getElementById('dg-busca-select').value = val;
+  document.getElementById('dg-busca-label').textContent = label;
+  document.getElementById('dg-busca-label').style.color = 'var(--text)';
+  document.getElementById('dg-busca-dropdown').style.display = 'none';
+  document.getElementById('dg-busca-arrow').style.transform = '';
   const manual = document.getElementById('dg-field-busca-manual');
   manual.style.display = val === '__manual__' ? '' : 'none';
+  if(val === '__manual__') document.getElementById('dg-busca').focus();
 }
+
+document.addEventListener('click', function(e) {
+  const trigger = document.getElementById('dg-busca-trigger');
+  const dd = document.getElementById('dg-busca-dropdown');
+  if(dd && trigger && !trigger.contains(e.target) && !dd.contains(e.target)) {
+    dd.style.display = 'none';
+    document.getElementById('dg-busca-arrow').style.transform = '';
+  }
+});
 
 function dgAdicionar() {
   const processo = document.getElementById('dg-processo').value.trim();
@@ -1090,9 +1124,10 @@ function dgAdicionar() {
     if(!detalhe){ alert('Selecione o analista.'); return; }
   } else {
     const selVal = document.getElementById('dg-busca-select').value;
-    if(selVal === '__manual__' || !selVal) {
+    if(!selVal){ alert('Selecione uma busca do histórico.'); return; }
+    if(selVal === '__manual__') {
       detalhe = document.getElementById('dg-busca').value.trim();
-      if(!detalhe){ alert('Selecione uma busca ou descreva manualmente.'); return; }
+      if(!detalhe){ alert('Descreva a busca manualmente.'); return; }
     } else {
       detalhe = selVal;
     }
@@ -1104,6 +1139,10 @@ function dgAdicionar() {
   document.getElementById('dg-analista').value = '';
   document.getElementById('dg-busca').value = '';
   document.getElementById('dg-busca-select').value = '';
+  document.getElementById('dg-busca-label').textContent = 'Selecione uma busca...';
+  document.getElementById('dg-busca-label').style.color = 'var(--text3)';
+  document.getElementById('dg-busca-dropdown').style.display = 'none';
+  document.getElementById('dg-busca-arrow').style.transform = '';
   document.getElementById('dg-field-busca-manual').style.display = 'none';
   const st = document.getElementById('dg-status');
   st.textContent = '✓ Registrado com sucesso!';
