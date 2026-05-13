@@ -442,8 +442,13 @@ body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min
           </select>
         </div>
         <div id="dg-field-busca" style="grid-column:1/-1;display:none">
-          <label class="form-label">Descrição da busca</label>
-          <input class="form-input" id="dg-busca" placeholder="Descreva a busca...">
+          <label class="form-label">Vincular busca do histórico</label>
+          <select class="form-input" id="dg-busca-select" onchange="dgOnBuscaSelect()">
+            <option value="">Carregando buscas...</option>
+          </select>
+          <div id="dg-field-busca-manual" style="display:none;margin-top:8px">
+            <input class="form-input" id="dg-busca" placeholder="Descreva a busca manualmente...">
+          </div>
         </div>
         <div style="grid-column:1/-1">
           <label class="form-label">Observação <span style="text-transform:none;font-weight:400;letter-spacing:0;opacity:.6">(opcional)</span></label>
@@ -1039,7 +1044,37 @@ function dgSetMotivo(m) {
     btnB.style.cssText += ';border:1px solid var(--accent);background:var(--accent);color:var(--accent-text);font-weight:700';
     btnA.style.cssText = btnA.style.cssText.replace('background:var(--accent)', 'background:transparent').replace('color:var(--accent-text)', 'color:var(--text2)');
     fA.style.display = 'none'; fB.style.display = '';
+    dgCarregarBuscas();
   }
+}
+
+async function dgCarregarBuscas() {
+  const sel = document.getElementById('dg-busca-select');
+  sel.innerHTML = '<option value="">Carregando...</option>';
+  try {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=100`, {
+      headers: {...getAuthHeaders()}
+    });
+    const data = await resp.json();
+    if(!Array.isArray(data) || !data.length) {
+      sel.innerHTML = '<option value="">Nenhuma busca salva</option><option value="__manual__">✏️ Digitar manualmente</option>';
+      return;
+    }
+    sel.innerHTML = '<option value="">Selecione uma busca...</option>' +
+      data.map(b => {
+        const label = [b.protocolo, b.matricula ? 'Mat. '+b.matricula : '', b.inscricao].filter(Boolean).join(' · ');
+        return `<option value="${b.protocolo||b.id}">${label}</option>`;
+      }).join('') +
+      '<option value="__manual__">✏️ Digitar manualmente</option>';
+  } catch(e) {
+    sel.innerHTML = '<option value="">Erro ao carregar</option><option value="__manual__">✏️ Digitar manualmente</option>';
+  }
+}
+
+function dgOnBuscaSelect() {
+  const val = document.getElementById('dg-busca-select').value;
+  const manual = document.getElementById('dg-field-busca-manual');
+  manual.style.display = val === '__manual__' ? '' : 'none';
 }
 
 function dgAdicionar() {
@@ -1054,8 +1089,13 @@ function dgAdicionar() {
     detalhe = document.getElementById('dg-analista').value;
     if(!detalhe){ alert('Selecione o analista.'); return; }
   } else {
-    detalhe = document.getElementById('dg-busca').value.trim();
-    if(!detalhe){ alert('Descreva a busca.'); return; }
+    const selVal = document.getElementById('dg-busca-select').value;
+    if(selVal === '__manual__' || !selVal) {
+      detalhe = document.getElementById('dg-busca').value.trim();
+      if(!detalhe){ alert('Selecione uma busca ou descreva manualmente.'); return; }
+    } else {
+      detalhe = selVal;
+    }
   }
   dgRegistros.unshift({ id: Date.now(), processo, data, solicitante, motivo: dgMotivo, detalhe, obs });
   localStorage.setItem('dg_registros', JSON.stringify(dgRegistros));
@@ -1063,6 +1103,8 @@ function dgAdicionar() {
   document.getElementById('dg-obs').value = '';
   document.getElementById('dg-analista').value = '';
   document.getElementById('dg-busca').value = '';
+  document.getElementById('dg-busca-select').value = '';
+  document.getElementById('dg-field-busca-manual').style.display = 'none';
   const st = document.getElementById('dg-status');
   st.textContent = '✓ Registrado com sucesso!';
   setTimeout(() => st.textContent = '', 3000);
