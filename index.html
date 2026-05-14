@@ -212,6 +212,75 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.5}
 .tag-amber{background:rgba(239,159,39,.1);color:var(--amber)}
 .tag-red{background:rgba(226,75,74,.1);color:var(--red)}
 
+
+/* ── AGENDA ── */
+.ag-filter-chip{padding:5px 12px;border-radius:999px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-size:11px;cursor:pointer;font-family:var(--sans);transition:all .15s}
+.ag-filter-chip.active{border-color:var(--accent);color:var(--accent);background:rgba(26,158,110,.1)}
+.ag-month-group.closed .ag-month-body{display:none}
+.ag-month-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg2);border-radius:10px;cursor:pointer;border:0.5px solid var(--border);margin-bottom:6px;transition:border-color .15s}
+.ag-month-header:hover{border-color:var(--border2)}
+.ag-month-title{font-family:var(--barlow);font-size:16px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em}
+.ag-month-count{font-size:11px;color:var(--text3);font-family:var(--mono)}
+.ag-month-chevron{width:14px;height:14px;color:var(--text3);transition:transform .2s}
+.ag-month-group.closed .ag-month-chevron{transform:rotate(-90deg)}
+.ag-day-card{border:0.5px solid var(--border);border-radius:12px;margin-bottom:6px;overflow:hidden;transition:border-color .2s}
+.ag-day-card.past-day{opacity:.65}
+.ag-day-body{display:none}
+.ag-day-card.open .ag-day-body{display:block}
+.ag-day-header{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;cursor:pointer;background:var(--surface);transition:background .15s}
+.ag-day-header:hover{background:var(--bg3)}
+.ag-day-date{font-size:14px;font-weight:600;color:var(--text)}
+.ag-day-meta{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px}
+.ag-badge-terca{background:rgba(26,111,173,.15);color:#5aabef;border:0.5px solid rgba(26,111,173,.3);font-size:10px;padding:2px 8px;border-radius:999px;font-family:var(--mono);font-weight:600;margin-right:8px;flex-shrink:0}
+.ag-badge-quinta{background:rgba(127,119,221,.15);color:#9c96ef;border:0.5px solid rgba(127,119,221,.3);font-size:10px;padding:2px 8px;border-radius:999px;font-family:var(--mono);font-weight:600;margin-right:8px;flex-shrink:0}
+.ag-aviso-bar{display:flex;gap:6px;flex-wrap:wrap;padding:8px 14px;background:rgba(239,159,39,.06);border-bottom:0.5px solid rgba(239,159,39,.15)}
+.ag-aviso-tag{font-size:11px;color:#f0ac3a;background:rgba(239,159,39,.12);border:0.5px solid rgba(239,159,39,.2);border-radius:6px;padding:2px 8px;display:flex;align-items:center;gap:4px}
+.ag-rm-aviso{background:none;border:none;cursor:pointer;color:var(--text3);font-size:14px;line-height:1;padding:0 2px}
+.ag-slots{display:flex;flex-direction:column}
+.ag-slot{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:0.5px solid var(--border);cursor:pointer;transition:background .15s;position:relative}
+.ag-slot:last-child{border-bottom:none}
+.ag-slot:hover{background:rgba(255,255,255,.02)}
+.ag-slot.past-slot{cursor:default;opacity:.7}
+.ag-slot.dimmed{opacity:.3}
+.ag-slot-time{font-family:var(--mono);font-size:12px;color:var(--text3);width:40px;flex-shrink:0}
+.ag-slot-info{flex:1}
+.ag-slot-nome{font-size:13px;font-weight:600;color:var(--text)}
+.ag-slot-assunto{font-size:11px;color:var(--text2);margin-top:1px;font-family:var(--mono)}
+.ag-slot-agendadopor{font-size:10px;color:var(--text3);font-style:italic;margin-top:1px}
+.ag-slot-livre{font-size:12px;color:var(--text3)}
+.ag-slot-badges{display:flex;gap:4px;flex-shrink:0;flex-wrap:wrap}
+.ag-analista-badge{font-size:10px;padding:2px 8px;border-radius:999px;font-family:var(--mono);font-weight:600;white-space:nowrap}
+.ag-slot-rm{background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:0 4px;line-height:1;flex-shrink:0;opacity:0;transition:opacity .15s}
+.ag-slot:hover .ag-slot-rm{opacity:1}
+.ag-slot-rm:hover{color:var(--red)}
+.ag-icon-btn{background:none;border:0.5px solid var(--border2);border-radius:6px;cursor:pointer;color:var(--text3);font-size:12px;padding:3px 7px;transition:all .15s}
+.ag-icon-btn:hover{border-color:var(--border2);color:var(--text)}
+.ag-icon-btn.danger:hover{border-color:var(--red);color:var(--red)}
+.ag-analista-opt{padding:6px 14px;border-radius:8px;border:0.5px solid var(--border2);cursor:pointer;font-size:12px;font-weight:600;transition:all .15s;font-family:var(--sans);user-select:none}
+.ag-analista-opt:hover{background:rgba(255,255,255,.04)}
+.ag-analista-opt.selected{border-width:1.5px!important}
+.ag-analista-opt.blocked{opacity:.4;cursor:not-allowed;text-decoration:line-through}
+.ag-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem}
+.ag-kpi-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px}
+.ag-kpi-val{font-family:var(--barlow);font-size:28px;font-weight:800;line-height:1}
+.ag-kpi-label{font-size:11px;color:var(--text3);margin-top:2px}
+.ag-dash-card{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px}
+.ag-dash-title{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;font-family:var(--mono)}
+.ag-an-table{width:100%;border-collapse:collapse;font-size:12px}
+.ag-an-table th{text-align:left;padding:6px 10px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;border-bottom:0.5px solid var(--border)}
+.ag-an-table td{padding:10px 10px;border-bottom:0.5px solid var(--border);color:var(--text)}
+.ag-an-table tr:last-child td{border-bottom:none}
+.ag-bar-track{height:4px;background:var(--border);border-radius:999px;overflow:hidden;width:100%;min-width:80px}
+.ag-bar-fill{height:100%;border-radius:999px;transition:width .4s ease}
+.ag-config-section{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:16px;margin-bottom:8px}
+.ag-config-title{font-family:var(--barlow);font-size:16px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+.ag-config-desc{font-size:12px;color:var(--text2);margin-bottom:12px}
+.ag-config-item{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:0.5px solid var(--border)}
+.ag-config-item:last-child{border-bottom:none}
+.ag-color-picker{width:32px;height:32px;border-radius:8px;border:0.5px solid var(--border2);cursor:pointer;padding:2px;background:none}
+.ag-livres-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:0.5px solid var(--border);font-size:12px}
+.ag-livres-row:last-child{border-bottom:none}
+
 /* ── CONFIDENCE BADGES ── */
 .conf-badge{font-size:11px;padding:3px 10px;border-radius:999px;font-family:var(--mono);font-weight:500;white-space:nowrap;flex-shrink:0}
 .conf-alta{background:rgba(26,158,110,.15);color:#4ecb9e;border:0.5px solid rgba(26,158,110,.25)}
@@ -608,6 +677,65 @@ canvas#pdfCanvas{width:100%;display:block}
       </div>
 
     </div>
+
+      <!-- PAGE AGENDA -->
+      <div id="page-agenda" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px">
+          <div style="display:flex;gap:4px;background:var(--bg2);border-radius:8px;padding:3px">
+            <button id="ag-btn-agenda" onclick="agSetView('agenda')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:0.5px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;font-family:var(--sans)">Agenda</button>
+            <button id="ag-btn-painel" onclick="agSetView('painel')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">Painel</button>
+            <button id="ag-btn-livres" onclick="agSetView('livres')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">Horários livres</button>
+            <button id="ag-btn-config" onclick="agSetView('config')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">⚙ Config</button>
+          </div>
+          <button onclick="agOpenModalNovoDia()" style="padding:7px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)">+ Novo dia</button>
+        </div>
+        <div id="ag-filters-wrap" style="margin-bottom:1rem"><div id="ag-filters" style="display:flex;gap:6px;flex-wrap:wrap"></div></div>
+        <div id="ag-view-agenda"></div>
+        <div id="ag-view-painel" style="display:none"></div>
+        <div id="ag-view-livres" style="display:none"></div>
+        <div id="ag-view-config" style="display:none"></div>
+        <div id="ag-toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg2);border:0.5px solid var(--border2);border-radius:10px;padding:10px 20px;font-size:13px;color:var(--text);font-family:var(--mono);opacity:0;transition:opacity .3s;pointer-events:none;z-index:9000"></div>
+        <div id="ag-overlay-slot" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;padding:1rem">
+          <div style="background:var(--modal-bg);border:0.5px solid var(--modal-border);border-radius:14px;padding:1.5rem;width:100%;max-width:480px;animation:fadeIn .2s ease">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+              <span style="font-family:var(--barlow);font-size:18px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.03em" id="ag-modal-slot-title">Agendar horário</span>
+              <button onclick="agCloseModal('ag-overlay-slot')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1">×</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem">
+              <div><label class="form-label">Data</label><input class="form-input" id="ag-slot-data" readonly></div>
+              <div><label class="form-label">Horário</label><input class="form-input" id="ag-slot-hora" readonly></div>
+            </div>
+            <div style="margin-bottom:.875rem"><label class="form-label">Nome do requerente *</label><input class="form-input" id="ag-slot-nome" placeholder="Ex: João Silva"></div>
+            <div style="margin-bottom:.875rem"><label class="form-label">Protocolo / Assunto</label><input class="form-input" id="ag-slot-assunto" placeholder="Ex: 12345/2026"></div>
+            <div style="margin-bottom:.875rem"><label class="form-label">Agendado por</label><input class="form-input" id="ag-slot-agendadopor" placeholder="Ex: Emanuel"></div>
+            <div style="margin-bottom:1.25rem">
+              <label class="form-label">Analista(s) — selecione até 2</label>
+              <div id="ag-analista-grid" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button onclick="agCloseModal('ag-overlay-slot')" class="btn">Cancelar</button>
+              <button onclick="agSalvarSlot()" class="btn btn-primary">Salvar</button>
+            </div>
+          </div>
+        </div>
+        <div id="ag-overlay-dia" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;padding:1rem">
+          <div style="background:var(--modal-bg);border:0.5px solid var(--modal-border);border-radius:14px;padding:1.5rem;width:100%;max-width:380px;animation:fadeIn .2s ease">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+              <span style="font-family:var(--barlow);font-size:18px;font-weight:700;color:var(--text);text-transform:uppercase">Novo dia</span>
+              <button onclick="agCloseModal('ag-overlay-dia')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px">×</button>
+            </div>
+            <div style="margin-bottom:.875rem"><label class="form-label">Data *</label><input class="form-input" id="ag-novo-data" type="date"></div>
+            <div style="margin-bottom:.875rem"><label class="form-label">Dia da semana</label>
+              <select class="form-input" id="ag-novo-weekday"><option value="TERÇA-FEIRA">Terça-feira</option><option value="QUINTA-FEIRA">Quinta-feira</option></select>
+            </div>
+            <div style="margin-bottom:1.25rem"><label class="form-label">Aviso inicial (opcional)</label><input class="form-input" id="ag-novo-aviso" placeholder="Ex: Férias Gabriela"></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button onclick="agCloseModal('ag-overlay-dia')" class="btn">Cancelar</button>
+              <button onclick="agSalvarNovoDia()" class="btn btn-primary">Criar dia</button>
+            </div>
+          </div>
+        </div>
+      </div>
   </div>
 
 </div>
@@ -627,6 +755,10 @@ canvas#pdfCanvas{width:100%;display:block}
     <button class="dock-item" id="nav-historico" onclick="navTo('historico')">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
       <div class="dock-tip">Histórico</div>
+    </button>
+    <button class="dock-item" id="nav-agenda" onclick="navTo('agenda')">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path stroke-linecap="round" d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <div class="dock-tip">Agenda</div>
     </button>
     <button class="dock-item" id="nav-digitalizacao" onclick="navTo('digitalizacao')">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
@@ -699,7 +831,14 @@ function showApp(){
   const email = sessionStorage.getItem('seplan_email')||'';
   const av = document.getElementById('topbar-av');
   if(av && email) av.textContent = email.slice(0,2).toUpperCase();
-  navTo('home');
+  // Forçar home visível
+  const pageHome = document.getElementById('page-home');
+  if(pageHome) pageHome.style.display='block';
+  const navHome = document.getElementById('nav-home');
+  if(navHome) navHome.classList.add('active');
+  homeTick();
+  initHomeCanvas();
+  loadHomeStats();
   const nome = email.split('@')[0];
   const elUser = document.getElementById('usuarioLogado');
   if(elUser) elUser.textContent=nome;
@@ -785,7 +924,7 @@ if(sessionStorage.getItem('seplan_token')){
 
 // NAV
 function navTo(page){
-  ['home','busca','historico'].forEach(p=>{
+  ['home','busca','historico','agenda'].forEach(p=>{
     const el=document.getElementById('page-'+p);
     if(el) el.style.display=p===page?'block':'none';
     const btn=document.getElementById('nav-'+p);
@@ -797,6 +936,7 @@ function navTo(page){
     initHomeCanvas();
     loadHomeStats();
   }
+  if(page==='agenda'){ agInit(); }
   if(page==='digitalizacao'){ abrirDigitalizacao(); }
 }
 
@@ -1215,7 +1355,17 @@ async function salvarEdicao(){
   } else { alert('Erro ao salvar alterações.'); }
 }
 
-function closeModal(id){ document.getElementById(id).style.display='none'; }
+function closeModal(id){
+  document.getElementById(id).style.display='none';
+  // Ao fechar digitalização, volta pra home se não tiver nenhuma page ativa
+  if(id==='modalDigitalizacao'){
+    const anyVisible = ['home','busca','historico'].some(p=>{
+      const el=document.getElementById('page-'+p);
+      return el && el.style.display!=='none';
+    });
+    if(!anyVisible) navTo('home');
+  }
+}
 
 // CERTIDÃO
 function gerarCertidao(){
@@ -1737,6 +1887,312 @@ function diShow(type){
       _diAnim({fromW:cw,fromH:ch,toW:10,toH:10,dur:DI_C,closing:true,onDone:()=>{_diBusy=false;_diPad.innerHTML='';}});
     },cfg.dur);
   }});
+}
+
+// ── AGENDA ────────────────────────────────────────────────────────────────────
+const AG_HORARIOS = ["08:30","09:00","09:30","10:00","10:30","11:00","11:30"];
+const AG_MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+let AG_DAYS = [], AG_ANALISTAS = [], AG_BLOQUEIOS = {};
+let agCurrentView = 'agenda', agCurrentAnalista = 'todos';
+let agEditCtx = null, agSelAnalistas = [], agInited = false;
+
+async function agLoadAll() {
+  try {
+    const [rDays, rAn] = await Promise.all([
+      authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?order=data.asc,hora.asc`),
+      authFetch(`${SUPABASE_URL}/rest/v1/analistas_config?order=nome.asc`)
+    ]);
+    const rawDays = await rDays.json();
+    const rawAn = await rAn.json();
+    if(Array.isArray(rawAn) && rawAn.length) AG_ANALISTAS = rawAn;
+    if(Array.isArray(rawDays)) AG_DAYS = agroupByDay(rawDays);
+  } catch(e) { console.error(e); }
+  agRebuildFilters(); agRender();
+}
+
+function agroupByDay(rows) {
+  const byDay = {};
+  rows.forEach(r => {
+    const key = r.data;
+    if(!byDay[key]) byDay[key] = { data:key, dataFmt:agIsoToBR(r.data), weekday:agGetWeekday(r.data), avisos:[], slots:{} };
+    byDay[key].slots[r.hora] = { id:r.id, nome:r.nome||'', assunto:r.assunto||'', agendadopor:r.agendado_por||'', analistas:r.analistas||[] };
+  });
+  Object.values(byDay).forEach(day => {
+    AG_HORARIOS.forEach(h => { if(!day.slots[h]) day.slots[h] = {id:null,nome:'',assunto:'',agendadopor:'',analistas:[]}; });
+  });
+  return Object.values(byDay).sort((a,b) => a.data.localeCompare(b.data));
+}
+
+function agIsoToBR(iso) { if(!iso) return ''; const [y,m,d]=iso.split('-'); return `${d}/${m}/${y}`; }
+function agBRToIso(br) { const [d,m,y]=br.split('/'); return `${y}-${m}-${d}`; }
+function agGetWeekday(iso) {
+  const d = new Date(iso+'T12:00:00'), dow = d.getDay();
+  if(dow===2) return 'TERÇA-FEIRA'; if(dow===4) return 'QUINTA-FEIRA';
+  return d.toLocaleDateString('pt-BR',{weekday:'long'}).toUpperCase();
+}
+function agGetCor(nome) { const an=AG_ANALISTAS.find(a=>a.nome===nome); return an?.cor||'#888'; }
+function agGetNomes() { return AG_ANALISTAS.filter(a=>a.ativo!==false).map(a=>a.nome); }
+
+function agToast(msg, err=false) {
+  const t=document.getElementById('ag-toast'); if(!t) return;
+  t.textContent=msg; t.style.opacity='1';
+  t.style.borderColor=err?'rgba(226,75,74,.4)':'var(--border2)';
+  setTimeout(()=>{t.style.opacity='0';},2500);
+}
+function agCloseModal(id) { const el=document.getElementById(id); if(el) el.style.display='none'; }
+function agOpenModal(id) { const el=document.getElementById(id); if(el) el.style.display='flex'; }
+function agOpenModalNovoDia() {
+  document.getElementById('ag-novo-data').value='';
+  document.getElementById('ag-novo-aviso').value='';
+  agOpenModal('ag-overlay-dia');
+  setTimeout(()=>document.getElementById('ag-novo-data').focus(),200);
+}
+
+function agSelAnalista(nome) {
+  if(!nome){agSelAnalistas=[];agRebuildAnalistaGrid(agEditCtx?.dayData);return;}
+  if(agSelAnalistas.includes(nome)){agSelAnalistas=agSelAnalistas.filter(a=>a!==nome);}
+  else{if(agSelAnalistas.length>=2){agToast('Máximo 2 analistas por slot');return;}agSelAnalistas.push(nome);}
+  agRebuildAnalistaGrid(agEditCtx?.dayData);
+}
+
+function agRebuildAnalistaGrid(dayData) {
+  const grid=document.getElementById('ag-analista-grid'); if(!grid) return;
+  const blocked=dayData?agGetBlocked(dayData):[];
+  const nomes=agGetNomes();
+  let html=`<div class="ag-analista-opt" onclick="agSelAnalista('')" style="border-color:${agSelAnalistas.length===0?'var(--accent)':'var(--border2)'};color:${agSelAnalistas.length===0?'var(--accent)':'var(--text2)'}">—</div>`;
+  nomes.forEach(an=>{
+    const cor=agGetCor(an), sel=agSelAnalistas.includes(an), blk=blocked.includes(an);
+    html+=`<div class="ag-analista-opt${sel?' selected':''}${blk?' blocked':''}" style="border-color:${sel?cor:'var(--border2)'};color:${sel?cor:'var(--text2)'};background:${sel?cor+'20':'transparent'}" ${blk?'title="Bloqueado"':`onclick="agSelAnalista('${an}')"`}>${an}${blk?' 🚫':''}</div>`;
+  });
+  grid.innerHTML=html;
+}
+
+function agGetBlocked(dayData) {
+  const blocked=[];
+  Object.entries(AG_BLOQUEIOS).forEach(([an,regras])=>{
+    if(!regras) return;
+    const lista=Array.isArray(regras)?regras:Object.values(regras);
+    for(const regra of lista){
+      if(!regra) continue;
+      if(regra.includes('>')){
+        const [ini,fim]=regra.split('>');
+        const d=new Date(dayData+'T12:00:00'),dI=new Date(agBRToIso(ini)+'T00:00:00'),dF=new Date(agBRToIso(fim)+'T23:59:59');
+        if(d>=dI&&d<=dF){blocked.push(an);break;}
+      } else { if(regra===agIsoToBR(dayData)){blocked.push(an);break;} }
+    }
+  });
+  return blocked;
+}
+
+function agOpenSlot(dayData, hora) {
+  const day=AG_DAYS.find(d=>d.data===dayData); if(!day) return;
+  const slot=day.slots[hora]; agEditCtx={dayData,hora};
+  agSelAnalistas=slot.analistas?[...slot.analistas]:[];
+  document.getElementById('ag-slot-data').value=day.dataFmt;
+  document.getElementById('ag-slot-hora').value=hora;
+  document.getElementById('ag-slot-nome').value=slot.nome;
+  document.getElementById('ag-slot-assunto').value=slot.assunto;
+  document.getElementById('ag-slot-agendadopor').value=slot.agendadopor||'';
+  document.getElementById('ag-modal-slot-title').textContent=slot.nome?'Editar agendamento':'Agendar horário';
+  agRebuildAnalistaGrid(dayData);
+  agOpenModal('ag-overlay-slot');
+  setTimeout(()=>document.getElementById('ag-slot-nome').focus(),200);
+}
+
+async function agSalvarSlot() {
+  const nome=document.getElementById('ag-slot-nome').value.trim();
+  if(!nome){agToast('Informe o nome do requerente',true);return;}
+  const {dayData,hora}=agEditCtx;
+  const payload={data:dayData,hora,nome,assunto:document.getElementById('ag-slot-assunto').value.trim(),agendado_por:document.getElementById('ag-slot-agendadopor').value.trim(),analistas:agSelAnalistas};
+  const day=AG_DAYS.find(d=>d.data===dayData);
+  const slot=day?.slots[hora];
+  try {
+    let resp;
+    if(slot?.id){resp=await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?id=eq.${slot.id}`,{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify(payload)});}
+    else{resp=await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos`,{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(payload)});}
+    if(resp.ok){agCloseModal('ag-overlay-slot');agToast('Agendamento salvo ✓');await agLoadAll();}
+    else agToast('Erro ao salvar',true);
+  } catch(e){agToast('Erro ao salvar',true);}
+}
+
+async function agLimparSlot(dayData, hora, e) {
+  e.stopPropagation();
+  if(!confirm('Remover este agendamento?')) return;
+  const day=AG_DAYS.find(d=>d.data===dayData), slot=day?.slots[hora];
+  if(!slot?.id) return;
+  try{await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?id=eq.${slot.id}`,{method:'DELETE'});agToast('Removido');await agLoadAll();}
+  catch(e){agToast('Erro',true);}
+}
+
+async function agSalvarNovoDia() {
+  const isoDate=document.getElementById('ag-novo-data').value;
+  if(!isoDate){agToast('Selecione uma data',true);return;}
+  if(AG_DAYS.find(d=>d.data===isoDate)){agToast('Este dia já existe',true);return;}
+  const rows=AG_HORARIOS.map(h=>({data:isoDate,hora:h,nome:'',assunto:'',agendado_por:'',analistas:[]}));
+  try{
+    const resp=await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos`,{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(rows)});
+    if(resp.ok){agCloseModal('ag-overlay-dia');agToast(`Dia ${agIsoToBR(isoDate)} criado ✓`);await agLoadAll();}
+    else agToast('Erro ao criar dia',true);
+  }catch(e){agToast('Erro',true);}
+}
+
+async function agExcluirDia(dayData, e) {
+  e.stopPropagation();
+  const day=AG_DAYS.find(d=>d.data===dayData);
+  if(!day||!confirm(`Excluir o dia ${day.dataFmt}?`)) return;
+  try{await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?data=eq.${dayData}`,{method:'DELETE'});agToast('Dia removido');await agLoadAll();}
+  catch(e){agToast('Erro',true);}
+}
+
+function agParseDataBR(br){const [d,m,y]=br.split('/');return new Date(parseInt(y),parseInt(m)-1,parseInt(d));}
+function agIsFuturoOuHoje(dataFmt){const hoje=new Date();hoje.setHours(0,0,0,0);const d=agParseDataBR(dataFmt);d.setHours(0,0,0,0);return d>=hoje;}
+
+function agBadgeHtml(analistas) {
+  if(!analistas||!analistas.length) return '';
+  return analistas.map(an=>{const cor=agGetCor(an);return `<span class="ag-analista-badge" style="background:${cor}22;color:${cor};border:0.5px solid ${cor}44">${an}</span>`;}).join('');
+}
+
+function agRenderAgenda() {
+  const filt=agCurrentAnalista, byMonth={};
+  let anyDay=false;
+  const todayFmt=new Date().toLocaleDateString('pt-BR');
+  AG_DAYS.forEach(day=>{
+    const slots=AG_HORARIOS.map(h=>({h,...day.slots[h]}));
+    if(filt==='livres'&&!slots.some(s=>!s.nome)) return;
+    if(filt!=='todos'&&filt!=='livres'&&!slots.some(s=>s.analistas&&s.analistas.includes(filt))) return;
+    anyDay=true;
+    const [y,m]=day.data.split('-'), mk=y+'-'+m;
+    if(!byMonth[mk]) byMonth[mk]=[];
+    byMonth[mk].push(day);
+  });
+  const el=document.getElementById('ag-view-agenda');
+  if(!anyDay){el.innerHTML='<div style="text-align:center;padding:3rem;color:var(--text3);font-size:14px">Nenhum resultado.</div>';return;}
+  const sortedMonths=Object.keys(byMonth).sort(), lastMonth=sortedMonths[sortedMonths.length-1];
+  let html='';
+  sortedMonths.forEach(mk=>{
+    const [y,m]=mk.split('-'), monthLabel=AG_MESES[parseInt(m)-1]+' '+y;
+    const groupId='ag-month-'+mk.replace('-','_');
+    const hasToday=byMonth[mk].some(d=>d.dataFmt===todayFmt);
+    const monthOpen=mk===lastMonth||hasToday;
+    html+=`<div class="ag-month-group${monthOpen?'':' closed'}" id="${groupId}" style="margin-bottom:10px">`;
+    html+=`<div class="ag-month-header" onclick="agToggleMonth('${groupId}')"><div class="ag-month-title">${monthLabel}</div><div class="ag-month-count">${byMonth[mk].length} dia(s)</div><svg class="ag-month-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div><div class="ag-month-body">`;
+    byMonth[mk].forEach(day=>{
+      const slots=AG_HORARIOS.map(h=>({h,...day.slots[h]}));
+      const ocupados=slots.filter(s=>s.nome).length, livres=AG_HORARIOS.length-ocupados;
+      const isTerca=day.weekday.includes('TERÇA')||day.weekday.includes('TERCA');
+      const isToday=day.dataFmt===todayFmt, isPast=!agIsFuturoOuHoje(day.dataFmt)&&!isToday;
+      const cardId='ag-card-'+day.data.replace(/-/g,'_');
+      html+=`<div class="ag-day-card${isToday?' open':''}${isPast?' past-day':''}" id="${cardId}">`;
+      html+=`<div class="ag-day-header" onclick="agToggleCard('${cardId}')"><div style="display:flex;align-items:center"><span class="${isTerca?'ag-badge-terca':'ag-badge-quinta'}">${isTerca?'Terça':'Quinta'}</span><div><div class="ag-day-date">${day.dataFmt}${isToday?' <span style="font-size:10px;color:var(--accent)">● hoje</span>':''}${isPast?' <span style="font-size:10px;color:var(--text3)">• encerrado</span>':''}</div><div class="ag-day-meta">${ocupados} agendamento(s) · ${livres} livre(s)</div></div></div><div style="display:flex;align-items:center;gap:6px"><button class="ag-icon-btn" onclick="agAddAviso('${day.data}');event.stopPropagation()">⚠</button><button class="ag-icon-btn danger" onclick="agExcluirDia('${day.data}',event)">🗑</button><svg style="width:14px;height:14px;color:var(--text3)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg></div></div><div class="ag-day-body">`;
+      if(day.avisos&&day.avisos.length){html+=`<div class="ag-aviso-bar">`;day.avisos.forEach((av,ai)=>{html+=`<span class="ag-aviso-tag">⚠ ${av}<button class="ag-rm-aviso" onclick="agRmAviso('${day.data}',${ai},event)">×</button></span>`;});html+=`</div>`;}
+      html+=`<div class="ag-slots">`;
+      slots.forEach(s=>{
+        const isLivre=!s.nome;
+        let dimmed=false;
+        if(filt!=='todos'){if(filt==='livres'&&!isLivre)dimmed=true;if(filt!=='livres'&&!isLivre&&(!s.analistas||!s.analistas.includes(filt)))dimmed=true;}
+        html+=`<div class="ag-slot${dimmed?' dimmed':''}${isPast?' past-slot':''}" ${isPast?'':`onclick="agOpenSlot('${day.data}','${s.h}')"`}><div class="ag-slot-time">${s.h}</div><div class="ag-slot-info">`;
+        if(isLivre){html+=`<div class="ag-slot-livre">${isPast?'— livre':'— livre — clique para agendar'}</div>`;}
+        else{html+=`<div class="ag-slot-nome">${s.nome}</div>`;if(s.assunto)html+=`<div class="ag-slot-assunto">${s.assunto}</div>`;if(s.agendadopor)html+=`<div class="ag-slot-agendadopor">por ${s.agendadopor}</div>`;}
+        html+=`</div><div class="ag-slot-badges">${agBadgeHtml(s.analistas)}</div>`;
+        if(!isLivre&&!isPast)html+=`<button class="ag-slot-rm" onclick="agLimparSlot('${day.data}','${s.h}',event)">×</button>`;
+        html+=`</div>`;
+      });
+      html+=`</div></div></div>`;
+    });
+    html+=`</div></div>`;
+  });
+  el.innerHTML=html;
+}
+
+function agToggleCard(id){document.getElementById(id)?.classList.toggle('open');}
+function agToggleMonth(id){document.getElementById(id)?.classList.toggle('closed');}
+function agAddAviso(dayData){const txt=prompt('Novo aviso:');if(!txt||!txt.trim())return;const day=AG_DAYS.find(d=>d.data===dayData);if(!day)return;if(!day.avisos)day.avisos=[];day.avisos.push(txt.trim());agRenderAgenda();}
+function agRmAviso(dayData,idx,e){e.stopPropagation();const day=AG_DAYS.find(d=>d.data===dayData);if(!day)return;day.avisos.splice(idx,1);agRenderAgenda();}
+
+function agRenderPainel() {
+  const el=document.getElementById('ag-view-painel'), nomes=agGetNomes();
+  const totals={};nomes.forEach(n=>{totals[n]=0;});
+  let totalAgend=0;
+  AG_DAYS.forEach(day=>{AG_HORARIOS.forEach(h=>{const s=day.slots[h];if(s&&s.nome){totalAgend++;(s.analistas||[]).forEach(an=>{if(totals[an]!==undefined)totals[an]++;});}});});
+  let totalLivres=0;
+  AG_DAYS.forEach(day=>{if(!agIsFuturoOuHoje(day.dataFmt))return;AG_HORARIOS.forEach(h=>{if(!day.slots[h]||!day.slots[h].nome)totalLivres++;});});
+  const totalSlots=AG_DAYS.length*AG_HORARIOS.length||1, taxa=Math.round(totalAgend/totalSlots*100);
+  let html=`<div class="ag-kpi-row"><div class="ag-kpi-card"><div style="width:36px;height:36px;border-radius:10px;background:rgba(26,111,173,.15);color:var(--accent2);display:flex;align-items:center;justify-content:center;font-size:18px">📋</div><div><div class="ag-kpi-val" style="color:var(--accent2)">${totalAgend}</div><div class="ag-kpi-label">Atendimentos</div></div></div><div class="ag-kpi-card"><div style="width:36px;height:36px;border-radius:10px;background:rgba(26,158,110,.15);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:18px">🟢</div><div><div class="ag-kpi-val" style="color:var(--accent)">${totalLivres}</div><div class="ag-kpi-label">Livres futuros</div></div></div><div class="ag-kpi-card"><div style="width:36px;height:36px;border-radius:10px;background:rgba(127,119,221,.15);color:#9c96ef;display:flex;align-items:center;justify-content:center;font-size:18px">📊</div><div><div class="ag-kpi-val" style="color:#9c96ef">${taxa}%</div><div class="ag-kpi-label">Ocupação</div></div></div><div class="ag-kpi-card"><div style="width:36px;height:36px;border-radius:10px;background:var(--bg3);color:var(--text3);display:flex;align-items:center;justify-content:center;font-size:18px">📅</div><div><div class="ag-kpi-val" style="color:var(--text3)">${AG_DAYS.length}</div><div class="ag-kpi-label">Dias</div></div></div></div>`;
+  html+=`<div class="ag-dash-card"><div class="ag-dash-title">Resumo por analista</div><table class="ag-an-table"><thead><tr><th>Analista</th><th>Atend.</th><th>%</th><th>Carga</th></tr></thead><tbody>`;
+  nomes.forEach(an=>{const val=totals[an]||0,pct=totalAgend>0?Math.round(val/totalAgend*100):0,cor=agGetCor(an);html+=`<tr><td><span class="ag-analista-badge" style="background:${cor}22;color:${cor};border:0.5px solid ${cor}44">${an}</span></td><td style="font-family:var(--barlow);font-size:18px;font-weight:700;color:${cor}">${val}</td><td style="color:var(--text3)">${pct}%</td><td style="min-width:120px"><div class="ag-bar-track"><div class="ag-bar-fill" style="width:${pct}%;background:${cor}"></div></div></td></tr>`;});
+  html+=`</tbody></table></div>`;
+  el.innerHTML=html;
+}
+
+function agRenderLivres() {
+  const el=document.getElementById('ag-view-livres'), list=[];
+  AG_DAYS.forEach(day=>{if(!agIsFuturoOuHoje(day.dataFmt))return;AG_HORARIOS.forEach(h=>{if(!day.slots[h]||!day.slots[h].nome)list.push({day,h});});});
+  let html=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem"><div style="font-size:15px;font-weight:600;color:var(--text)">Próximas vagas</div><span class="ag-analista-badge" style="background:rgba(26,158,110,.12);color:var(--accent);border:0.5px solid rgba(26,158,110,.2)">${list.length} vaga(s)</span></div>`;
+  if(!list.length){html+=`<div style="text-align:center;padding:3rem;color:var(--text3)">✅ Todos os horários preenchidos.</div>`;}
+  else{html+=`<div style="background:var(--surface);border:0.5px solid var(--border);border-radius:12px;overflow:hidden">`;list.forEach(({day,h})=>{const isTerca=day.weekday.includes('TERÇA');html+=`<div class="ag-livres-row"><span class="${isTerca?'ag-badge-terca':'ag-badge-quinta'}">${isTerca?'Terça':'Quinta'}</span><span style="color:var(--text);font-weight:500;flex:1">${day.dataFmt}</span><span style="color:var(--text2);font-family:var(--mono)">${h}</span><button onclick="agOpenSlot('${day.data}','${h}');agSetView('agenda')" style="padding:4px 12px;border-radius:6px;border:0.5px solid var(--accent);background:transparent;color:var(--accent);font-size:11px;cursor:pointer;font-family:var(--sans)">+ Agendar</button></div>`;});html+=`</div>`;}
+  el.innerHTML=html;
+}
+
+function agRenderConfig() {
+  const el=document.getElementById('ag-view-config');
+  let html=`<div class="ag-config-section"><div class="ag-config-title">👥 Analistas</div><div class="ag-config-desc">Configure o nome e a cor de cada analista.</div>`;
+  AG_ANALISTAS.forEach(an=>{html+=`<div class="ag-config-item"><input type="color" class="ag-color-picker" value="${an.cor||'#1a9e6e'}" onchange="agUpdateCor('${an.id}',this.value)"><span style="font-size:13px;font-weight:500;color:var(--text);flex:1">${an.nome}</span><span class="ag-analista-badge" style="background:${an.cor}22;color:${an.cor};border:0.5px solid ${an.cor}44">${an.nome}</span></div>`;});
+  html+=`<div style="display:flex;gap:8px;margin-top:10px"><input class="form-input" id="ag-novo-analista" placeholder="Nome do analista" style="flex:1"><input type="color" class="ag-color-picker" id="ag-novo-analista-cor" value="#1a9e6e" style="width:44px"><button onclick="agAddAnalista()" class="btn btn-primary" style="white-space:nowrap">+ Adicionar</button></div></div>`;
+  el.innerHTML=html;
+}
+
+async function agUpdateCor(id,cor){AG_ANALISTAS=AG_ANALISTAS.map(a=>a.id===id?{...a,cor}:a);await authFetch(`${SUPABASE_URL}/rest/v1/analistas_config?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({cor})});agRebuildFilters();agRender();}
+
+async function agAddAnalista(){
+  const nome=document.getElementById('ag-novo-analista').value.trim(), cor=document.getElementById('ag-novo-analista-cor').value;
+  if(!nome){agToast('Informe o nome',true);return;}
+  if(AG_ANALISTAS.find(a=>a.nome===nome)){agToast('Analista já existe',true);return;}
+  try{const resp=await authFetch(`${SUPABASE_URL}/rest/v1/analistas_config`,{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({nome,cor,ativo:true})});if(resp.ok){const data=await resp.json();AG_ANALISTAS.push(Array.isArray(data)?data[0]:data);document.getElementById('ag-novo-analista').value='';agToast(`${nome} adicionado ✓`);agRebuildFilters();agRenderConfig();}}catch(e){agToast('Erro',true);}
+}
+
+function agRebuildFilters(){
+  const wrap=document.getElementById('ag-filters');if(!wrap)return;
+  const nomes=agGetNomes();
+  let html=`<button class="ag-filter-chip active" id="ag-chip-todos" onclick="agSetAnalista('todos')">Todos</button>`;
+  nomes.forEach(an=>{const cor=agGetCor(an);html+=`<button class="ag-filter-chip" id="ag-chip-${an}" onclick="agSetAnalista('${an}')" style="border-color:${cor}44">${an}</button>`;});
+  html+=`<button class="ag-filter-chip" id="ag-chip-livres" onclick="agSetAnalista('livres')" style="border-color:rgba(26,158,110,.4);color:var(--accent)">Só livres</button>`;
+  wrap.innerHTML=html;
+  document.querySelectorAll('.ag-filter-chip').forEach(b=>b.classList.remove('active'));
+  const chipId=agCurrentAnalista==='todos'?'ag-chip-todos':agCurrentAnalista==='livres'?'ag-chip-livres':`ag-chip-${agCurrentAnalista}`;
+  document.getElementById(chipId)?.classList.add('active');
+}
+
+function agSetAnalista(an){
+  agCurrentAnalista=an;
+  document.querySelectorAll('.ag-filter-chip').forEach(b=>b.classList.remove('active'));
+  const id=an==='todos'?'ag-chip-todos':an==='livres'?'ag-chip-livres':`ag-chip-${an}`;
+  document.getElementById(id)?.classList.add('active');
+  agRenderAgenda();
+}
+
+function agSetView(v){
+  agCurrentView=v;
+  ['agenda','painel','livres','config'].forEach(x=>{
+    const el=document.getElementById(`ag-view-${x}`);if(el)el.style.display=x===v?'block':'none';
+    const btn=document.getElementById(`ag-btn-${x}`);
+    if(btn){btn.style.background=x===v?'var(--surface)':'none';btn.style.color=x===v?'var(--text)':'var(--text2)';btn.style.border=x===v?'0.5px solid var(--border2)':'none';}
+  });
+  const fw=document.getElementById('ag-filters-wrap');if(fw)fw.style.display=v==='agenda'?'block':'none';
+  agRender();
+}
+
+function agRender(){
+  if(agCurrentView==='agenda')agRenderAgenda();
+  if(agCurrentView==='painel')agRenderPainel();
+  if(agCurrentView==='livres')agRenderLivres();
+  if(agCurrentView==='config')agRenderConfig();
+}
+
+async function agInit(){
+  if(agInited){agRender();return;}
+  agInited=true;
+  document.getElementById('ag-view-agenda').innerHTML='<div style="text-align:center;padding:3rem;color:var(--text3);font-size:13px;font-family:var(--mono)">Carregando agenda...</div>';
+  await agLoadAll();
 }
 
 function toggleSenha() {
