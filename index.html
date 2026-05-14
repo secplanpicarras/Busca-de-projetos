@@ -7,841 +7,239 @@
 <title>Busca de Projeto — SEPLAN</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-/* ── CENTRAL SEPLAN — IDENTIDADE NOVA ── */
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap');
-
-:root{
-  --bg:#07111f;--bg2:#0c1a2e;--bg3:#0f1e30;--surface:#111e30;
-  --input-bg:#0a1628;
-  --border:rgba(255,255,255,.06);--border2:rgba(255,255,255,.11);
-  --text:#eef2f7;--text2:rgba(238,242,247,.52);--text3:rgba(238,242,247,.22);
-  --accent:#1a9e6e;--accent2:#1a6fad;
-  --accent-text:#ffffff;
-  --green:#1a9e6e;--red:#E24B4A;--amber:#EF9F27;--blue:#1a6fad;
-  --mono:'DM Mono',monospace;--sans:'Inter',sans-serif;--barlow:'Barlow Condensed',sans-serif;
-  --dock:64px;
-  --radius:8px;--radius-card:14px;--radius-btn:8px;
+/* ── DARK THEME (Bruno Simon) ── */
+:root,[data-theme="dark"]{
+  --bg:#1D1721;--bg2:#251F2B;--bg3:#1a1520;
+  --input-bg:#1a1520;
+  --border:rgba(255,255,255,.07);--border2:rgba(255,255,255,.12);
+  --text:#FFFFFF;--text2:rgba(255,255,255,.55);--text3:rgba(255,255,255,.25);
+  --accent:#D5FF95;--accent2:#bfef7a;
+  --accent-text:#1D1721;
+  --green:#D5FF95;--red:#FF6B6B;--amber:#FFCECA;--blue:#b8c8ff;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+  --sidebar:220px;
+  --radius:8px;--radius-card:15px;--radius-btn:6px;
   --shadow:none;
-  --card-grad:transparent;
-  --upload-border:rgba(26,158,110,.25);--upload-bg:rgba(26,158,110,.03);
-  --upload-hover-bg:rgba(26,158,110,.08);
-  --modal-bg:#0c1a2e;--modal-border:rgba(26,158,110,.15);
-  --nav-hover-bg:rgba(26,158,110,.12);--nav-hover-color:#1a9e6e;
-  --hist-hover-bg:rgba(26,158,110,.05);
-  --content-grad:radial-gradient(ellipse at top right,rgba(26,111,173,.05) 0%,transparent 55%);
-  --sidebar:var(--dock);
+  --card-grad:linear-gradient(135deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+  --upload-border:rgba(213,255,149,.2);--upload-bg:rgba(213,255,149,.02);
+  --upload-hover-bg:rgba(213,255,149,.05);
+  --modal-bg:linear-gradient(135deg,#251F2B,#1D1721);
+  --modal-border:rgba(213,255,149,.12);
+  --nav-hover-bg:rgba(213,255,149,.08);--nav-hover-color:var(--accent);
+  --hist-hover-bg:rgba(213,255,149,.05);
+  --content-grad:radial-gradient(ellipse at top left,rgba(213,255,149,.04) 0%,transparent 60%),radial-gradient(ellipse at bottom right,rgba(255,206,202,.03) 0%,transparent 60%);
 }
 
+/* ── LIGHT THEME (Unseen Studio) ── */
+[data-theme="light"]{
+  --bg:#ffffff;--bg2:#f1eded;--bg3:#efded9;
+  --input-bg:#f7f5f5;
+  --border:rgba(0,0,0,.07);--border2:rgba(0,0,0,.12);
+  --text:#000000;--text2:#424242;--text3:#9a9a9a;
+  --accent:#212121;--accent2:#424242;
+  --accent-text:#ffffff;
+  --green:#2d6a2d;--red:#c0392b;--amber:#8a5a00;--blue:#1a3a6a;
+  --mono:'DM Mono',monospace;--sans:'DM Sans',sans-serif;
+  --sidebar:220px;
+  --radius:23px;--radius-card:28px;--radius-btn:50px;
+  --shadow:0 1px 3px rgba(0,0,0,.06);
+  --card-grad:linear-gradient(135deg,rgba(0,0,0,.01),rgba(0,0,0,.005));
+  --upload-border:rgba(0,0,0,.15);--upload-bg:rgba(0,0,0,.02);
+  --upload-hover-bg:rgba(0,0,0,.04);
+  --modal-bg:#ffffff;
+  --modal-border:rgba(0,0,0,.1);
+  --nav-hover-bg:rgba(0,0,0,.05);--nav-hover-color:#000;
+  --hist-hover-bg:rgba(0,0,0,.03);
+  --content-grad:radial-gradient(ellipse at top right,rgba(239,222,217,.4) 0%,transparent 60%);
+}
 *{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;transition:background .3s,color .3s}
-
+body{background:var(--bg);color:var(--text);font-family:'Nunito',var(--sans);min-height:100vh;transition:background .3s,color .3s}
 @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
 @keyframes slideIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
-@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
-
-/* ── LOGIN ── */
-#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg);position:relative;overflow:hidden}
-#login-canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.3}
-.login-card{position:relative;z-index:2;background:var(--bg2);border:0.5px solid var(--border2);border-radius:16px;padding:2rem;width:100%;max-width:340px;animation:fadeIn .5s ease}
-.login-card input{width:100%;padding:11px 14px;background:var(--input-bg);border:0.5px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:14px;font-family:var(--mono);outline:none;transition:border-color .15s}
+/* LOGIN */
+#loginScreen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--content-grad)}
+.login-card{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:2.5rem;width:100%;max-width:380px;text-align:center;animation:fadeIn .5s ease;box-shadow:var(--shadow);transition:background .3s,border-color .3s}
+.login-logo{width:52px;height:52px;background:var(--accent);border-radius:14px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:22px;color:var(--accent-text);margin:0 auto 1.25rem;animation:pulse 2.5s ease infinite}
+.login-card h1{font-size:20px;font-weight:700;margin-bottom:.25rem;letter-spacing:-.3px}
+.login-card p{font-size:13px;color:var(--text2);margin-bottom:1.5rem}
+.login-card input{width:100%;padding:11px 14px;background:var(--input-bg);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:14px;font-family:var(--mono);margin-bottom:.75rem;outline:none;transition:border-color .15s}
 .login-card input:focus{border-color:var(--accent)}
 .login-error{font-size:12px;color:var(--red);margin-bottom:.75rem;display:none}
-
-/* ── DOCK (sidebar minimalista com ícones) ── */
-#app{display:none;min-height:100vh;position:relative}
-.sidebar{position:fixed;top:0;left:0;width:var(--dock);height:100vh;background:var(--bg2);border-right:0.5px solid var(--border);display:flex;flex-direction:column;align-items:center;z-index:50;padding:12px 0;transition:background .3s}
-.dock-logo{width:36px;height:36px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:20px;flex-shrink:0}
-.dock-logo svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2.5;stroke-linecap:round}
-.dock-sep{width:28px;height:0.5px;background:var(--border);margin:8px 0}
-.dock-item{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);transition:all .2s;border:none;background:none;position:relative;margin-bottom:2px}
-.dock-item:hover{background:var(--nav-hover-bg);color:var(--accent);transform:scale(1.08)}
-.dock-item.active{background:rgba(26,158,110,.15);color:var(--accent)}
-.dock-item svg{width:18px;height:18px}
-.dock-tip{position:absolute;left:52px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .15s;z-index:100;font-family:var(--sans)}
-.dock-item:hover .dock-tip{opacity:1}
-.dock-bottom{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:2px}
-
-/* ── TOPBAR ── */
-.topbar{position:fixed;top:0;left:var(--dock);right:0;height:52px;background:var(--bg);border-bottom:0.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:40;transition:background .3s}
-.topbar-logo{font-family:var(--barlow);font-size:14px;font-weight:700;color:var(--text);letter-spacing:.06em;text-transform:uppercase}
-.topbar-logo span{color:var(--accent)}
-.topbar-right{display:flex;align-items:center;gap:8px}
-.mode-pills{display:flex;gap:3px;background:var(--bg2);border-radius:7px;padding:3px}
-.mpill{font-size:11px;padding:4px 12px;border-radius:5px;border:none;background:none;cursor:pointer;color:var(--text2);transition:all .2s;font-family:var(--sans)}
-.mpill.on{background:var(--surface);color:var(--text);border:0.5px solid var(--border2)}
-.topbar-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1a6fad,#1a9e6e);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;cursor:pointer;font-family:var(--sans)}
-.topbar-menu{width:30px;height:30px;border-radius:8px;border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);transition:all .2s}
-.topbar-menu:hover{border-color:var(--border2);color:var(--text)}
-
-/* ── CONTENT ── */
-.content{margin-left:var(--dock);min-height:100vh;padding-top:52px;background:var(--content-grad);transition:background .3s}
-.content-inner{max-width:800px;margin:0 auto;padding:2rem}
-
-/* ── HOME PAGE ── */
-.home-hero{padding:2rem 0 1rem;position:relative}
-.home-eyebrow{font-size:10px;letter-spacing:.15em;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px;margin-bottom:10px;font-family:var(--sans)}
-.home-eyebrow::before{content:'';width:20px;height:1px;background:var(--accent);display:block}
-.home-title{font-family:var(--barlow);font-size:72px;font-weight:800;line-height:.88;color:var(--text);letter-spacing:-.01em;text-transform:uppercase}
-.home-title .hl{color:var(--accent)}
-.home-desc{font-size:13px;color:var(--text2);margin-top:14px;max-width:320px;line-height:1.7}
-.home-stats{display:flex;align-items:center;gap:16px;margin-top:16px}
-.hstat{display:flex;flex-direction:column}
-.hstat-num{font-family:var(--barlow);font-size:22px;font-weight:700;color:var(--text)}
-.hstat-lbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em}
-.hstat-div{width:1px;height:26px;background:var(--border2)}
-
-.home-grid{display:grid;grid-template-columns:1.7fr 1fr 1fr;grid-template-rows:auto auto;gap:8px;margin-bottom:1rem}
-.hmod{border-radius:14px;cursor:pointer;border:0.5px solid var(--border);overflow:hidden;position:relative;transition:border-color .2s,transform .2s}
-.hmod:hover{transform:translateY(-2px)}
-.hmod-main{background:var(--bg3);grid-row:span 2;padding:20px;display:flex;flex-direction:column}
-.hmod-main:hover{border-color:rgba(26,158,110,.4)}
-.hmod-sm{background:var(--surface);padding:14px 16px;transition:border-color .2s}
-.hmod-sm:hover{border-color:var(--border2)}
-.hmod-lbl{font-size:9px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--text3);margin-bottom:8px;font-family:var(--sans)}
-.hmod-name{font-family:var(--barlow);font-size:18px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.02em}
-.hmod-desc{font-size:11px;color:var(--text2);line-height:1.55;margin-top:5px}
-.hmod-num{font-family:var(--barlow);font-size:56px;font-weight:800;color:var(--accent);line-height:1;margin-top:auto;padding-top:16px}
-.hmod-numlbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
-.hmod-arr{position:absolute;bottom:14px;right:14px;width:26px;height:26px;border-radius:50%;border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:13px;transition:all .25s}
-.hmod-main:hover .hmod-arr{border-color:var(--accent);color:var(--accent);transform:rotate(-45deg)}
-.hmod-badge{position:absolute;top:10px;right:10px;font-size:10px;padding:2px 8px;border-radius:999px;font-family:var(--mono);font-weight:500}
-.hmod-badge.warn{background:rgba(239,159,39,.15);color:#EF9F27}
-.hmod-badge.ok{background:rgba(26,158,110,.15);color:var(--accent)}
-.hchip{display:inline-flex;font-size:10px;padding:3px 8px;border-radius:4px;font-weight:500;margin-top:8px;margin-right:4px}
-.hchip-g{background:rgba(26,158,110,.15);color:#4ecb9e}
-.hchip-b{background:rgba(26,111,173,.15);color:#5aabef}
-.hchip-a{background:rgba(239,159,39,.13);color:#f0ac3a}
-
-.home-feed{margin-bottom:1.5rem}
-.feed-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;font-family:var(--mono)}
-.feed-items{display:flex;flex-direction:column;gap:6px}
-.feed-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;background:var(--surface);border:0.5px solid var(--border);cursor:pointer;transition:border-color .15s}
-.feed-item:hover{border-color:var(--border2)}
-.fdot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
-.ftext{font-size:12px;color:var(--text2);flex:1}
-.fmono{font-family:var(--mono);font-size:12px;color:var(--text);font-weight:500}
-.ftime{font-size:10px;color:var(--text3);font-family:var(--mono)}
-
-/* ── STEPS ── */
+/* SIDEBAR */
+#app{display:none;min-height:100vh}
+.sidebar{position:fixed;top:0;left:0;width:var(--sidebar);height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:50;animation:slideIn .3s ease;transition:background .3s,border-color .3s}
+.sidebar-header{padding:1.25rem 1rem 1rem;border-bottom:1px solid var(--border)}
+.sidebar-logo{display:flex;align-items:center;gap:10px}
+.s-logo-icon{width:32px;height:32px;background:var(--accent);border-radius:var(--radius);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--accent-text);flex-shrink:0}
+.s-logo-text{font-size:13px;font-weight:700;line-height:1.2}
+.s-logo-sub{font-size:11px;color:var(--text3)}
+.sidebar-nav{flex:1;padding:.75rem .5rem;overflow-y:auto}
+.nav-section{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;padding:8px 10px 4px;font-family:var(--mono)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius);cursor:pointer;font-size:13px;font-weight:600;color:var(--text2);transition:all .15s;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--nav-hover-bg);color:var(--nav-hover-color);transform:translateX(-3px)}
+.nav-item.active{background:var(--accent);color:var(--accent-text);font-weight:700}
+.nav-item.active:hover{transform:none}
+.sidebar-footer{padding:.75rem .5rem;border-top:1px solid var(--border)}
+/* CONTENT */
+.content{margin-left:var(--sidebar);min-height:100vh;padding:2rem;background:var(--content-grad);transition:background .3s}
+.content-inner{max-width:740px;margin:0 auto}
+/* STEPS */
 .steps{display:flex;gap:6px;margin-bottom:1.75rem;flex-wrap:wrap}
-.step-pill{display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:999px;border:0.5px solid var(--border2);font-size:12px;font-weight:600;color:var(--text2);font-family:var(--mono);transition:all .2s}
-.step-pill.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.step-pill{display:flex;align-items:center;gap:6px;padding:5px 14px;border-radius:999px;border:1px solid var(--border2);font-size:12px;font-weight:600;color:var(--text2);font-family:var(--mono);transition:all .2s}
+.step-pill.active{background:var(--accent);color:var(--accent-text);border-color:var(--accent);animation:fadeIn .3s ease}
 .step-pill.done{border-color:var(--accent);color:var(--accent)}
-
-/* ── CARDS ── */
-.card{background:var(--card-grad);border:0.5px solid var(--border);border-radius:var(--radius-card);padding:1.5rem;margin-bottom:1rem;transition:border-color .2s,background .3s;background:var(--surface)}
-.card:hover{border-color:var(--border2)}
+/* CARDS */
+.card{background:var(--card-grad);border:1px solid var(--border);border-radius:var(--radius-card);padding:1.5rem;margin-bottom:1rem;transition:border-color .2s,background .3s,box-shadow .2s;box-shadow:var(--shadow)}
+.card:hover{border-color:rgba(255,255,255,.1)}
 .card-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem;font-family:var(--mono)}
-
-/* ── UPLOAD ── */
-.upload-zone{border:0.5px dashed var(--upload-border);border-radius:var(--radius-card);padding:2.5rem 1rem;text-align:center;cursor:pointer;transition:all .25s;background:var(--upload-bg)}
+/* UPLOAD */
+.upload-zone{border:1px dashed var(--upload-border);border-radius:var(--radius-card);padding:2.5rem 1rem;text-align:center;cursor:pointer;transition:all .25s;background:var(--upload-bg)}
 .upload-zone:hover{border-color:var(--accent);background:var(--upload-hover-bg);transform:translateY(-2px)}
 .upload-zone svg{display:block;margin:0 auto .75rem;color:var(--text3);transition:color .2s}
 .upload-zone:hover svg{color:var(--accent)}
 .upload-zone p{font-size:14px;font-weight:600;color:var(--text2);margin-bottom:.25rem}
 .upload-zone span{font-size:12px;color:var(--text3)}
-
-/* ── BTNS ── */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:var(--radius-btn);border:0.5px solid var(--border2);background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;font-family:var(--sans)}
-.btn:hover{border-color:var(--border2);color:var(--text);background:rgba(255,255,255,.04)}
-.btn-primary{background:var(--accent);border-color:var(--accent);color:var(--accent-text)}
-.btn-primary:hover{opacity:.88;color:var(--accent-text)}
+/* PROGRESS */
+.progress-wrap{margin-top:.75rem;display:none}
+.progress-bar{height:3px;background:var(--border);border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),#bfef7a);border-radius:999px;transition:width .4s ease}
+.progress-msg{font-size:12px;color:var(--text2);margin-top:.5rem;font-family:var(--mono)}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:var(--radius-btn);border:1px solid var(--border2);background:transparent;cursor:pointer;font-size:13px;font-weight:600;color:var(--text);font-family:'Nunito',var(--sans);transition:all .15s}
+.btn:hover{background:rgba(255,255,255,.05);transform:translateX(-2px)}
+.btn-primary{background:var(--accent);color:var(--accent-text);border-color:var(--accent);font-weight:700}
+.btn-primary:hover{background:var(--accent2);transform:translateX(-2px)}
+.btn-green{border-color:rgba(213,255,149,.4);color:var(--accent)}
+.btn-green:hover{background:rgba(213,255,149,.08);transform:translateX(-2px)}
+[data-theme="light"] .btn-green{border-color:rgba(0,0,0,.2);color:var(--accent)}
+[data-theme="light"] .btn-green:hover{background:rgba(0,0,0,.05)}
 .btn-sm{padding:5px 12px;font-size:12px}
-.btn-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:.5rem}
-
-/* ── PROGRESS ── */
-.progress-wrap{display:none;margin-top:1rem}
-.progress-bar{height:3px;background:var(--border);border-radius:999px;overflow:hidden;margin-bottom:.5rem}
-.progress-fill{height:100%;background:var(--accent);border-radius:999px;transition:width .3s ease}
-.progress-msg{font-size:12px;color:var(--text2);font-family:var(--mono)}
-#searchStatusCard{display:none}
-
-/* ── NAMES ── */
-.name-row{display:flex;align-items:center;gap:8px;margin-bottom:.5rem}
-.name-row input{flex:1;padding:6px 10px;background:var(--input-bg);border:0.5px solid var(--border2);border-radius:6px;color:var(--text);font-size:13px;font-family:var(--mono);outline:none}
+.btn-ghost{border-color:transparent}
+.btn-ghost:hover{border-color:var(--border2);transform:none}
+.btn-row{display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap}
+/* NAMES */
+.name-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);transition:background .15s;animation:fadeIn .2s ease}
+.name-row:last-of-type{border-bottom:none}
+.name-row input{flex:1;padding:6px 10px;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s}
 .name-row input:focus{border-color:var(--accent)}
-.name-row .btn-sm{flex-shrink:0}
+.conf-badge{font-size:11px;padding:2px 9px;border-radius:999px;border:1px solid;white-space:nowrap;font-family:var(--mono);font-weight:600}
+[data-theme="dark"] .conf-alta{color:#D5FF95;border-color:rgba(213,255,149,.3);background:rgba(213,255,149,.08)}
+[data-theme="dark"] .conf-media{color:#FFCECA;border-color:rgba(255,206,202,.3);background:rgba(255,206,202,.08)}
+[data-theme="dark"] .conf-baixa{color:#FF6B6B;border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.08)}
+[data-theme="light"] .conf-alta{color:#2d6a2d;border-color:rgba(45,106,45,.3);background:rgba(45,106,45,.08)}
+[data-theme="light"] .conf-media{color:#8a5a00;border-color:rgba(138,90,0,.3);background:rgba(138,90,0,.08)}
+[data-theme="light"] .conf-baixa{color:#c0392b;border-color:rgba(192,57,43,.3);background:rgba(192,57,43,.08)}
+.del-btn{background:none;border:none;cursor:pointer;color:var(--text3);font-size:18px;line-height:1;padding:2px 4px;transition:all .15s;border-radius:4px}
+.del-btn:hover{color:var(--red);transform:scale(1.2)}
 .add-row{display:flex;gap:8px;margin-top:.75rem}
-.add-row input{flex:1;padding:9px 12px;background:var(--input-bg);border:0.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--mono);outline:none}
+.add-row input{flex:1;padding:9px 12px;background:var(--input-bg);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s}
 .add-row input:focus{border-color:var(--accent)}
-
-/* ── TABS ── */
-.tabs{display:flex;gap:4px;margin-bottom:1rem;border-bottom:0.5px solid var(--border);padding-bottom:.5rem}
-.tab{padding:5px 14px;border-radius:6px;border:none;background:none;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;font-family:var(--sans)}
-.tab:hover{color:var(--text);background:rgba(255,255,255,.04)}
-.tab.active{background:var(--surface);color:var(--text);border:0.5px solid var(--border2)}
-
-/* ── RESULTADO ── */
-.resultado-header{margin-bottom:1rem}
-.resultado-title{font-family:var(--barlow);font-size:22px;font-weight:700;color:var(--text);letter-spacing:.02em;text-transform:uppercase}
-.resultado-sub{font-size:12px;color:var(--text2);margin-top:4px;font-family:var(--mono)}
-.f-resultado-preview{font-size:11px;padding:4px 10px;border-radius:4px;background:var(--input-bg);border:0.5px solid var(--border);color:var(--text2);font-family:var(--mono);margin-top:.5rem}
-
-/* ── HISTORICO ── */
-.hist-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:var(--radius-card);border:0.5px solid var(--border);margin-bottom:6px;cursor:pointer;transition:all .15s;background:var(--surface)}
-.hist-item:hover{border-color:var(--border2);background:var(--hist-hover-bg)}
+.empty-note{font-size:13px;color:var(--text3);text-align:center;padding:1.5rem 0}
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:1rem}
+.tab{padding:6px 16px;border-radius:999px;border:1px solid var(--border);font-size:12px;font-weight:600;cursor:pointer;color:var(--text2);background:transparent;font-family:'Nunito',var(--sans);transition:all .2s}
+.tab:hover{border-color:var(--border2);color:var(--text);transform:translateX(-2px)}
+.tab.active{background:var(--accent);color:var(--accent-text);border-color:var(--accent)}
+.tab.active:hover{transform:none}
+/* PDF HIGHLIGHT */
+.highlight-item{margin-bottom:.75rem;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}
+.highlight-header{padding:8px 12px;background:rgba(255,255,255,.03);font-size:12px;font-family:var(--mono);color:var(--text2);display:flex;justify-content:space-between}
+.highlight-canvas-wrap{position:relative;background:#525659}
+.highlight-canvas-wrap canvas{display:block;width:100%}
+.page-overlay{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+/* RESULTS */
+.result-item{padding:.875rem 0;border-bottom:1px solid var(--border);animation:fadeIn .25s ease}
+.result-item:last-child{border-bottom:none}
+.result-name{font-size:14px;font-weight:700;color:var(--text);font-family:var(--mono)}
+/* HISTORY */
+.hist-item{padding:.875rem .75rem;border-bottom:1px solid var(--border);cursor:pointer;transition:all .15s;border-radius:var(--radius)}
+.hist-item:last-child{border-bottom:none}
+.hist-item:hover{background:var(--hist-hover-bg);transform:translateX(-3px)}
 .hist-meta{font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:3px}
-.hist-title{font-size:13px;font-weight:600;color:var(--text)}
-.hist-badge{font-size:10px;padding:2px 8px;border-radius:4px;background:rgba(26,158,110,.12);color:var(--accent);border:0.5px solid rgba(26,158,110,.2);font-family:var(--mono);white-space:nowrap}
-.hist-status-pend{background:rgba(239,159,39,.1);color:var(--amber);border-color:rgba(239,159,39,.2)}
-
-/* ── MODAL ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;animation:fadeIn .2s ease}
-.modal{background:var(--modal-bg);border:0.5px solid var(--modal-border);border-radius:var(--radius-card);padding:1.5rem;width:100%;max-width:560px;max-height:90vh;overflow-y:auto;animation:fadeIn .2s ease}
-.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem}
-.modal-title{font-family:var(--barlow);font-size:18px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.03em}
-.modal-close{background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1;padding:2px 6px;border-radius:4px;transition:color .15s}
-.modal-close:hover{color:var(--text)}
-.form-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;display:block;margin-bottom:5px;font-family:var(--mono)}
-.form-input{width:100%;padding:9px 12px;background:var(--input-bg);border:0.5px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--sans);outline:none;transition:border-color .15s}
-.form-input:focus{border-color:var(--accent)}
-select.form-input{cursor:pointer}
-textarea.form-input{resize:vertical;min-height:60px;line-height:1.5}
-
-/* ── DYNAMIC ISLAND ── */
-.di-wrap{position:fixed;top:11px;left:50%;transform:translateX(-50%);z-index:9999;pointer-events:none}
-.di-outer{background:#000;border-radius:999px;overflow:hidden;width:10px;height:10px;position:relative;pointer-events:auto}
-.di-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding:0 14px;opacity:0;white-space:nowrap;border-radius:inherit;background:#000;gap:8px}
-
-/* ── MISC ── */
-.empty-state{text-align:center;padding:3rem 1rem;color:var(--text3);font-size:14px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-family:var(--mono);font-weight:500}
-.tag-green{background:rgba(26,158,110,.12);color:var(--accent)}
-.tag-blue{background:rgba(26,111,173,.12);color:#5aabef}
-.tag-amber{background:rgba(239,159,39,.1);color:var(--amber)}
-.tag-red{background:rgba(226,75,74,.1);color:var(--red)}
-
-
-
-/* ── AGENDA CSS ── */
-
-/* ── TEMA ESCURO (padrão) ── */
-
-
-/* ── TEMA CLARO ── */
-
-
-/* Segue preferência do sistema se não houver escolha manual */
-@media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
-    --bg:       #f2f4f8;
-    --surface:  #ffffff;
-    --card:     #ffffff;
-    --border:   #dde1ec;
-    --border2:  #c8cede;
-    --text:     #1a1f36;
-    --muted:    #8890a8;
-    --accent:   #2563eb;
-    --danger:   #dc2626;
-    --success:  #16a34a;
-
-    --gabriela: #2563eb; --gabriela-b: #dbeafe;
-    --ruy:      #16a34a; --ruy-b:      #dcfce7;
-    --sabrina:  #dc2626; --sabrina-b:  #fee2e2;
-    --vera:     #d97706; --vera-b:     #fef3c7;
-    --marco:    #7c3aed; --marco-b:    #ede9fe;
-    --livre-t:  #94a3b8;
-
-    --tint-gabriela: rgba(37,99,235,.07);
-    --tint-ruy:      rgba(22,163,74,.07);
-    --tint-sabrina:  rgba(220,38,38,.07);
-    --tint-vera:     rgba(217,119,6,.07);
-    --tint-marco:    rgba(124,58,237,.07);
-    --tint-livre:    rgba(200,206,222,.25);
-    --tint-panel-gabriela: rgba(37,99,235,.08);
-    --tint-panel-ruy:      rgba(22,163,74,.08);
-    --tint-panel-sabrina:  rgba(220,38,38,.08);
-    --tint-panel-vera:     rgba(217,119,6,.08);
-    --tint-panel-marco:    rgba(124,58,237,.1);
-    --row-alt: rgba(242,244,248,.8);
-    --aviso-bg: #fffbeb; --aviso-bd: #d97706; --aviso-txt: #92400e;
-    --aviso-field-bg: #fffdf0; --aviso-field-bd: #f59e0b; --aviso-field-bd2: #fde68a;
-    --shadow: 0 4px 24px rgba(0,0,0,.10);
-  }
-}
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-
-/* HEADER */
-#page-agenda .header {
-  background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
-  height: 60px; position: sticky; top: 0; z-index: 100;
-}
-#page-agenda .header-brand { display: flex; align-items: center; gap: 12px; }
-#page-agenda .header-logo { width: 34px; height: 34px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-#page-agenda .header-title { font-size: 15px; font-weight: 700; }
-#page-agenda .header-sub { font-size: 11px; color: var(--muted); }
-.theme-toggle {
-  width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border2);
-  background: var(--card); cursor: pointer; display: flex; align-items: center;
-  justify-content: center; font-size: 16px; transition: all .2s;
-}
-.theme-toggle:hover { background: var(--border); transform: rotate(20deg); }
-.btn-novo-dia {
-  display: flex; align-items: center; gap: 6px;
-  padding: 8px 14px; background: var(--accent); color: #fff;
-  border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif;
-  font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .15s;
-}
-.btn-novo-dia:hover { opacity: .85; }
-
-/* NAV */
-#page-agenda .nav {
-  background: var(--surface); border-bottom: 1px solid var(--border);
-  padding: 0 20px; display: flex; gap: 4px; overflow-x: auto;
-}
-.nav::-webkit-scrollbar { height: 0; }
-.nav-btn {
-  padding: 10px 16px; border: none; background: transparent; color: var(--muted);
-  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
-  cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all .15s;
-}
-.nav-btn:hover { color: var(--text); }
-.nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
-
-/* MAIN */
-#page-agenda .main { padding: 20px; max-width: 1100px; margin: 0 auto; }
-
-/* FILTERS */
-#page-agenda .filters-wrap {
-  position: sticky;
-  top: 60px;
-  z-index: 90;
-  background: var(--bg);
-  padding: 10px 20px;
-  border-bottom: 1px solid var(--border);
-  margin: 0 -20px 20px;
-}
-#page-agenda .filters { display: flex; gap: 8px; flex-wrap: wrap; max-width: 1100px; margin: 0 auto; }
-.filter-chip {
-  padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border2);
-  background: var(--card); color: var(--muted); font-size: 12px; font-weight: 500;
-  cursor: pointer; transition: all .15s;
-}
-.filter-chip:hover { border-color: var(--accent); color: var(--text); }
-.filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-.filter-chip.gabriela.active { background: var(--gabriela); border-color: var(--gabriela); }
-.filter-chip.ruy.active      { background: var(--ruy); border-color: var(--ruy); color: #0a2010; }
-.filter-chip.sabrina.active  { background: var(--sabrina); border-color: var(--sabrina); }
-.filter-chip.vera.active     { background: var(--vera); border-color: var(--vera); color: #1a1000; }
-.filter-chip.marco.active    { background: var(--marco); border-color: var(--marco); }
-
-/* PAST DAYS */
-.day-card.past-day { opacity: .55; }
-.day-card.past-day .day-header { background: var(--bg); }
-.slot.past-slot { cursor: default; opacity: .6; }
-.slot.past-slot:hover { filter: none; }
-
-/* MONTH GROUP */
-.month-group { margin-bottom: 8px; }
-.month-header {
-  display: flex; align-items: center; gap: 10px;
-  padding: 8px 4px; margin-bottom: 10px; cursor: pointer; user-select: none;
-}
-.month-title {
-  font-size: 13px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 1px; color: var(--muted);
-}
-.month-count {
-  font-size: 11px; color: var(--muted);
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 10px; padding: 2px 8px;
-}
-.month-chevron { width: 14px; height: 14px; color: var(--muted); transition: transform .2s; margin-left: auto; }
-.month-group.closed .month-chevron { transform: rotate(-90deg); }
-.month-group.closed .month-
-.month-
-
-/* DAY CARDS */
-.days-grid { display: flex; flex-direction: column; gap: 14px; }
-.day-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-.day-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 13px 18px; background: var(--surface); border-bottom: 1px solid var(--border);
-  cursor: pointer; user-select: none;
-}
-.day-header-left { display: flex; align-items: center; gap: 12px; }
-.day-badge { padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
-.badge-terca  { background: #1a2a4a; color: var(--accent); }
-.badge-quinta { background: #1a3020; color: var(--ruy); }
-.day-date { font-size: 15px; font-weight: 600; }
-.day-meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
-.day-actions { display: flex; gap: 6px; align-items: center; }
-.icon-btn {
-  width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border2);
-  background: transparent; color: var(--muted); cursor: pointer; display: flex;
-  align-items: center; justify-content: center; font-size: 14px; transition: all .15s;
-}
-.icon-btn:hover { background: var(--border); color: var(--text); }
-.icon-btn.danger:hover { background: var(--sabrina-b); border-color: var(--sabrina); color: var(--sabrina); }
-.chevron { width: 16px; height: 16px; color: var(--muted); transition: transform .2s; }
-.day-card.open .chevron { transform: rotate(180deg); }
-.day-
-.day-card.open .day-
-
-/* AVISOS BAR */
-.avisos-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
-.aviso-tag {
-  display: flex; align-items: center; gap: 5px; padding: 4px 10px;
-  background: var(--aviso-bg); border: 1px solid var(--aviso-bd); border-radius: 6px;
-  font-size: 11px; color: var(--aviso-txt); font-weight: 500;
-}
-.aviso-tag .rm-aviso {
-  background: none; border: none; color: var(--aviso-txt); cursor: pointer;
-  font-size: 13px; line-height: 1; padding: 0 0 0 2px; opacity: .6;
-}
-.aviso-tag .rm-aviso:hover { opacity: 1; }
-.btn-add-aviso {
-  padding: 4px 10px; border-radius: 6px; border: 1px dashed #5a3d00;
-  background: transparent; color: #f5a623; font-size: 11px; cursor: pointer; transition: all .15s;
-}
-.btn-add-aviso:hover { background: #2a2010; }
-
-/* SLOTS */
-.slots { display: flex; flex-direction: column; gap: 5px; }
-.slot {
-  display: grid; grid-template-columns: 68px 1fr auto auto;
-  align-items: center; gap: 8px; padding: 9px 12px;
-  border-radius: 8px; border-left: 3px solid transparent; cursor: pointer; transition: filter .15s;
-}
-.slot:hover { filter: brightness(1.1); }
-.slot.livre    { background: var(--tint-livre);    border-left-color: var(--livre-t); }
-.slot.gabriela { border-left-color: var(--gabriela); background: var(--tint-gabriela); }
-.slot.ruy      { border-left-color: var(--ruy);      background: var(--tint-ruy); }
-.slot.sabrina  { border-left-color: var(--sabrina);  background: var(--tint-sabrina); }
-.slot.vera     { border-left-color: var(--vera);     background: var(--tint-vera); }
-.slot.marco    { border-left-color: var(--marco);    background: var(--tint-marco); }
-.slot.dimmed   { opacity: .22; }
-.slot-time { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--muted); }
-.slot-nome { font-size: 14px; font-weight: 600; }
-.slot-assunto { font-size: 11px; color: var(--muted); margin-top: 1px; font-family: 'DM Mono', monospace; }
-.slot-livre-label { font-size: 13px; color: var(--livre-t); font-style: italic; }
-.analista-badge {
-  padding: 3px 9px; border-radius: 5px; font-size: 10px; font-weight: 700;
-  letter-spacing: .5px; text-transform: uppercase; white-space: nowrap;
-}
-.badge-gabriela { background: var(--gabriela-b); color: var(--gabriela); }
-.badge-ruy      { background: var(--ruy-b);      color: var(--ruy); }
-.badge-sabrina  { background: var(--sabrina-b);  color: var(--sabrina); }
-.badge-vera     { background: var(--vera-b);     color: var(--vera); }
-.badge-marco    { background: var(--marco-b);    color: var(--marco); }
-.slot-rm {
-  width: 22px; height: 22px; border-radius: 5px; border: none; background: transparent;
-  color: var(--muted); cursor: pointer; font-size: 14px; display: flex;
-  align-items: center; justify-content: center; opacity: 0; transition: opacity .15s;
-}
-.slot:hover .slot-rm { opacity: 1; }
-.slot-rm:hover { color: var(--danger); background: var(--sabrina-b); }
-
-/* PAINEL */
-/* PAINEL */
-.painel-toolbar {
-  display: flex; align-items: center; justify-content: space-between;
-  flex-wrap: wrap; gap: 12px;
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 10px; padding: 12px 16px;
-}
-.painel-chips { display: flex; gap: 6px; flex-wrap: wrap; }
-.pf-chip {
-  padding: 5px 13px; border-radius: 16px; border: 1px solid var(--border2);
-  background: var(--surface); color: var(--muted); font-family: 'DM Sans', sans-serif;
-  font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s;
-}
-.pf-chip:hover { color: var(--text); border-color: var(--accent); }
-.pf-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
-.pf-chip.gabriela.active { background: var(--gabriela); border-color: var(--gabriela); }
-.pf-chip.ruy.active      { background: var(--ruy); border-color: var(--ruy); color: #0a2010; }
-.pf-chip.sabrina.active  { background: var(--sabrina); border-color: var(--sabrina); }
-.pf-chip.vera.active     { background: var(--vera); border-color: var(--vera); color: #1a1000; }
-.pf-chip.marco.active    { background: var(--marco); border-color: var(--marco); }
-.painel-datas { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.p-label { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
-.p-date {
-  background: var(--surface); border: 1px solid var(--border2); border-radius: 6px;
-  color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 12px;
-  padding: 5px 8px; outline: none; cursor: pointer;
-}
-.p-date:focus { border-color: var(--accent); }
-.p-clear {
-  padding: 5px 10px; background: transparent; border: 1px solid var(--border2);
-  border-radius: 6px; color: var(--muted); font-size: 11px; cursor: pointer;
-  font-family: 'DM Sans', sans-serif; transition: all .15s;
-}
-.p-clear:hover { background: var(--sabrina-b); color: var(--sabrina); border-color: var(--sabrina); }
-
-/* KPI CARDS */
-.kpi-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; margin:16px 0; }
-.kpi-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 16px; display:flex; align-items:center; gap:12px; }
-.kpi-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
-.kpi-label { font-size:11px; color:var(--muted); margin-bottom:3px; font-weight:500; }
-.kpi-val { font-size:26px; font-weight:700; line-height:1; }
-
-/* ANALISTA TABLE */
-.an-table { width:100%; border-collapse:collapse; font-size:13px; }
-.an-table th { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; padding:8px 12px; border-bottom:1px solid var(--border); text-align:left; }
-.an-table td { padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
-.an-table tr:last-child td { border-bottom:none; }
-.an-table tr:hover td { background:var(--surface); }
-.an-badge { padding:4px 12px; border-radius:6px; font-size:11px; font-weight:700; }
-.an-bar-track { height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
-.an-bar-fill { height:100%; border-radius:3px; transition:width .4s; }
-
-/* PIE */
-.pie-leg-pct { color:var(--muted); font-size:10px; margin-left:4px; }
-
-/* DASHBOARD */
-.dashboard-row {
-  display: flex; gap: 14px; margin: 16px 0; flex-wrap: wrap;
-}
-.dash-card {
-  background: var(--card); border: 1px solid var(--border);
-  border-radius: 12px; padding: 16px 20px; flex: 1; min-width: 260px;
-}
-.dash-card-title {
-  font-size: 12px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .6px; color: var(--muted); margin-bottom: 14px;
-}
-.pie-wrap { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-.pie-svg { width: 160px; height: 145px; flex-shrink: 0; }
-.pie-legend { display: flex; flex-direction: column; gap: 7px; flex: 1; }
-.pie-leg-item { display: flex; align-items: center; gap: 7px; font-size: 12px; }
-.pie-leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-.pie-leg-name { flex: 1; font-weight: 500; }
-.pie-leg-val { font-weight: 600; white-space: nowrap; }
-
-/* BAR CHART */
-.bar-chart {
-  display: flex; align-items: flex-end; gap: 6px;
-  height: 130px; padding-bottom: 20px; position: relative;
-  overflow-x: auto;
-}
-.bar-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex-shrink: 0; min-width: 32px; }
-.bar-val { font-size: 9px; font-weight: 700; color: var(--muted); }
-.bar-track {
-  width: 26px; flex: 1; background: var(--border);
-  border-radius: 4px; display: flex; align-items: flex-end; overflow: hidden;
-}
-.bar-fill {
-  width: 100%; background: var(--accent); border-radius: 4px;
-  min-height: 3px; transition: height .3s;
-}
-.bar-fill.bar-past { background: var(--muted); opacity: .5; }
-.bar-label { font-size: 9px; color: var(--muted); text-align: center; white-space: nowrap; }
-
-/* PAINEL TABLE */
-.painel-table-wrap { overflow-x: auto; margin-top: 16px; border-radius: 10px; border: 1px solid var(--border); }
-.painel-table { width: 100%; border-collapse: collapse; font-size: 11px; }
-.painel-table thead tr { background: var(--surface); }
-.painel-table th {
-  padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 700;
-  color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
-  border-bottom: 1px solid var(--border); white-space: nowrap;
-}
-.painel-table tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
-.painel-table tbody tr:hover { background: var(--surface); }
-.painel-table tbody tr:last-child { border-bottom: none; }
-.painel-table td { padding: 7px 10px; vertical-align: middle; }
-.row-past { opacity: .45; }
-.td-date { font-weight: 600; white-space: nowrap; font-size: 12px; }
-.td-slot { min-width: 110px; }
-.td-slot.gabriela { background: var(--tint-gabriela); }
-.td-slot.ruy      { background: var(--tint-ruy); }
-.td-slot.sabrina  { background: var(--tint-sabrina); }
-.td-slot.vera     { background: var(--tint-vera); }
-.td-slot.marco    { background: var(--tint-marco); }
-.td-slot.livre-cell { text-align: center; color: var(--border2); }
-.td-nome { font-weight: 500; font-size: 11px; }
-.td-an   { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; margin-top: 1px; }
-.td-total { white-space: nowrap; font-size: 12px; text-align: center; }
-.livre-dot { color: var(--ruy); font-size: 8px; }
-
-.stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 10px; margin-bottom: 20px; }
-.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
-.stat-label { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
-.stat-value { font-size: 28px; font-weight: 700; margin-top: 4px; }
-.stat-value.gabriela { color: var(--gabriela); }
-.stat-value.ruy      { color: var(--ruy); }
-.stat-value.sabrina  { color: var(--sabrina); }
-.stat-value.vera     { color: var(--vera); }
-.stat-value.marco    { color: var(--marco); }
-.panel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px,1fr)); gap: 12px; }
-.panel-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-.panel-card-header { padding: 10px 14px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-.panel-card-date { font-size: 13px; font-weight: 600; }
-.panel-card-day { font-size: 10px; color: var(--muted); }
-.panel-slots { padding: 8px; display: flex; flex-direction: column; gap: 3px; }
-.panel-slot { display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; border-radius: 5px; font-size: 11px; }
-.panel-slot.livre    { color: var(--livre-t); }
-.panel-slot.gabriela { background: var(--tint-panel-gabriela); }
-.panel-slot.ruy      { background: var(--tint-panel-ruy); }
-.panel-slot.sabrina  { background: var(--tint-panel-sabrina); }
-.panel-slot.vera     { background: var(--tint-panel-vera); }
-.panel-slot.marco    { background: var(--tint-panel-marco); }
-.panel-slot-time { font-family: 'DM Mono', monospace; color: var(--muted); font-size: 10px; flex-shrink: 0; }
-.panel-slot-nome { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding: 0 6px; }
-
-/* LIVRES */
-.livres-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-.livres-count { padding: 4px 12px; background: rgba(62,207,120,.1); border: 1px solid rgba(62,207,120,.25); border-radius: 20px; font-size: 13px; color: var(--ruy); font-weight: 600; }
-.livres-grid { display: flex; flex-direction: column; gap: 5px; }
-.livre-row { display: grid; grid-template-columns: 120px 140px 90px auto; align-items: center; gap: 10px; padding: 10px 16px; background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--ruy); border-radius: 8px; font-size: 13px; }
-.livre-row-date { font-weight: 600; }
-.livre-row-day  { color: var(--muted); font-size: 12px; }
-.livre-row-time { font-family: 'DM Mono', monospace; color: var(--ruy); font-weight: 500; }
-.btn-agendar-livre {
-  padding: 5px 12px; background: rgba(62,207,120,.1); border: 1px solid rgba(62,207,120,.3);
-  border-radius: 6px; color: var(--ruy); font-size: 11px; font-weight: 600;
-  cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .15s; white-space: nowrap;
-}
-.btn-agendar-livre:hover { background: rgba(62,207,120,.2); }
-
 /* MODAL */
-#page-agenda .overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,.7);
-  z-index: 200; display: flex; align-items: center; justify-content: center;
-  padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s;
-}
-#page-agenda .overlay.open { opacity: 1; pointer-events: all; }
-#page-agenda .modal {
-  background: var(--surface); border: 1px solid var(--border2); border-radius: 14px;
-  width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
-  transform: translateY(16px); transition: transform .2s;
-}
-#page-agenda .overlay.open #page-agenda .modal { transform: translateY(0); }
-.modal-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 18px 20px 14px; border-bottom: 1px solid var(--border);
-}
-.modal-title { font-size: 16px; font-weight: 700; }
-.modal-close {
-  width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border2);
-  background: transparent; color: var(--muted); cursor: pointer; font-size: 18px;
-  display: flex; align-items: center; justify-content: center;
-}
-.modal-close:hover { background: var(--border); color: var(--text); }
-.modal-
-.form-group { display: flex; flex-direction: column; gap: 6px; }
-.form-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
-.form-input, .form-select {
-  background: var(--card); border: 1px solid var(--border2); border-radius: 8px;
-  padding: 10px 12px; color: var(--text); font-family: 'DM Sans', sans-serif;
-  font-size: 14px; outline: none; width: 100%; transition: border-color .15s;
-}
-.form-input:focus, .form-select:focus { border-color: var(--accent); }
-.form-select option { background: var(--card); }
-.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.modal-footer { padding: 14px 20px 18px; display: flex; gap: 10px; border-top: 1px solid var(--border); }
-.btn-primary {
-  flex: 1; padding: 10px; background: var(--accent); color: #fff; border: none;
-  border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px;
-  font-weight: 600; cursor: pointer; transition: opacity .15s;
-}
-.btn-primary:hover { opacity: .85; }
-.btn-secondary {
-  padding: 10px 18px; background: transparent; color: var(--muted);
-  border: 1px solid var(--border2); border-radius: 8px; font-family: 'DM Sans', sans-serif;
-  font-size: 14px; cursor: pointer; transition: all .15s;
-}
-.btn-secondary:hover { background: var(--border); color: var(--text); }
-
-/* ANALISTA SELECTOR */
-.analista-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
-.analista-opt {
-  padding: 8px 4px; border-radius: 8px; border: 2px solid var(--border2);
-  background: var(--card); text-align: center; font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: all .15s;
-}
-.analista-opt:hover { border-color: var(--border2); filter: brightness(1.15); }
-.analista-opt.sel-Gabriela { border-color: var(--gabriela); background: var(--gabriela-b); color: var(--gabriela); }
-.analista-opt.sel-Ruy      { border-color: var(--ruy);      background: var(--ruy-b);      color: var(--ruy); }
-.analista-opt.sel-Sabrina  { border-color: var(--sabrina);  background: var(--sabrina-b);  color: var(--sabrina); }
-.analista-opt.sel-Vera     { border-color: var(--vera);     background: var(--vera-b);     color: var(--vera); }
-.analista-opt.sel-Marco    { border-color: var(--marco);    background: var(--marco-b);    color: var(--marco); }
-.analista-opt.nenhum.sel-nenhum { border-color: var(--border2); background: var(--border); color: var(--text); }
-
-/* EMPTY / TOAST */
-.empty { text-align: center; padding: 60px 20px; color: var(--muted); }
-.empty-icon { font-size: 40px; margin-bottom: 12px; }
-#page-agenda .toast {
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
-  background: var(--success); color: #0a2010; padding: 10px 20px; border-radius: 8px;
-  font-weight: 600; font-size: 13px; z-index: 300; transition: transform .25s; pointer-events: none;
-}
-#page-agenda .toast.show { transform: translateX(-50%) translateY(0); }
-#page-agenda .toast.err { background: var(--danger); color: #fff; }
-
-
-
-/* SLOT AGENDADO POR */
-.slot-agendadopor { font-size: 10px; color: var(--muted); margin-top: 1px; font-style: italic; }
-.analista-opt.blocked { opacity: .45; cursor: not-allowed; border-color: var(--border); }
-.livre-avisos { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 4px; }
-.livre-row.has-aviso { flex-wrap: wrap; }
-
-/* CONFIG SCREEN */
-.config-wrap { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
-.config-section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
-.config-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
-.config-desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
-.config-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; min-height: 36px; }
-.config-item { display: flex; align-items: center; gap: 6px; }
-.config-badge { padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; }
-.config-rm { background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 4px; border-radius: 4px; transition: all .15s; }
-.config-rm:hover { background: var(--sabrina-b); color: var(--sabrina); }
-.config-add-row { display: flex; gap: 10px; align-items: center; }
-
-@media (max-width: 600px) {
-  #page-agenda .main { padding: 12px; }
-  .slot { grid-template-columns: 60px 1fr auto; }
-  .slot .analista-badge { display: none; }
-  .slot-assunto { display: none; }
-  .livre-row { grid-template-columns: 90px 1fr 70px auto; }
-  .analista-grid { grid-template-columns: repeat(3,1fr); }
-  .form-row { grid-template-columns: 1fr; }
-  .stats-row { grid-template-columns: repeat(3,1fr); }
-}
-
-
-/* ── CONFIDENCE BADGES ── */
-.conf-badge{font-size:11px;padding:3px 10px;border-radius:999px;font-family:var(--mono);font-weight:500;white-space:nowrap;flex-shrink:0}
-.conf-alta{background:rgba(26,158,110,.15);color:#4ecb9e;border:0.5px solid rgba(26,158,110,.25)}
-.conf-media{background:rgba(239,159,39,.13);color:#f0ac3a;border:0.5px solid rgba(239,159,39,.2)}
-.conf-baixa{background:rgba(226,75,74,.12);color:#f07070;border:0.5px solid rgba(226,75,74,.2)}
-.del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1;padding:0 4px;transition:color .15s;flex-shrink:0}
-.del-btn:hover{color:var(--red)}
-.empty-note{font-size:13px;color:var(--text3);text-align:center;padding:1.5rem;font-family:var(--mono)}
-
-/* ── SEARCH STATUS ── */
-#searchStatusCard{display:none;margin-bottom:1rem}
-.search-fill{height:3px;background:var(--border);border-radius:999px;overflow:hidden;margin-bottom:.5rem}
-#searchFill{height:100%;background:var(--accent);border-radius:999px;transition:width .3s ease;width:0%}
-#searchMsg{font-size:12px;color:var(--text2);font-family:var(--mono)}
-
-/* ── RESULTADO PREVIEW ── */
-.f-resultado-preview,.fResultadoPreview{font-size:11px;padding:4px 10px;border-radius:4px;background:var(--input-bg);border:0.5px solid var(--border2);color:var(--text2);font-family:var(--mono);margin-top:.5rem}
-.fProcessosPreview{font-size:11px;padding:4px 10px;border-radius:4px;background:var(--input-bg);border:0.5px solid var(--border2);color:var(--text2);font-family:var(--mono);margin-top:.5rem}
-
-/* ── HIGHLIGHT PANEL ── */
-.highlight-page{margin-bottom:1rem;border-radius:var(--radius-card);overflow:hidden;border:0.5px solid var(--border)}
-.highlight-page canvas{width:100%;display:block}
-.highlight-label{font-size:11px;color:var(--text3);font-family:var(--mono);padding:6px 10px;background:var(--bg2);border-top:0.5px solid var(--border)}
-
-/* ── DIGITALIZACAO MODAL BADGES ── */
-.badge-analista{background:rgba(26,111,173,.12);color:#5aabef;border:0.5px solid rgba(26,111,173,.2)}
-.badge-busca{background:rgba(239,159,39,.1);color:#f0ac3a;border:0.5px solid rgba(239,159,39,.2)}
-#pdfPreviewContainer{display:none;margin-top:1rem;border:0.5px solid var(--border);border-radius:var(--radius-card);overflow:hidden;background:var(--bg)}
-canvas#pdfCanvas{width:100%;display:block}
-
-/* ── PRINT ── */
-@media print{
-  body{background:#fff;color:#000}
-  .sidebar,.topbar,.btn-row,.steps,.modal-overlay{display:none!important}
-  .content{margin:0;padding:0}
-}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;animation:fadeIn .2s ease}
+.modal{background:var(--modal-bg);border:1px solid var(--modal-border);border-radius:20px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;padding:1.75rem;animation:fadeIn .25s ease;box-shadow:var(--shadow)}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem}
+.modal-title{font-size:15px;font-weight:700}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--text2);font-size:22px;padding:2px 6px;border-radius:6px;transition:all .15s;line-height:1}
+.modal-close:hover{color:var(--red);transform:scale(1.2)}
+.form-group{margin-bottom:1rem}
+.form-label{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;font-family:var(--mono);display:block;margin-bottom:.4rem}
+.form-input{width:100%;padding:10px 12px;background:var(--input-bg);border:1px solid var(--border2);border-radius:var(--radius);color:var(--text);font-size:13px;font-family:var(--mono);outline:none;transition:border-color .15s}
+.form-input:focus{border-color:var(--accent)}
+.form-input[readonly]{opacity:.5;cursor:default}
+.page-header{margin-bottom:1.75rem;animation:fadeIn .3s ease}
+.page-header h1{font-size:22px;font-weight:700;margin-bottom:.25rem;letter-spacing:-.3px}
+.page-header p{font-size:13px;color:var(--text2)}
 </style>
 </head>
 <body>
 
-<canvas id="login-canvas"></canvas>
+<!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-card">
-    <div style="margin-bottom:1.5rem">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:800;color:var(--text);line-height:.88;text-transform:uppercase;letter-spacing:-.01em"><span style="color:var(--accent)">Central</span><br>SEPLAN</div>
-      <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-top:10px;font-family:'DM Mono',monospace">Balneário Piçarras · Governo Municipal</div>
-    </div>
-    <input type="email" id="loginEmail" placeholder="E-mail" style="margin-bottom:8px" onkeydown="if(event.key==='Enter')checkLogin()">
-    <div style="position:relative;margin-bottom:8px">
-      <input type="password" id="loginInput" placeholder="Senha" style="padding-right:40px;width:100%" onkeydown="if(event.key==='Enter')checkLogin()">
-      <button type="button" onclick="toggleSenha()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px" id="btnOlho">👁</button>
+    <div class="login-logo">S</div>
+    <h1>Busca de Projeto</h1>
+    <p>SEPLAN · Balneário Piçarras</p>
+    <input type="email" id="loginEmail" placeholder="E-mail" style="margin-bottom:.5rem" onkeydown="if(event.key==='Enter')checkLogin()">
+    <div style="position:relative;margin-bottom:.75rem">
+      <input type="password" id="loginInput" placeholder="Senha" style="margin-bottom:0;padding-right:40px;width:100%" onkeydown="if(event.key==='Enter')checkLogin()">
+      <button type="button" onclick="toggleSenha()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);padding:4px;line-height:1;font-size:16px" title="Mostrar/ocultar senha" id="btnOlho">👁</button>
     </div>
     <div class="login-error" id="loginError">E-mail ou senha incorretos.</div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="checkLogin()" id="loginBtn">Entrar</button>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.25rem" onclick="checkLogin()" id="loginBtn">Entrar</button>
   </div>
 </div>
 
 <!-- APP -->
-<div id="app" style="display:none">
-<!-- DYNAMIC ISLAND -->
-<div class="di-wrap">
-  <div class="di-outer" id="di-island">
-    <div class="di-inner" id="di-ipad"></div>
-  </div>
-</div>
+<div id="app">
 
-<!-- TOPBAR -->
-<div class="topbar" id="topbar">
-  <div class="topbar-logo"><span>Central</span> SEPLAN · <span style="color:var(--text3);font-weight:400;font-size:12px">Balneário Piçarras</span></div>
-  <div class="topbar-right">
-    <div class="mode-pills">
-      <button class="mpill on" onclick="setModoApresentacao(false)">Operacional</button>
-      <button class="mpill" onclick="setModoApresentacao(true)">Apresentação</button>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="s-logo-icon">S</div>
+        <div><div class="s-logo-text">Busca de Projeto</div><div class="s-logo-sub">SEPLAN · Piçarras</div></div>
+      </div>
     </div>
-    <div class="topbar-avatar" id="topbar-av">EM</div>
-    <div class="topbar-menu" onclick="logout()" title="Sair" style="cursor:pointer">
-      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"/></svg>
+    <div class="sidebar-nav">
+      <div class="nav-section">Menu</div>
+      <button class="nav-item active" id="nav-busca" onclick="navTo('busca')">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
+        Nova busca
+      </button>
+      <button class="nav-item" id="nav-historico" onclick="navTo('historico')">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+        Histórico
+      </button>
+      <button class="nav-item" id="nav-digitalizacao" onclick="abrirDigitalizacao()">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
+        Digitalização
+      </button>
+    </div>
+    <div class="sidebar-footer">
+      <div style="padding:6px 10px;margin-bottom:4px">
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.06em">Logado como</div>
+        <div id="usuarioLogado" style="font-size:12px;color:var(--text2);font-family:var(--mono);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div>
+      </div>
+      <button class="nav-item" onclick="toggleTheme()" id="themeToggleBtn" style="margin-bottom:4px">
+        <span id="themeIcon">☀️</span>
+        <span id="themeLabel">Tema claro</span>
+      </button>
+      <button class="nav-item" onclick="logout()" style="color:var(--red)">
+        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75"/></svg>
+        Sair
+      </button>
     </div>
   </div>
-</div>
+
   <!-- MAIN CONTENT -->
   <div class="content">
     <div class="content-inner">
-      <!-- HOME PAGE -->
-      <div id="page-home" style="display:none">
-        <canvas id="home-canvas" style="position:fixed;top:52px;right:0;width:55%;height:50vh;pointer-events:none;opacity:.4;z-index:0"></canvas>
-        <div class="home-hero" style="position:relative;z-index:1">
-          <div class="home-eyebrow">Secretaria de Planejamento Urbano</div>
-          <div class="home-title"><span class="hl">Central</span><br>SEPLAN</div>
-          <div class="home-desc">Sistema unificado de gestão — processos, buscas, agendamentos e digitalização em um só lugar.</div>
-          <div class="home-stats">
-            <div class="hstat"><div class="hstat-num" id="home-nbuscas">—</div><div class="hstat-lbl">Buscas</div></div>
-            <div class="hstat-div"></div>
-            <div class="hstat"><div class="hstat-num" id="home-ndig">—</div><div class="hstat-lbl">Digitalizações</div></div>
-            <div class="hstat-div"></div>
-            <div class="hstat"><div class="hstat-num" id="home-clock">—</div><div class="hstat-lbl">Horário</div></div>
-          </div>
-        </div>
-        <div class="home-grid" style="position:relative;z-index:1">
-          <div class="hmod hmod-main" onclick="navTo('busca')">
-            <div class="hmod-badge warn" id="hbadge-busca">carregando</div>
-            <div class="hmod-lbl">Módulo principal</div>
-            <div class="hmod-name">Busca de Projetos</div>
-            <div class="hmod-desc">Matrícula, inscrição imobiliária e análise por inteligência artificial.</div>
-            <div class="hmod-num" id="home-num-buscas">—</div>
-            <div class="hmod-numlbl">Buscas realizadas</div>
-            <div class="hmod-arr">→</div>
-          </div>
-          <div class="hmod hmod-sm" onclick="navTo('historico')">
-            <div class="hmod-lbl">Histórico</div>
-            <div class="hmod-name">Buscas salvas</div>
-            <span class="hchip hchip-g">Ver registros</span>
-          </div>
-          <div class="hmod hmod-sm">
-            <div class="hmod-lbl">Agendamentos</div>
-            <div class="hmod-name">Em breve</div>
-            <span class="hchip hchip-b">Integração</span>
-          </div>
-          <div class="hmod hmod-sm" onclick="navTo('digitalizacao')">
-            <div class="hmod-badge warn" id="hbadge-dig" style="position:absolute;top:10px;right:10px;font-size:10px;padding:2px 8px;border-radius:999px;font-family:var(--mono)">—</div>
-            <div class="hmod-lbl">Digitalização</div>
-            <div class="hmod-name">Pedidos</div>
-            <span class="hchip hchip-a" id="hchip-dig">carregando</span>
-          </div>
-          <div class="hmod hmod-sm">
-            <div class="hmod-lbl">Viabilidade</div>
-            <div class="hmod-name">REGIN</div>
-            <span class="hchip hchip-b">1.331 CNAEs</span>
-          </div>
-        </div>
-        <div class="home-feed" style="position:relative;z-index:1" id="home-feed-wrap">
-          <div class="feed-label">Atividade recente</div>
-          <div class="feed-items" id="home-feed"></div>
-        </div>
-      </div>
 
-<!-- PAGE BUSCA -->
-      <div id="page-busca" style="display:none">
+      <!-- PAGE BUSCA -->
+      <div id="page-busca">
         <div class="steps">
           <div class="step-pill active" id="pill1"><span>01</span> Matrícula</div>
           <div class="step-pill" id="pill2"><span>02</span> Proprietários</div>
@@ -923,126 +321,6 @@ canvas#pdfCanvas{width:100%;display:block}
         <div class="card">
           <div id="histListPage"><div class="empty-note">Carregando...</div></div>
         </div>
-
-      <!-- PAGE AGENDA -->
-      <div id="page-agenda" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
-  <div style="display:flex;gap:4px;background:var(--bg2);border-radius:8px;padding:3px">
-    <button class="nav-btn active" id="btn-agenda" onclick="setView('agenda')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:0.5px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;font-family:var(--sans)">Agenda</button>
-    <button class="nav-btn" id="btn-painel" onclick="setView('painel')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">Painel</button>
-    <button class="nav-btn" id="btn-livres" onclick="setView('livres')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">Horários Livres</button>
-    <button class="nav-btn" id="btn-config" onclick="setView('config')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">⚙ Config</button>
-  </div>
-  <button class="btn-novo-dia" onclick="openModalNovoDia()" style="padding:7px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:12px;font-weight:600;cursor:pointer">+ Novo dia</button>
-</div>
-
-        
-  </div>
-  <div style="display:flex;gap:8px;align-items:center">
-    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
-      <span id="theme-icon">☀️</span>
-    </button>
-    <button class="btn-novo-dia" onclick="openModalNovoDia()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-    Novo dia
-  </button>
-  </div>
-</div>
-
-<!-- NAV -->
-
-
-<div class="main">
-  <div class="filters-wrap" id="filters-wrap">
-    <div class="filters" id="filters">
-      <button class="filter-chip active"    onclick="setAnalista('todos')"    id="chip-todos">Todos</button>
-      <button class="filter-chip gabriela" onclick="setAnalista('Gabriela')" id="chip-Gabriela">Gabriela</button>
-      <button class="filter-chip ruy"      onclick="setAnalista('Ruy')"      id="chip-Ruy">Ruy</button>
-      <button class="filter-chip sabrina"  onclick="setAnalista('Sabrina')"  id="chip-Sabrina">Sabrina</button>
-      <button class="filter-chip vera"     onclick="setAnalista('Vera')"     id="chip-Vera">Vera</button>
-      <button class="filter-chip marco"    onclick="setAnalista('Marco')"    id="chip-Marco">Marco</button>
-      <button class="filter-chip" style="border-color:#3ecf7840;color:#3ecf78" onclick="setAnalista('livres')" id="chip-livres">Só livres</button>
-    </div>
-  </div>
-  <div id="view-agenda"></div>
-  <div id="view-painel" style="display:none"></div>
-  <div id="view-livres" style="display:none"></div>
-  <div id="view-config" style="display:none"></div>
-</div>
-
-<!-- MODAL AGENDAMENTO -->
-<div class="overlay" id="overlay-slot" onclick="overlayClick(event,'overlay-slot')">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title" id="modal-slot-title">Agendar horário</div>
-      <button class="modal-close" onclick="closeModal('overlay-slot')">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <div class="form-label">Data · Horário</div>
-        <div style="display:flex;gap:8px">
-          <input class="form-input" id="slot-data" readonly style="flex:.6">
-          <input class="form-input" id="slot-hora" readonly style="flex:.4">
-        </div>
-      </div>
-      <div class="form-group">
-        <div class="form-label">Nome do requerente</div>
-        <input class="form-input" id="slot-nome" placeholder="Ex: João Silva" autocomplete="off">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Protocolo / Assunto</div>
-        <input class="form-input" id="slot-assunto" placeholder="Ex: 12345/2026">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Agendado por</div>
-        <input class="form-input" id="slot-agendadopor" placeholder="Ex: Emanuel" autocomplete="off">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Analista responsável</div>
-        <div class="analista-grid" id="analista-grid">
-          <!-- preenchido dinamicamente por rebuildAnalistaGrid() -->
-        </div>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('overlay-slot')">Cancelar</button>
-      <button class="btn-primary" onclick="salvarSlot()">Salvar agendamento</button>
-    </div>
-  </div>
-</div>
-
-<!-- MODAL NOVO DIA -->
-<div class="overlay" id="overlay-dia" onclick="overlayClick(event,'overlay-dia')">
-  <div class="modal">
-    <div class="modal-header">
-      <div class="modal-title">Adicionar novo dia</div>
-      <button class="modal-close" onclick="closeModal('overlay-dia')">×</button>
-    </div>
-    <div class="modal-body">
-      <div class="form-group">
-        <div class="form-label">Data</div>
-        <input class="form-input" id="novo-data" type="date">
-      </div>
-      <div class="form-group">
-        <div class="form-label">Dia da semana</div>
-        <select class="form-select" id="novo-weekday">
-          <option value="TERÇA-FEIRA">Terça-feira</option>
-          <option value="QUINTA-FEIRA">Quinta-feira</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <div class="form-label">Aviso inicial (opcional)</div>
-        <input class="form-input" id="novo-aviso" placeholder="Ex: Férias Gabriela">
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn-secondary" onclick="closeModal('overlay-dia')">Cancelar</button>
-      <button class="btn-primary" onclick="salvarNovoDia()">Criar dia</button>
-    </div>
-  </div>
-</div>
-
-      </div>
       </div>
 
     </div>
@@ -1124,11 +402,7 @@ canvas#pdfCanvas{width:100%;display:block}
     </div>
   </div>
 
-  
-    </div>
-  </div>
-
-<!-- MODAL DIGITALIZAÇÃO -->
+  <!-- MODAL DIGITALIZAÇÃO -->
   <div id="modalDigitalizacao" class="modal-overlay" style="display:none">
     <div class="modal" style="max-width:680px">
       <div class="modal-header">
@@ -1220,54 +494,15 @@ canvas#pdfCanvas{width:100%;display:block}
       </div>
 
     </div>
-
-
-</div>
-
-<div class="sidebar" id="dock">
-    <div class="dock-logo">
-      <svg viewBox="0 0 16 16"><path d="M2 8h12M8 2v12"/></svg>
-    </div>
-    <button class="dock-item active" id="nav-home" onclick="navTo('home')">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      <div class="dock-tip">Início</div>
-    </button>
-    <button class="dock-item" id="nav-busca" onclick="navTo('busca')">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
-      <div class="dock-tip">Busca de projetos</div>
-    </button>
-    <button class="dock-item" id="nav-historico" onclick="navTo('historico')">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
-      <div class="dock-tip">Histórico</div>
-    </button>
-    <button class="dock-item" id="nav-agenda" onclick="navTo('agenda')">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path stroke-linecap="round" d="M16 2v4M8 2v4M3 10h18"/></svg>
-      <div class="dock-tip">Agenda</div>
-    </button>
-    <button class="dock-item" id="nav-digitalizacao" onclick="navTo('digitalizacao')">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
-      <div class="dock-tip">Digitalização</div>
-    </button>
-    <div class="dock-sep"></div>
-    <div class="dock-bottom">
-      <button class="dock-item" onclick="toggleTheme()" id="themeToggleBtn">
-        <svg id="themeIcon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364-.707.707M6.343 17.657l-.707.707m12.728 0-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/></svg>
-        <div class="dock-tip" id="themeLabel">Tema claro</div>
-      </button>
-    </div>
   </div>
 
 </div>
-
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 const PASSWORD='@Ma07nu209970';
 const SUPABASE_URL='https://oqmiwgnxltfgmdmhmxmq.supabase.co';
 const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xbWl3Z254bHRmZ21kbWhteG1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNDQzMDksImV4cCI6MjA5MzcyMDMwOX0.XClbKEYt-DJezINAydYPn8enQoNT8Ub-J0xVeY3dfQE';
-let homeCanvasInited = false;
-let dgMotivo = 'analista';
-let _diBusy=false,_diTimer,_diAf,_diCleanup=null;
 const SHEET_ID='1AGrwH3KW1dgtvUr8H2uPlaj_Vleq7mwYDGoW6JHkOFI';
 
 const pdfjsLib=window['pdfjs-dist/build/pdf'];
@@ -1286,7 +521,7 @@ async function checkLogin(){
   const btn = document.getElementById('loginBtn');
   btn.textContent='Entrando...';btn.disabled=true;
   try{
-    const resp = await authFetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
       method:'POST',
       headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON},
       body:JSON.stringify({email,password})
@@ -1298,7 +533,6 @@ async function checkLogin(){
       return;
     }
     sessionStorage.setItem('seplan_token', data.access_token);
-    sessionStorage.setItem('seplan_refresh', data.refresh_token);
     sessionStorage.setItem('seplan_email', data.user.email);
     currentUser = data.user;
     showApp();
@@ -1311,21 +545,9 @@ async function checkLogin(){
 function showApp(){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('app').style.display='block';
-  // topbar e dock já visíveis dentro do #app
   const email = sessionStorage.getItem('seplan_email')||'';
-  const av = document.getElementById('topbar-av');
-  if(av && email) av.textContent = email.slice(0,2).toUpperCase();
-  // Forçar home visível
-  const pageHome = document.getElementById('page-home');
-  if(pageHome) pageHome.style.display='block';
-  const navHome = document.getElementById('nav-home');
-  if(navHome) navHome.classList.add('active');
-  homeTick();
-  initHomeCanvas();
-  loadHomeStats();
   const nome = email.split('@')[0];
-  const elUser = document.getElementById('usuarioLogado');
-  if(elUser) elUser.textContent=nome;
+  document.getElementById('usuarioLogado').textContent=nome;
 }
 
 function logout(){
@@ -1365,42 +587,6 @@ function getAuthHeaders(){
   return {'apikey':SUPABASE_ANON,'Authorization':`Bearer ${token}`,'Content-Type':'application/json'};
 }
 
-async function refreshToken(){
-  const refresh = sessionStorage.getItem('seplan_refresh');
-  if(!refresh) return false;
-  try{
-    const resp = await authFetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,{
-      method:'POST',
-      headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON},
-      body:JSON.stringify({refresh_token:refresh})
-    });
-    const data = await resp.json();
-    if(data.access_token){
-      sessionStorage.setItem('seplan_token', data.access_token);
-      sessionStorage.setItem('seplan_refresh', data.refresh_token);
-      return true;
-    }
-  }catch(e){}
-  return false;
-}
-
-// Fetch com refresh automático — usa no lugar de fetch direto
-async function authFetch(url, opts={}){
-  opts.headers = {...getAuthHeaders(), ...(opts.headers||{})};
-  let resp = await fetch(url, opts);
-  if(resp.status === 401){
-    const ok = await refreshToken();
-    if(ok){
-      opts.headers = {...getAuthHeaders(), ...(opts.headers||{})};
-      resp = await fetch(url, opts);
-    } else {
-      // Token expirado e sem refresh — faz logout
-      logout();
-    }
-  }
-  return resp;
-}
-
 // Verifica sessão ao carregar
 if(sessionStorage.getItem('seplan_token')){
   showApp();
@@ -1408,24 +594,12 @@ if(sessionStorage.getItem('seplan_token')){
 
 // NAV
 function navTo(page){
-  ['home','busca','historico','agenda'].forEach(p=>{
-    const el=document.getElementById('page-'+p);
-    if(el) el.style.display=p===page?'block':'none';
+  ['busca','historico'].forEach(p=>{
+    document.getElementById('page-'+p).style.display=p===page?'block':'none';
     const btn=document.getElementById('nav-'+p);
-    if(btn) btn.classList.toggle('active', p===page);
+    if(btn) btn.className='nav-item'+(p===page?' active':'');
   });
   if(page==='historico') loadHistoricoPage();
-  if(page==='home'){
-    homeTick();
-    initHomeCanvas();
-    loadHomeStats();
-  }
-  if(page==='agenda'){
-    const pageAg = document.getElementById('page-agenda');
-    if(pageAg) pageAg.style.display = 'block';
-    agInit();
-  }
-  if(page==='digitalizacao'){ abrirDigitalizacao(); }
 }
 
 // STEPS
@@ -1503,7 +677,7 @@ async function callEdgeFunction(pdfBase64,pdfText,imageBase64,mediaType){
     if(imageBase64){body.imageBase64=imageBase64;body.mediaType=mediaType||'image/jpeg';}
     else if(pdfBase64){body.pdfBase64=pdfBase64;}
     if(pdfText) body.pdfText=pdfText;
-    const resp=await authFetch(`${SUPABASE_URL}/functions/v1/extrair-nomes`,{
+    const resp=await fetch(`${SUPABASE_URL}/functions/v1/extrair-nomes`,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body:JSON.stringify(body)
@@ -1575,7 +749,6 @@ async function startSearch(){
   document.getElementById('resultsContainer').innerHTML='';
   document.getElementById('btnSalvarBusca').style.display='none';
   setSearchProgress(10,'Carregando planilha...');
-  diShow('busca');
   try{
     if(!sheetData){
       const resp=await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`);
@@ -1745,12 +918,12 @@ async function salvarBusca(){
   const payload={protocolo,matricula,inscricao:currentSearch.inscricao,proprietarios:currentSearch.proprietarios,inscricao_resultados:currentSearch.inscricao_resultados,nome_resultados:confirmados,tem_resultado:temRes};
   const email=sessionStorage.getItem('seplan_email')||'';
   payload.usuario_email=email;
-  const resp=await authFetch(`${SUPABASE_URL}/rest/v1/buscas`,{
+  const resp=await fetch(`${SUPABASE_URL}/rest/v1/buscas`,{
     method:'POST',
     headers:{'Content-Type':'application/json',...getAuthHeaders(),'Prefer':'return=representation'},
     body:JSON.stringify(payload)
   });
-  if(resp.ok){closeModal('modalCadastro');diShow('salvo');loadHomeStats();}
+  if(resp.ok){closeModal('modalCadastro');alert('Busca salva com sucesso!');}
   else{const err=await resp.json();alert('Erro ao salvar: '+JSON.stringify(err));}
 }
 
@@ -1758,7 +931,7 @@ async function salvarBusca(){
 async function loadHistoricoPage(){
   const el=document.getElementById('histListPage');
   el.innerHTML='<div class="empty-note">Carregando...</div>';
-  const resp=await authFetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=100`,{
+  const resp=await fetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=100`,{
     headers:{...getAuthHeaders()}
   });
   const data=await resp.json();
@@ -1829,7 +1002,7 @@ function abrirEdicao(){
 async function salvarEdicao(){
   if(!buscaSelecionada) return;
   const payload={protocolo:document.getElementById('eProtocolo').value.trim(),matricula:document.getElementById('eMatricula').value.trim(),inscricao:document.getElementById('eInscricao').value.trim()};
-  const resp=await authFetch(`${SUPABASE_URL}/rest/v1/buscas?id=eq.${buscaSelecionada.id}`,{
+  const resp=await fetch(`${SUPABASE_URL}/rest/v1/buscas?id=eq.${buscaSelecionada.id}`,{
     method:'PATCH',
     headers:{'Content-Type':'application/json',...getAuthHeaders()},
     body:JSON.stringify(payload)
@@ -1843,17 +1016,7 @@ async function salvarEdicao(){
   } else { alert('Erro ao salvar alterações.'); }
 }
 
-function closeModal(id){
-  document.getElementById(id).style.display='none';
-  // Ao fechar digitalização, volta pra home se não tiver nenhuma page ativa
-  if(id==='modalDigitalizacao'){
-    const anyVisible = ['home','busca','historico'].some(p=>{
-      const el=document.getElementById('page-'+p);
-      return el && el.style.display!=='none';
-    });
-    if(!anyVisible) navTo('home');
-  }
-}
+function closeModal(id){ document.getElementById(id).style.display='none'; }
 
 // CERTIDÃO
 function gerarCertidao(){
@@ -1885,6 +1048,7 @@ function gerarCertidao(){
 }
 
 // ── DIGITALIZAÇÃO ─────────────────────────────────────────────────────────
+let dgMotivo = 'analista';
 
 function abrirDigitalizacao() {
   document.getElementById('dg-data').value = new Date().toISOString().slice(0,10);
@@ -1923,7 +1087,7 @@ async function dgCarregarBuscas() {
   const list = document.getElementById('dg-busca-list');
   list.innerHTML = '<div style="padding:14px;font-size:12px;color:var(--text3);font-family:var(--mono);text-align:center">Carregando...</div>';
   try {
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=100`, { headers:{...getAuthHeaders()} });
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=100`, { headers:{...getAuthHeaders()} });
     const data = await resp.json();
     if(!Array.isArray(data)||!data.length){
       list.innerHTML = '<div style="padding:14px;font-size:12px;color:var(--text3);font-family:var(--mono);text-align:center">Nenhuma busca salva</div>';
@@ -1993,7 +1157,7 @@ async function dgAdicionar() {
   const btn = document.querySelector('#dg-pane-novo .btn-primary');
   btn.textContent = 'Salvando...'; btn.disabled = true;
   try {
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao`, {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/digitalizacao`, {
       method:'POST',
       headers:{'Content-Type':'application/json','Prefer':'return=representation',...getAuthHeaders()},
       body: JSON.stringify({ processo, data, motivo: dgMotivo, detalhe, obs, status:'pedido' })
@@ -2012,7 +1176,6 @@ async function dgAdicionar() {
     const st = document.getElementById('dg-status');
     st.textContent = '✓ Registrado!';
     setTimeout(()=>st.textContent='',3000);
-    diShow('digitalizacao');
   } catch(e) {
     alert('Erro ao salvar. Tente novamente.');
   } finally {
@@ -2075,7 +1238,7 @@ function dgItemHtml(r) {
 async function dgToggleStatus(id, statusAtual) {
   const novoStatus = statusAtual === 'pedido' ? 'entregue' : 'pedido';
   try {
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?id=eq.${id}`, {
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/digitalizacao?id=eq.${id}`, {
       method:'PATCH',
       headers:{'Content-Type':'application/json','Prefer':'return=representation',...getAuthHeaders()},
       body: JSON.stringify({ status: novoStatus })
@@ -2091,7 +1254,7 @@ async function dgToggleStatus(id, statusAtual) {
 async function dgRemover(id) {
   if(!confirm('Remover este registro?')) return;
   try {
-    await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?id=eq.${id}`, {
+    await fetch(`${SUPABASE_URL}/rest/v1/digitalizacao?id=eq.${id}`, {
       method:'DELETE', headers:{...getAuthHeaders()}
     });
     const el = document.getElementById('dg-item-'+id);
@@ -2106,7 +1269,7 @@ async function dgCarregarAnalistas() {
   grid.style.display = '';
   grid.innerHTML = '<div style="grid-column:1/-1;font-size:12px;color:var(--text3);font-family:var(--mono);text-align:center;padding:.5rem">Carregando...</div>';
   try {
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?motivo=eq.analista&order=criado_em.desc`, { headers:{...getAuthHeaders()} });
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/digitalizacao?motivo=eq.analista&order=criado_em.desc`, { headers:{...getAuthHeaders()} });
     const data = await resp.json();
     const contagem = {};
     analistas.forEach(a => contagem[a] = 0);
@@ -2133,7 +1296,7 @@ async function dgVerAnalista(nome) {
   det.style.display = '';
   lista.innerHTML = '<div style="font-size:12px;color:var(--text3);font-family:var(--mono);padding:.75rem;text-align:center">Carregando...</div>';
   try {
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?motivo=eq.analista&detalhe=eq.${encodeURIComponent(nome)}&order=criado_em.desc`, { headers:{...getAuthHeaders()} });
+    const resp = await fetch(`${SUPABASE_URL}/rest/v1/digitalizacao?motivo=eq.analista&detalhe=eq.${encodeURIComponent(nome)}&order=criado_em.desc`, { headers:{...getAuthHeaders()} });
     const data = await resp.json();
     if(!Array.isArray(data)||!data.length){
       lista.innerHTML = '<div style="font-size:13px;color:var(--text3);text-align:center;padding:1.5rem;font-family:var(--mono)">Nenhum pedido de '+nome+'.</div>';
@@ -2154,1249 +1317,6 @@ function dgFmtData(d) {
   if(!d) return '—';
   const [y,mo,dd] = d.split('-');
   return dd+'/'+mo+'/'+y;
-}
-
-// ── HOME PAGE ─────────────────────────────────────────────────────────────────
-async function loadHomeStats(){
-  // Skeleton loading
-  const feed = document.getElementById('home-feed');
-  if(feed) feed.innerHTML = `
-    <div class="feed-item" style="opacity:.4"><div class="fdot" style="background:var(--border2)"></div><div class="ftext" style="background:var(--border2);border-radius:4px;height:12px;width:60%"></div></div>
-    <div class="feed-item" style="opacity:.3"><div class="fdot" style="background:var(--border2)"></div><div class="ftext" style="background:var(--border2);border-radius:4px;height:12px;width:45%"></div></div>`;
-
-  try{
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/buscas?select=id&limit=1000`);
-    const data = await resp.json();
-    if(Array.isArray(data)){
-      const n = data.length;
-      countTo(document.getElementById('home-nbuscas'), n, 1200);
-      countTo(document.getElementById('home-num-buscas'), n, 1400);
-      const badge = document.getElementById('hbadge-busca');
-      if(badge){badge.textContent = n + ' registros'; badge.className='hmod-badge ok';}
-    }
-  }catch(e){}
-
-  try{
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?select=id,status`);
-    const data = await resp.json();
-    if(Array.isArray(data)){
-      const pend = data.filter(r=>r.status==='pedido').length;
-      countTo(document.getElementById('home-ndig'), data.length, 800);
-      const chip = document.getElementById('hchip-dig');
-      const badge = document.getElementById('hbadge-dig');
-      if(chip){chip.textContent = pend + ' pendentes'; chip.className = pend>0?'hchip hchip-a':'hchip hchip-g';}
-      if(badge){badge.textContent = pend + ' pend.'; badge.style.background=pend>0?'rgba(239,159,39,.15)':'rgba(26,158,110,.15)'; badge.style.color=pend>0?'#EF9F27':'#4ecb9e';}
-    }
-  }catch(e){}
-
-  // Feed de atividade
-  try{
-    const [b,d] = await Promise.all([
-      authFetch(`${SUPABASE_URL}/rest/v1/buscas?select=protocolo,criado_em&order=criado_em.desc&limit=4`).then(r=>r.json()),
-      authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?select=processo,motivo,detalhe,criado_em&order=criado_em.desc&limit=4`).then(r=>r.json()),
-    ]);
-    const items = [];
-    if(Array.isArray(b)) b.forEach(x=>items.push({color:'#1a6fad',text:'Busca — ',mono:x.protocolo||'—',time:x.criado_em}));
-    if(Array.isArray(d)) d.forEach(x=>items.push({color:'#1a9e6e',text:(x.motivo==='analista'?x.detalhe+' — ':'Busca — '),mono:x.processo||'—',time:x.criado_em}));
-    items.sort((a,b)=>new Date(b.time)-new Date(a.time));
-    if(feed) feed.innerHTML = items.length
-      ? items.slice(0,4).map(i=>`
-          <div class="feed-item">
-            <div class="fdot" style="background:${i.color}"></div>
-            <div class="ftext">${i.text}<span class="fmono">${i.mono}</span></div>
-            <div class="ftime">${relTime(i.time)}</div>
-          </div>`).join('')
-      : '<div class="empty-state">Sem atividade recente.</div>';
-  }catch(e){
-    if(feed) feed.innerHTML = '<div class="empty-state">Sem atividade recente.</div>';
-  }
-}
-
-function relTime(iso){
-  if(!iso) return '—';
-  const diff = (Date.now()-new Date(iso))/1000;
-  if(diff<60) return 'agora';
-  if(diff<3600) return Math.round(diff/60)+'min';
-  if(diff<86400) return Math.round(diff/3600)+'h';
-  return Math.round(diff/86400)+'d';
-}
-
-function countTo(el, target, dur){
-  if(!el) return;
-  let s=0; const step=target/(dur/16);
-  const iv=setInterval(()=>{s=Math.min(s+step,target);el.textContent=Math.round(s);if(s>=target)clearInterval(iv);},16);
-}
-
-// Canvas ondas home
-function initHomeCanvas(){
-  if(homeCanvasInited) return;
-  homeCanvasInited = true;
-  const cv = document.getElementById('home-canvas');
-  if(!cv) return;
-  const ctx = cv.getContext('2d');
-  let W,H,t=0;
-  function rsz(){W=cv.width=cv.offsetWidth;H=cv.height=cv.offsetHeight;}
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    for(let i=0;i<18;i++){
-      const r=50+i*22,ph=t*.3+i*.3,w=24*Math.sin(t*.22+i*.6);
-      ctx.beginPath();
-      for(let a=0;a<=Math.PI*2;a+=.035){
-        const rr=r+w*Math.sin(a*3+ph),x=W*.5+rr*Math.cos(a),y=H*.44+rr*Math.sin(a)*.68;
-        a===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-      }
-      ctx.closePath();
-      const g=Math.round(82+i*5),b=Math.round(118+i*5);
-      ctx.strokeStyle=`rgba(26,${g},${b},${.18-i*.007})`;
-      ctx.lineWidth=1.3;ctx.stroke();
-    }
-    t+=.009;requestAnimationFrame(draw);
-  }
-  rsz();draw();
-  window.addEventListener('resize',rsz);
-}
-
-// Canvas login
-(function(){
-  const cv=document.getElementById('login-canvas');
-  if(!cv)return;
-  const ctx=cv.getContext('2d');
-  let W,H,t=0;
-  function rsz(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
-  function draw(){
-    ctx.clearRect(0,0,W,H);
-    for(let i=0;i<16;i++){
-      const r=45+i*26,ph=t*.28+i*.32,w=20*Math.sin(t*.2+i*.55);
-      ctx.beginPath();
-      for(let a=0;a<=Math.PI*2;a+=.04){
-        const rr=r+w*Math.sin(a*3+ph),x=W*.72+rr*Math.cos(a),y=H*.38+rr*Math.sin(a)*.7;
-        a===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-      }
-      ctx.closePath();
-      const g=Math.round(85+i*5),b=Math.round(125+i*5);
-      ctx.strokeStyle=`rgba(26,${g},${b},${.15-i*.006})`;
-      ctx.lineWidth=1.2;ctx.stroke();
-    }
-    t+=.007;requestAnimationFrame(draw);
-  }
-  rsz();draw();
-  window.addEventListener('resize',rsz);
-})();
-
-// Relogio
-function homeTick(){
-  const el=document.getElementById('home-clock');
-  if(!el)return;
-  const n=new Date();
-  el.textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
-}
-homeTick();setInterval(homeTick,30000);
-
-// Modo apresentação
-function setModoApresentacao(on){
-  document.querySelectorAll('.mpill').forEach((b,i)=>b.classList.toggle('on',on?i===1:i===0));
-  const feed=document.getElementById('home-feed-wrap');
-  const canvas=document.getElementById('home-canvas');
-  if(on){
-    if(feed)feed.style.opacity='.1';
-    document.querySelector('.home-desc').textContent='Sistema de Gestão Urbana — Prefeitura de Balneário Piçarras';
-  } else {
-    if(feed)feed.style.opacity='1';
-    document.querySelector('.home-desc').textContent='Sistema unificado de gestão — processos, buscas, agendamentos e digitalização em um só lugar.';
-  }
-}
-
-// ── DYNAMIC ISLAND ────────────────────────────────────────────────────────────
-const _di=document.getElementById('di-island');
-const _diPad=document.getElementById('di-ipad');
-const DI_O=650,DI_C=560;
-function _diEaseOut(t){return 1-Math.pow(1-t,3.2);}
-function _diEaseIn(t){return Math.pow(t,2.8);}
-function _diAnim({fromW,fromH,toW,toH,dur,closing,onDone}){
-  cancelAnimationFrame(_diAf);
-  const start=performance.now();
-  const ease=closing?_diEaseIn:_diEaseOut;
-  function frame(now){
-    const raw=Math.min((now-start)/dur,1),p=ease(raw);
-    const cw=fromW+(toW-fromW)*p,ch=fromH+(toH-fromH)*p;
-    const safeR=Math.max(ch/2,Math.min(26,ch/2+(26-ch/2)*Math.min(1,(cw-ch)/180)));
-    _di.style.width=cw+'px';_di.style.height=ch+'px';
-    _di.style.borderRadius=safeR+'px';_diPad.style.borderRadius=safeR+'px';
-    if(!closing){const op=Math.max(0,(raw-.5)/.5);_diPad.style.opacity=_diEaseOut(op);}
-    else{const op=Math.min(1,raw/.42);_diPad.style.opacity=1-_diEaseIn(op);}
-    if(raw<1){_diAf=requestAnimationFrame(frame);}
-    else{_di.style.width=toW+'px';_di.style.height=toH+'px';_di.style.borderRadius=(toW<=10?999:Math.max(toH/2,26))+'px';_diPad.style.opacity=closing?'0':'1';if(onDone)onDone();}
-  }
-  _diAf=requestAnimationFrame(frame);
-}
-const _diCfgs={
-  busca:{w:280,h:52,dur:4500,build(){
-    _diPad.innerHTML=`<canvas id="di-sc" width="26" height="26" style="flex-shrink:0"></canvas><div style="flex:1"><div id="di-stxt" style="font-size:12px;font-weight:600;color:#fff">Buscando...</div><div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:1px">IA analisando a matrícula</div></div><div style="font-size:10px;color:#5aabef;letter-spacing:3px">●●●</div>`;
-    const cv=document.getElementById('di-sc'),ctx=cv.getContext('2d');
-    let a=0,af;
-    const ws=['Buscando...','Analisando...','Cruzando...','Finalizando...'];let wi=0;
-    const iv=setInterval(()=>{wi=(wi+1)%ws.length;const el=document.getElementById('di-stxt');if(el)el.textContent=ws[wi];},950);
-    function loop(){ctx.clearRect(0,0,26,26);ctx.beginPath();ctx.arc(13,13,9,0,Math.PI*2);ctx.strokeStyle='rgba(26,111,173,.15)';ctx.lineWidth=2.2;ctx.stroke();ctx.beginPath();ctx.arc(13,13,9,a,a+1.3);ctx.strokeStyle='#1a6fad';ctx.lineWidth=2.2;ctx.lineCap='round';ctx.stroke();a+=.055;af=requestAnimationFrame(loop);}
-    loop();
-    return()=>{clearInterval(iv);cancelAnimationFrame(af);};
-  }},
-  busca_ok:{w:260,h:52,dur:3500,build(){
-    _diPad.innerHTML=`<canvas id="di-cc" width="28" height="28" style="flex-shrink:0"></canvas><div style="flex:1;margin-left:8px"><div style="font-size:12px;font-weight:600;color:#1a9e6e;font-family:'Barlow Condensed',sans-serif;font-size:14px;text-transform:uppercase">Concluída!</div><div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:1px">Resultados disponíveis</div></div>`;
-    const cv=document.getElementById('di-cc'),ctx=cv.getContext('2d');
-    const pts=[{x:8,y:14},{x:12,y:19},{x:20,y:10}];
-    let p={v:0};const iv=setInterval(()=>{p.v=Math.min(p.v+.05,2);ctx.clearRect(0,0,28,28);ctx.beginPath();ctx.arc(14,14,10,0,Math.PI*2);ctx.strokeStyle='rgba(26,158,110,.2)';ctx.lineWidth=1.8;ctx.stroke();ctx.beginPath();ctx.strokeStyle='#1a9e6e';ctx.lineWidth=2.2;ctx.lineCap='round';ctx.lineJoin='round';const t1=Math.min(p.v,1),t2=Math.max(0,p.v-1);ctx.moveTo(pts[0].x,pts[0].y);ctx.lineTo(pts[0].x+(pts[1].x-pts[0].x)*t1,pts[0].y+(pts[1].y-pts[0].y)*t1);if(p.v>1){ctx.moveTo(pts[1].x,pts[1].y);ctx.lineTo(pts[1].x+(pts[2].x-pts[1].x)*t2,pts[1].y+(pts[2].y-pts[1].y)*t2);}ctx.stroke();if(p.v>=2)clearInterval(iv);},16);
-    return()=>{clearInterval(iv);};
-  }},
-  salvo:{w:240,h:52,dur:3000,build(){
-    _diPad.innerHTML=`<div style="width:24px;height:24px;border-radius:50%;background:rgba(26,158,110,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#1a9e6e;font-size:14px;font-weight:700">✓</div><div style="flex:1;margin-left:8px"><div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#1a9e6e;text-transform:uppercase">Salvo</div><div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:1px">Histórico atualizado</div></div>`;
-    return()=>{};
-  }},
-  erro:{w:240,h:52,dur:3500,build(){
-    _diPad.innerHTML=`<div id="di-ai" style="width:24px;height:24px;border-radius:50%;background:rgba(226,75,74,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:800;color:#E24B4A">!</div><div style="flex:1;margin-left:8px"><div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#E24B4A;text-transform:uppercase">Erro</div><div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:1px">Verifique e tente novamente</div></div>`;
-    let s=1,dir=1,af;function pulse(){s+=dir*.008;if(s>1.12||s<1)dir*=-1;const el=document.getElementById('di-ai');if(el)el.style.transform=`scale(${s})`;af=requestAnimationFrame(pulse);}pulse();
-    return()=>{cancelAnimationFrame(af);};
-  }},
-  digitalizacao:{w:270,h:52,dur:3500,build(){
-    _diPad.innerHTML=`<div style="width:24px;height:24px;border-radius:50%;background:rgba(26,111,173,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:12px">📄</div><div style="flex:1;margin-left:8px"><div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#fff;text-transform:uppercase">Digitalização</div><div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:1px">Registro salvo com sucesso</div></div>`;
-    return()=>{};
-  }}
-};
-function diShow(type){
-  if(_diBusy)return;_diBusy=true;clearTimeout(_diTimer);
-  if(_diCleanup){_diCleanup();_diCleanup=null;}
-  const cfg=_diCfgs[type];if(!cfg)return;
-  _diPad.innerHTML='';_diPad.style.opacity='0';
-  const fw=parseFloat(_di.style.width)||10,fh=parseFloat(_di.style.height)||10;
-  _diAnim({fromW:fw,fromH:fh,toW:cfg.w,toH:cfg.h,dur:DI_O,closing:false,onDone:()=>{
-    _diCleanup=cfg.build();
-    _diTimer=setTimeout(()=>{
-      if(_diCleanup){_diCleanup();_diCleanup=null;}
-      const cw=parseFloat(_di.style.width)||cfg.w,ch=parseFloat(_di.style.height)||cfg.h;
-      _diAnim({fromW:cw,fromH:ch,toW:10,toH:10,dur:DI_C,closing:true,onDone:()=>{_diBusy=false;_diPad.innerHTML='';}});
-    },cfg.dur);
-  }});
-}
-
-
-// ── SUPABASE ADAPTER (substitui Firebase) ────────────────────────────────────
-window._fb = {
-  listenDays: async function(cb) {
-    // Carregar dias do Supabase
-    async function load() {
-      try {
-        const resp = await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?order=data.asc,hora.asc`);
-        const rows = await resp.json();
-        if(!Array.isArray(rows)) { cb(null); return; }
-        // Agrupar por dia (mesmo formato do Firebase)
-        const byDay = {};
-        rows.forEach(r => {
-          const key = r.data.replace(/-/g,'') + '_' + (r.data.includes('T') ? r.data : r.data);
-          const dataFmt = r.data.split('-').reverse().join('/');
-          const dow = new Date(r.data+'T12:00:00').getDay();
-          const weekday = dow===2?'TERÇA-FEIRA':dow===4?'QUINTA-FEIRA':'OUTRO';
-          const id = (weekday.startsWith('TERÇA')?'TERÇA':'QUINTA') + ' ' + dataFmt.slice(0,5).replace('/','');
-          if(!byDay[id]) byDay[id] = { id, data: dataFmt, weekday, avisos:[], slots:{} };
-          byDay[id].slots[r.hora] = { nome:r.nome||'', assunto:r.assunto||'', analista: (r.analistas&&r.analistas[0])||'', analistas:r.analistas||[], agendadopor:r.agendado_por||'', _id:r.id, _data:r.data };
-        });
-        cb(Object.keys(byDay).length ? byDay : null);
-      } catch(e) { console.error(e); cb(null); }
-    }
-    load();
-    // Polling a cada 30s (sem realtime por ora)
-    window._agendaInterval = setInterval(load, 30000);
-  },
-  saveDays: async function(daysArr) {
-    // Salvar todos os slots modificados
-    for(const day of daysArr) {
-      const isoDate = day.data.split('/').reverse().join('-');
-      for(const [hora, slot] of Object.entries(day.slots||{})) {
-        const payload = { data:isoDate, hora, nome:slot.nome||'', assunto:slot.assunto||'', agendado_por:slot.agendadopor||'', analistas: slot.analistas || (slot.analista?[slot.analista]:[]) };
-        if(slot._id) {
-          await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?id=eq.${slot._id}`, { method:'PATCH', body:JSON.stringify(payload) });
-        } else if(slot.nome) {
-          const r = await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos`, { method:'POST', headers:{'Prefer':'return=representation'}, body:JSON.stringify(payload) });
-          if(r.ok) { const d=await r.json(); if(d[0]) slot._id=d[0].id; }
-        }
-      }
-    }
-  },
-  saveAnalistas: async function(list) {
-    localStorage.setItem('seplan_analistas', JSON.stringify(list));
-  },
-  listenAnalistas: async function(cb) {
-    // Carregar do Supabase
-    try {
-      const resp = await authFetch(`${SUPABASE_URL}/rest/v1/analistas_config?order=nome.asc`);
-      const data = await resp.json();
-      if(Array.isArray(data) && data.length) {
-        cb(data.map(a=>a.nome));
-        // Guardar cores
-        window._analistasCores = {};
-        data.forEach(a=>{ window._analistasCores[a.nome]=a.cor||'#888'; });
-      } else {
-        cb(null);
-      }
-    } catch(e) { cb(null); }
-  },
-  saveBloqueios: function(obj) { localStorage.setItem('seplan_bloqueios', JSON.stringify(obj)); },
-  listenBloqueios: function(cb) {
-    try { cb(JSON.parse(localStorage.getItem('seplan_bloqueios'))||{}); }
-    catch { cb({}); }
-  }
-};
-
->
-// ── DADOS BASE ─────────────────────────────────────────────────────────────
-const HORARIOS = ["08:30","09:00","09:30","10:00","10:30","11:00","11:30"];
-let ANALISTAS = ["Gabriela","Ruy","Sabrina","Vera","Marco","Andressa"];
-
-const BASE_DAYS = [{"id":"TERÇA 0601","data":"06/01/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Sidnei KZA","assunto":"5538/2025 - Ruy","analista":"Ruy"},"09:00":{"nome":"","assunto":"","analista":""},"09:30":{"nome":"Ronaldo","assunto":"43278/2025 - Ruy","analista":"Ruy"},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"Pedro Henrique","assunto":"41825/2025 - Ruy","analista":"Ruy"},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"QUINTA 0801","data":"08/01/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Jean Ricardo","assunto":"47110/2025 - Sabrina","analista":"Sabrina"},"09:00":{"nome":"Pedro Henrique","assunto":"11283/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Kaique","assunto":"39977/2025 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Lucas","assunto":"35064/2025 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Gabriel","assunto":"36604/2025 - Gabriela","analista":"Gabriela"},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 1301","data":"13/01/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Rosangela Pepe","assunto":"32689/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Adriano","assunto":"28231/2025 - Ruy","analista":"Ruy"},"09:30":{"nome":"Amabile","assunto":"40041/2025 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Adalberto","assunto":"12536/2025 - Sabrina","analista":"Sabrina"},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"QUINTA 1501","data":"15/01/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Sidnei","assunto":"10696/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Danilo","assunto":"26911/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"David","assunto":"26541- Gabriela","analista":"Gabriela"},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 2001","data":"20/01/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Jennifer","assunto":"41153/2025 - Sabrina","analista":"Sabrina"},"09:00":{"nome":"Bruna","assunto":"41938/2025 - Sabrina","analista":"Sabrina"},"09:30":{"nome":"Danyelly Barbosa","assunto":"15002/2025 - Ruy","analista":"Ruy"},"10:00":{"nome":"André Luiz","assunto":"17606/2025 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Jonas","assunto":"32143/2025 - Sabrina","analista":"Sabrina"},"11:00":{"nome":"Priscila Rodrigues","assunto":"43049/2025 - Gabriela","analista":"Gabriela"},"11:30":{"nome":"Fernando Mazao / Tainara","assunto":"35019/2025 - Ruy","analista":"Ruy"}}},{"id":"QUINTA 2201","data":"22/01/2026","weekday":"QUINTA-FEIRA","avisos":["Férias Gabriela"],"slots":{"08:30":{"nome":"Akes","assunto":"40333/2025","analista":""},"09:00":{"nome":"Shark","assunto":"44528/2025 - Vera","analista":"Vera"},"09:30":{"nome":"Ariel Augusto Hille","assunto":"40892/2025 - Ruy","analista":"Ruy"},"10:00":{"nome":"Thaiss e Aníbal","assunto":"19852/2025 - Ruy","analista":"Ruy"},"10:30":{"nome":"Mariana","assunto":"2397/2025 - Vera","analista":"Vera"},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"Katuana","assunto":"25799/2025 - Marco","analista":"Marco"}}},{"id":"TERÇA 2701","data":"27/01/2026","weekday":"TERÇA-FEIRA","avisos":["Férias Gabriela"],"slots":{"08:30":{"nome":"","assunto":"","analista":""},"09:00":{"nome":"Douglas","assunto":"47415/2025 - Sabrina","analista":"Sabrina"},"09:30":{"nome":"","assunto":"","analista":""},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"Juan Pianecer","assunto":"37550/2025 - Ruy","analista":"Ruy"},"11:30":{"nome":"Juan Pianecer","assunto":"25799/2025 - Marco","analista":"Marco"}}},{"id":"QUINTA 2901","data":"29/01/2026","weekday":"QUINTA-FEIRA","avisos":["Férias Gabriela"],"slots":{"08:30":{"nome":"","assunto":"","analista":""},"09:00":{"nome":"Liziane","assunto":"44095/2025 - Sabrina","analista":"Sabrina"},"09:30":{"nome":"Fernando","assunto":"47431/2025 - Vera","analista":"Vera"},"10:00":{"nome":"Djionas","assunto":"38902/2025 - Vera","analista":"Vera"},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 0302","data":"03/02/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Ralf / Arnaldo Bosco Câmera","assunto":"32804/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Gabriel","assunto":"36604/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Alexandre","assunto":"31623/2025 - Sabrina","analista":"Sabrina"},"10:00":{"nome":"Rogga","assunto":"36260/2025 - Ruy","analista":"Ruy"},"10:30":{"nome":"Akes","assunto":"40220/2025 - Ruy","analista":"Ruy"},"11:00":{"nome":"Alex","assunto":"48780/2025 - Sabrina","analista":"Sabrina"},"11:30":{"nome":"Mariana Vetter","assunto":"2397/2025 - Vera","analista":"Vera"}}},{"id":"QUINTA 0502","data":"05/02/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Thais","assunto":"20037/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Rogga","assunto":"36260/2025 - Ruy","analista":"Ruy"},"09:30":{"nome":"Rogga","assunto":"46608 e 46407/2025 - Vera","analista":"Vera"},"10:00":{"nome":"Leandro","assunto":"22266/2025 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Wgb","assunto":"38495/2025 - Gabriela","analista":"Gabriela"},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 1002","data":"10/02/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Kassio","assunto":"45932/2025 - Sabrina","analista":"Sabrina"},"09:00":{"nome":"Priscila","assunto":"35330/2025 - Marco","analista":"Marco"},"09:30":{"nome":"Emanuelly","assunto":"22448/2025 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Edson","assunto":"41637/2025 - Marco","analista":"Marco"},"10:30":{"nome":"Brunna","assunto":"21028/2025 - Sabrina","analista":"Sabrina"},"11:00":{"nome":"Annie","assunto":"39994/2025 - Marco","analista":"Marco"},"11:30":{"nome":"Arnaldo","assunto":"12094/2025 - Gabriela","analista":"Gabriela"}}},{"id":"QUINTA 1202","data":"12/02/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Mayron","assunto":"2459/2026 - Vera","analista":"Vera"},"09:00":{"nome":"","assunto":"","analista":""},"09:30":{"nome":"","assunto":"","analista":""},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"Maiã Priscila Kohls","assunto":"26541/2025 - Gabriela","analista":"Gabriela"}}},{"id":"QUINTA 1902","data":"19/02/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Katuana","assunto":"8875/2025 - Marco","analista":"Marco"},"09:00":{"nome":"Liziane","assunto":"35621/2025 - Ruy","analista":"Ruy"},"09:30":{"nome":"Douglas","assunto":"13243/2025 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Liziani","assunto":"17601/2025 - Sabrina","analista":"Sabrina"},"10:30":{"nome":"Ottavio","assunto":"30237/2025 - Marco","analista":"Marco"},"11:00":{"nome":"Duda","assunto":"39677/2025 - Gabriela","analista":"Gabriela"},"11:30":{"nome":"EDSON HAGEMANN","assunto":"14813/2025 - Gabriela","analista":"Gabriela"}}},{"id":"TERÇA 2402","data":"24/02/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Elço Poleza","assunto":"3158/2026 - Sabrina","analista":"Sabrina"},"09:00":{"nome":"Giovanni Minatti","assunto":"38089/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Dionel","assunto":"EIV - Azure (Frechal) - Vera","analista":"Vera"},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"Mayron Rodrigo","assunto":"15491/2025 - Marco","analista":"Marco"},"11:00":{"nome":"Jonathan","assunto":"13819/2025 - Sabrina","analista":"Sabrina"},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"QUINTA 2602","data":"26/02/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Maria Eduarda","assunto":"39677/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"","assunto":"","analista":""},"09:30":{"nome":"","assunto":"","analista":""},"10:00":{"nome":"Paulo","assunto":"30139/2025 - Marco","analista":"Marco"},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 0303","data":"03/03/2026","weekday":"TERÇA-FEIRA","avisos":["Emanuel","Carol"],"slots":{"08:30":{"nome":"Lizi","assunto":"28485/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Dani Ferretti","assunto":"43145/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Jannice","assunto":"1998/2026 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"João Delgado","assunto":"26101/2025 - Ruy","analista":"Ruy"},"10:30":{"nome":"WGB - Greici","assunto":"40178/2025 - Sabrina","analista":"Sabrina"},"11:00":{"nome":"Igor","assunto":"45531/2025 - Gabriela","analista":"Gabriela"},"11:30":{"nome":"Jonathan Gomes","assunto":"4206/2026 - Marco","analista":"Marco"}}},{"id":"QUINTA 0503","data":"05/03/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Wesley","assunto":"43822/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Augusto","assunto":"37585/2025 - Sabrina","analista":"Sabrina"},"09:30":{"nome":"Marina","assunto":"17606/2025 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Paulo Rosa","assunto":"3467/2026 - Marco","analista":"Marco"},"10:30":{"nome":"Jocinei","assunto":"21738/2024 - Gabriela","analista":"Gabriela"},"11:00":{"nome":"Augusto","assunto":"43278/2025 - Ruy","analista":"Ruy"},"11:30":{"nome":"Djionas Antônio Paludo","assunto":"17606/2025 - Gabriela","analista":"Gabriela"}}},{"id":"TERÇA 1003","data":"10/03/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Paulo Roberto da Rosa","assunto":"3467/2026 - Marco","analista":"Marco"},"09:00":{"nome":"Arnaldo Bosco","assunto":"3624/2026 - Ruy","analista":"Ruy"},"09:30":{"nome":"Cássia","assunto":"7817/2026 - Sabrina","analista":"Sabrina"},"10:00":{"nome":"Danilo","assunto":"26911/2025 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Leo Souza","assunto":"31515/2025 - Sabrina","analista":"Sabrina"},"11:00":{"nome":"Joice","assunto":"41637/2025 - Marco","analista":"Marco"},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"QUINTA 1203","data":"12/03/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Lizi","assunto":"17606/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"","assunto":"","analista":""},"09:30":{"nome":"Tainara","assunto":"35416/2025 - Ruy","analista":"Ruy"},"10:00":{"nome":"Tainara","assunto":"901/2025 - Sabrina","analista":"Sabrina"},"10:30":{"nome":"Antonio","assunto":"45521/2025 - Marco","analista":"Marco"},"11:00":{"nome":"David","assunto":"26541/2025 - Gabriela","analista":"Gabriela"},"11:30":{"nome":"Eng. Adriano","assunto":"28231/2025","analista":""}}},{"id":"TERÇA 1703","data":"17/03/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"","assunto":"","analista":""},"09:00":{"nome":"Eng Valdecir Nogueira","assunto":"4252/2026 - Sabrina","analista":"Sabrina"},"09:30":{"nome":"Tainara","assunto":"9911/2024 - Sabrina","analista":"Sabrina"},"10:00":{"nome":"Jannice","assunto":"41969/2025 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Rogga","assunto":"46407/2025 - Vera","analista":"Vera"},"11:00":{"nome":"Rogga","assunto":"46608/2025 - Vera","analista":"Vera"},"11:30":{"nome":"RKA arquitetura","assunto":"26911/2025 - Gabriela","analista":"Gabriela"}}},{"id":"QUINTA 1903","data":"19/03/2026","weekday":"QUINTA-FEIRA","avisos":["Não marcar nada para a Vera"],"slots":{"08:30":{"nome":"JHONATHAN","assunto":"4206/2026 - Marco","analista":"Marco"},"09:00":{"nome":"Rogga","assunto":"15002/2025 - Ruy","analista":"Ruy"},"09:30":{"nome":"Lucas","assunto":"38945/2025 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Lizi","assunto":"7503/2026 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Gerson","assunto":"40142/2025 - Gabriela","analista":"Gabriela"},"11:00":{"nome":"David","assunto":"26541/2025 - Gabriela","analista":"Gabriela"},"11:30":{"nome":"WGB","assunto":"6650/2026 - Gabriela","analista":"Gabriela"}}},{"id":"TERÇA 2403","data":"24/03/2026","weekday":"TERÇA-FEIRA","avisos":["Não marcar com o Ruy"],"slots":{"08:30":{"nome":"WGB","assunto":"5478/2026 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"ENG ALAN","assunto":"38629/2025 - Ruy","analista":"Ruy"},"09:30":{"nome":"Douglas Vinicius","assunto":"7913/2026 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Rogga","assunto":"46407/2025 - Vera","analista":"Vera"},"10:30":{"nome":"Douglas","assunto":"36986/2025 - Sabrina","analista":"Sabrina"},"11:00":{"nome":"Cleber","assunto":"36696/2025 - Marco","analista":"Marco"},"11:30":{"nome":"Gerson","assunto":"40142/2025 - Gabriela","analista":"Gabriela"}}},{"id":"QUINTA 2603","data":"26/03/2026","weekday":"QUINTA-FEIRA","avisos":["Não marcar nada para a Vera","Não marcar nada para a Gabriela/Sabrina"],"slots":{"08:30":{"nome":"Jannice","assunto":"1998/2026 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Vetter","assunto":"4114/2026 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Alexssandro","assunto":"6994/2026 - Sabrina","analista":"Sabrina"},"10:00":{"nome":"Douglas","assunto":"36986/2025 - Sabrina","analista":"Sabrina"},"10:30":{"nome":"Derner","assunto":"Gabriela","analista":"Gabriela"},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 3103","data":"31/03/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Vetter","assunto":"4114/2026 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Arnon Cardoso Cornette","assunto":"43822/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Cleber e Clodoaldo","assunto":"36696/2025 - Marco","analista":"Marco"},"10:00":{"nome":"Adrieli","assunto":"45508/2025 - Ruy","analista":"Ruy"},"10:30":{"nome":"Fernando Luz","assunto":"19476/2025","analista":""},"11:00":{"nome":"Barbara","assunto":"34397/2025","analista":""},"11:30":{"nome":"Akes","assunto":"8928/2026","analista":""}}},{"id":"QUINTA 0204","data":"02/04/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Dionel","assunto":"Frechal - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Gabriela - WGB Engenharia","assunto":"5159/2026 - Ruy","analista":"Ruy"},"09:30":{"nome":"Lizi","assunto":"7503/2026 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Liege Scremin","assunto":"9640/2026","analista":""},"10:30":{"nome":"Natalino Fuck","assunto":"4206/2026 - Marco","analista":"Marco"},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 0704","data":"07/04/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Amanda e Mayara","assunto":"22181/2024 - Vera","analista":"Vera"},"09:00":{"nome":"Gabriela","assunto":"40650/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Julian","assunto":"36700/2025 - Ruy","analista":"Ruy"},"10:00":{"nome":"Vetter","assunto":"48862/2025 - Ruy","analista":"Ruy"},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"QUINTA 0904","data":"09/04/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"WGB","assunto":"5478/2026 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"","assunto":"","analista":""},"09:30":{"nome":"","assunto":"","analista":""},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"Joice","assunto":"3459/2026 - Gabriela","analista":"Gabriela"}}},{"id":"TERÇA 1404","data":"14/04/2026","weekday":"TERÇA-FEIRA","avisos":["Emanuel","Sabrina"],"slots":{"08:30":{"nome":"Lizi","assunto":"8636/2026 - Sabrina","analista":"Sabrina"},"09:00":{"nome":"Jannice","assunto":"8353/2026 - Ruy","analista":"Ruy"},"09:30":{"nome":"Rauf","assunto":"48876/2025 - Marco","analista":"Marco"},"10:00":{"nome":"Edilaine","assunto":"40270/2025 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Tainara Manorov","assunto":"2072/2026 - Marco","analista":"Marco"},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"QUINTA 1604","data":"16/04/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"J&I administradora de bens","assunto":"31623/2025 - Sabrina","analista":"Sabrina"},"09:00":{"nome":"","assunto":"","analista":""},"09:30":{"nome":"","assunto":"","analista":""},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 2804","data":"28/04/2026","weekday":"TERÇA-FEIRA","avisos":["NÃO AGENDAR GABRIELA"],"slots":{"08:30":{"nome":"","assunto":"","analista":""},"09:00":{"nome":"ROSANE","assunto":"36717/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"","assunto":"","analista":""},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}}];
-
-// ── STATE ──────────────────────────────────────────────────────────────────
-let DAYS            = [];
-let currentView     = 'agenda';
-let currentAnalista = 'todos';
-let editCtx         = null;
-let selAnalistaVal  = '';
-window._appReady    = false;
-window.BASE_DAYS    = BASE_DAYS;
-
-// saveDays: envia para o Firebase — propaga para todos em tempo real
-function saveDays() {
-  window._fb.saveDays(DAYS);
-}
-
-function loadDays() {
-  // Dados chegam via listener Firebase — não faz nada aqui
-}
-
-// ── HELPERS ────────────────────────────────────────────────────────────────
-function analClass(an) { return an ? an.toLowerCase() : ''; }
-function badgeHtml(an) {
-  if (!an) return '';
-  const cor = (window._analistasCores&&window._analistasCores[an])||'#888';
-  return `<span class="analista-badge" style="background:${cor}22;color:${cor};border:0.5px solid ${cor}44;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;font-family:var(--mono)">${an}</span>`;
-}
-function dateToDDMMYYYY(iso) {
-  const [y,m,d] = iso.split('-');
-  return `${d}/${m}/${y}`;
-}
-function toast(msg, err=false) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className = 'toast show' + (err?' err':'');
-  setTimeout(() => t.className = 'toast', 2500);
-}
-function overlayClick(e, id) { if (e.target.id === id) closeModal(id); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-// ── ANALISTA SELECTOR ──────────────────────────────────────────────────────
-function selAnalista(an) {
-  selAnalistaVal = an;
-  document.querySelectorAll('.analista-opt').forEach(el => {
-    el.className = el.className.replace(/\bsel-\S+/g,'').trim();
-  });
-  const key = an || 'nenhum';
-  const el = document.getElementById('opt-' + (an || 'nenhum'));
-  if (el) el.classList.add('sel-' + key);
-}
-
-// ── MODAL SLOT ─────────────────────────────────────────────────────────────
-function openSlot(dayId, hora) {
-  const day = DAYS.find(d => d.id === dayId);
-  const slot = day.slots[hora];
-  editCtx = { dayId, hora };
-
-  document.getElementById('slot-data').value = day.data;
-  document.getElementById('slot-hora').value = hora;
-  document.getElementById('slot-nome').value = slot.nome;
-  document.getElementById('slot-assunto').value = slot.assunto;
-  document.getElementById('slot-agendadopor').value = slot.agendadopor || '';
-  document.getElementById('modal-slot-title').textContent =
-    slot.nome ? 'Editar agendamento' : 'Agendar horário';
-
-  // Reconstrói grid com analistas atuais, marcando bloqueados para este dia
-  rebuildAnalistaGrid(dayId);
-  selAnalista(slot.analista);
-  document.getElementById('overlay-slot').classList.add('open');
-  setTimeout(() => document.getElementById('slot-nome').focus(), 200);
-}
-
-function salvarSlot() {
-  const nome = document.getElementById('slot-nome').value.trim();
-  if (!nome) { toast('Informe o nome do requerente', true); return; }
-  const { dayId, hora } = editCtx;
-  const day = DAYS.find(d => d.id === dayId);
-  const analistas2 = selAnalistaVal ? (window._selAnalistas2||[selAnalistaVal]) : [];
-  day.slots[hora] = { nome, assunto: document.getElementById('slot-assunto').value.trim(), analista: selAnalistaVal, analistas: analistas2, agendadopor: document.getElementById('slot-agendadopor').value.trim() };
-  saveDays();
-  closeModal('overlay-slot');
-  toast('Agendamento salvo ✓');
-  render();
-}
-
-function limparSlot(dayId, hora, e) {
-  e.stopPropagation();
-  if (!confirm('Remover este agendamento?')) return;
-  const day = DAYS.find(d => d.id === dayId);
-  day.slots[hora] = { nome:'', assunto:'', analista:'' };
-  saveDays();
-  toast('Agendamento removido');
-  render();
-}
-
-// ── AVISOS ─────────────────────────────────────────────────────────────────
-function addAviso(dayId) {
-  const txt = prompt('Novo aviso:');
-  if (!txt || !txt.trim()) return;
-  const day = DAYS.find(d => d.id === dayId);
-  day.avisos.push(txt.trim());
-  saveDays(); render();
-}
-function rmAviso(dayId, idx, e) {
-  e.stopPropagation();
-  const day = DAYS.find(d => d.id === dayId);
-  day.avisos.splice(idx, 1);
-  saveDays(); render();
-}
-
-// ── MODAL NOVO DIA ─────────────────────────────────────────────────────────
-function openModalNovoDia() {
-  document.getElementById('novo-data').value = '';
-  document.getElementById('novo-aviso').value = '';
-  document.getElementById('overlay-dia').classList.add('open');
-  setTimeout(() => document.getElementById('novo-data').focus(), 200);
-}
-
-function salvarNovoDia() {
-  const isoDate = document.getElementById('novo-data').value;
-  if (!isoDate) { toast('Selecione uma data', true); return; }
-  const weekday = document.getElementById('novo-weekday').value;
-  const aviso   = document.getElementById('novo-aviso').value.trim();
-  const data    = dateToDDMMYYYY(isoDate);
-  const parts   = isoDate.split('-');
-  const dd = parts[2], mm = parts[1];
-  const pre = weekday.startsWith('TERÇA') ? 'TERÇA' : 'QUINTA';
-  const id  = `${pre} ${dd}${mm}`;
-
-  if (DAYS.find(d => d.id === id)) { toast('Este dia já existe', true); return; }
-
-  const emptySlots = {};
-  HORARIOS.forEach(h => { emptySlots[h] = { nome:'', assunto:'', analista:'' }; });
-  const newDay = { id, data, weekday, avisos: aviso ? [aviso] : [], slots: emptySlots };
-  DAYS.push(newDay);
-  DAYS.sort((a,b) => {
-    const toIso = d => d.split('/').reverse().join('-');
-    return toIso(a.data).localeCompare(toIso(b.data));
-  });
-  saveDays();
-  closeModal('overlay-dia');
-  toast(`Dia ${data} criado ✓`);
-  render();
-}
-
-function excluirDia(dayId, e) {
-  e.stopPropagation();
-  const day = DAYS.find(d => d.id === dayId);
-  if (!confirm(`Excluir o dia ${day.data}? Esta ação não pode ser desfeita.`)) return;
-  DAYS = DAYS.filter(d => d.id !== dayId);
-  saveDays(); toast('Dia removido'); render();
-}
-
-// ── RENDER AGENDA ──────────────────────────────────────────────────────────
-const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
-               'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-
-function renderAgenda() {
-  const filt = currentAnalista;
-
-  // Preserva quais cards/meses estão abertos
-  const openCards = new Set();
-  document.querySelectorAll('.day-card.open').forEach(el => openCards.add(el.id));
-  const openMonths = new Set();
-  document.querySelectorAll('.month-group:not(.closed)').forEach(el => openMonths.add(el.id));
-  const firstRender = openMonths.size === 0 && openCards.size === 0;
-
-  // Agrupa por mês
-  const byMonth = {};
-  let anyDay = false;
-  DAYS.forEach((day) => {
-    const slots = HORARIOS.map(h => ({ h, ...day.slots[h] }));
-    if (filt === 'livres' && !slots.some(s => !s.nome)) return;
-    if (filt !== 'todos' && filt !== 'livres' && !slots.some(s => s.analista === filt)) return;
-    anyDay = true;
-    const parts = day.data.split('/');
-    const monthKey = parts[2] + '-' + parts[1];
-    if (!byMonth[monthKey]) byMonth[monthKey] = [];
-    byMonth[monthKey].push(day);
-  });
-
-  if (!anyDay) {
-    document.getElementById('view-agenda').innerHTML =
-      '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Nenhum resultado para este filtro.</div></div>';
-    return;
-  }
-
-  const sortedMonths = Object.keys(byMonth).sort();
-  const lastMonth = sortedMonths[sortedMonths.length - 1];
-  const todayStr = new Date().toLocaleDateString('pt-BR');
-
-  let html = '';
-  sortedMonths.forEach(monthKey => {
-    const parts = monthKey.split('-');
-    const monthLabel = MESES[parseInt(parts[1])-1] + ' ' + parts[0];
-    const groupId = 'month-' + monthKey;
-    const hasToday = byMonth[monthKey].some(d => d.data === todayStr);
-    const monthOpen = firstRender ? (monthKey === lastMonth || hasToday) : openMonths.has(groupId);
-
-    html += '<div class="month-group' + (monthOpen ? '' : ' closed') + '" id="' + groupId + '">';
-    html += `<div class="month-header" onclick="toggleMonth('${groupId}')">`;
-    html += '<div class="month-title">' + monthLabel + '</div>';
-    html += '<div class="month-count">' + byMonth[monthKey].length + ' dia' + (byMonth[monthKey].length !== 1 ? 's' : '') + '</div>';
-    html += '<svg class="month-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
-    html += '</div><div class="month-body">';
-
-    byMonth[monthKey].forEach(day => {
-      const slots = HORARIOS.map(h => ({ h, ...day.slots[h] }));
-      const ocupados = slots.filter(s => s.nome).length;
-      const livres   = HORARIOS.length - ocupados;
-      const wl = day.weekday.toLowerCase();
-      const isTerca = wl.includes('terça') || wl.includes('terca');
-      const isToday = day.data === todayStr;
-      const isPast  = parseDataBR(day.data) < (() => { const h = new Date(); h.setHours(0,0,0,0); return h; })() && !isToday;
-      const cardId  = 'card-' + day.id.replace(/[^a-zA-Z0-9]/g, '_');
-      const cardOpen = isToday || openCards.has(cardId);
-
-      html += '<div class="day-card' + (cardOpen ? ' open' : '') + (isPast ? ' past-day' : '') + '" id="' + cardId + '">';
-      html += `<div class="day-header" onclick="toggleCard('${cardId}')">`;
-      html += '<div class="day-header-left">';
-      html += '<span class="day-badge ' + (isTerca ? 'badge-terca' : 'badge-quinta') + '">' + (isTerca ? 'Terça' : 'Quinta') + '</span>';
-      html += '<div><div class="day-date">' + day.data + (isToday ? ' <span style="font-size:10px;color:var(--success)">● hoje</span>' : '') + (isPast ? ' <span style="font-size:10px;color:var(--muted)">• encerrado</span>' : '') + '</div>';
-      html += '<div class="day-meta">' + ocupados + ' agendamento' + (ocupados!==1?'s':'') + ' · ' + livres + ' livre' + (livres!==1?'s':'') + '</div></div></div>';
-      html += '<div class="day-actions">';
-      html += `<button class="icon-btn" onclick="addAviso('${day.id}');event.stopPropagation()" title="Adicionar aviso">⚠</button>`;
-      html += `<button class="icon-btn danger" onclick="excluirDia('${day.id}',event)" title="Excluir dia">🗑</button>`;
-      html += '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
-      html += '</div></div><div class="day-body">';
-
-      if (day.avisos.length) {
-        html += '<div class="avisos-bar">';
-        day.avisos.forEach((av, ai) => {
-          html += `<span class="aviso-tag">⚠ ${av}<button class="rm-aviso" onclick="rmAviso('${day.id}',${ai},event)">×</button></span>`;
-        });
-        html += '</div>';
-      }
-
-      html += '<div class="slots">';
-      slots.forEach(s => {
-        const isLivre = !s.nome;
-        const anClass = analClass(s.analista);
-        let cls = isLivre ? 'livre' : (anClass || 'ocupado');
-        let dimmed = false;
-        if (filt !== 'todos') {
-          if (filt === 'livres' && !isLivre) dimmed = true;
-          if (filt !== 'livres' && !isLivre && s.analista !== filt) dimmed = true;
-        }
-        html += `<div class="slot ${cls}${dimmed ? ' dimmed' : ''}${isPast ? ' past-slot' : ''}" ${isPast ? '' : `onclick="openSlot('${day.id}','${s.h}')"`}>`;
-        html += '<div class="slot-time">' + s.h + '</div>';
-        html += '<div class="slot-info">';
-        if (isLivre) {
-          html += `<div class="slot-livre-label">${isPast ? '— livre' : '— livre — clique para agendar'}</div>`;
-        } else {
-          html += '<div class="slot-nome">' + s.nome + '</div>';
-          if (s.assunto) html += '<div class="slot-assunto">' + s.assunto + '</div>';
-          if (s.agendadopor) html += '<div class="slot-agendadopor">por ' + s.agendadopor + '</div>';
-        }
-        html += '</div>' + badgeHtml(s.analista);
-        if (!isLivre && !isPast) html += `<button class="slot-rm" onclick="limparSlot('${day.id}','${s.h}',event)" title="Remover">×</button>`;
-        html += '</div>';
-      });
-      html += '</div></div></div>';
-    });
-    html += '</div></div>';
-  });
-
-  document.getElementById('view-agenda').innerHTML = html;
-}
-
-// ── PAINEL STATE ───────────────────────────────────────────────────────────
-let painelAnalista = 'todos';
-let painelDe = '';
-let painelAte = '';
-
-function setPainelAnalista(an) {
-  painelAnalista = an;
-  document.querySelectorAll('.pf-chip').forEach(el => el.classList.remove('active'));
-  const id = an === 'todos' ? 'pf-todos' : 'pf-' + an;
-  document.getElementById(id)?.classList.add('active');
-  renderPainel();
-}
-
-// ── RENDER PAINEL ──────────────────────────────────────────────────────────
-const CORES_AN = { Gabriela:'#4f8ef7', Ruy:'#3ecf78', Sabrina:'#f75b6b', Vera:'#f5a623', Marco:'#b06ef5' };
-const CORES_BG = { Gabriela:'#0f2d6b', Ruy:'#0a3320', Sabrina:'#3d0f14', Vera:'#3d2900', Marco:'#280f40' };
-
-function calcPainel(filtDays, anFiltro) {
-  const totals = { Gabriela:0, Ruy:0, Sabrina:0, Vera:0, Marco:0 };
-  let totalAgend = 0, totalSlots = 0;
-  filtDays.forEach(day => {
-    HORARIOS.forEach(h => {
-      const s = day.slots[h];
-      if (anFiltro !== 'todos') {
-        // Conta só atendimentos do analista filtrado
-        if (s.analista === anFiltro) {
-          totalSlots++;
-          totalAgend++;
-          totals[anFiltro]++;
-        }
-      } else {
-        totalSlots++;
-        if (s.nome) {
-          totalAgend++;
-          if (totals[s.analista] !== undefined) totals[s.analista]++;
-        }
-      }
-    });
-  });
-
-  // Vagas futuras = sempre total geral de todos os dias, independente do filtro
-  let totalFuturos = 0;
-  const allDays = (typeof DAYS !== 'undefined' && DAYS.length) ? DAYS : [];
-  allDays.forEach(day => {
-    if (!isFuturoOuHoje(day.data)) return;
-    HORARIOS.forEach(h => {
-      if (!day.slots[h] || !day.slots[h].nome) totalFuturos++;
-    });
-  });
-
-  // Taxa de ocupação: slots do analista / total de slots do período
-  const slotsBase = anFiltro === 'todos'
-    ? totalSlots
-    : filtDays.reduce((acc) => acc + HORARIOS.length, 0);
-  return { totals, totalAgend, totalFuturos, totalSlots: slotsBase };
-}
-
-function buildPie(totals, totalAgend) {
-  const pieData = ANALISTAS.map(an => ({ an, val: totals[an] })).filter(d => d.val > 0);
-  const semAn = totalAgend - pieData.reduce((s,d) => s+d.val, 0);
-  if (semAn > 0) pieData.push({ an:'Sem analista', val: semAn });
-  const tot = pieData.reduce((s,d) => s+d.val, 0) || 1;
-  const R = 72, CX = 90, CY = 90;
-  let slices = '', angle = -Math.PI/2;
-  pieData.forEach(d => {
-    const sw = (d.val/tot)*2*Math.PI;
-    const ea = angle + sw;
-    const x1 = CX+R*Math.cos(angle), y1 = CY+R*Math.sin(angle);
-    const x2 = CX+R*Math.cos(ea),   y2 = CY+R*Math.sin(ea);
-    const lg = sw > Math.PI ? 1 : 0;
-    const col = CORES_AN[d.an] || '#8890a8';
-    const pct = Math.round(d.val/tot*100);
-    slices += `<path d="M${CX},${CY} L${x1.toFixed(1)},${y1.toFixed(1)} A${R},${R} 0 ${lg},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" fill="${col}" opacity=".88" stroke="var(--bg)" stroke-width="2"><title>${d.an}: ${d.val} (${pct}%)</title></path>`;
-    angle = ea;
-  });
-  let legend = '';
-  pieData.forEach(d => {
-    const col = CORES_AN[d.an] || '#8890a8';
-    const pct = Math.round(d.val/tot*100);
-    legend += `<div class="pie-leg-item"><span class="pie-leg-dot" style="background:${col}"></span><span class="pie-leg-name">${d.an}</span><span class="pie-leg-val">${d.val}<span class="pie-leg-pct">${pct}%</span></span></div>`;
-  });
-  return { slices, legend, CX, CY, R };
-}
-
-function renderPainel() {
-  const de  = document.getElementById('p-de')?.value  || '';
-  const ate = document.getElementById('p-ate')?.value || '';
-
-  const filtDays = DAYS.filter(day => {
-    if (painelAnalista !== 'todos' && !HORARIOS.some(h => day.slots[h].analista === painelAnalista)) return false;
-    if (de || ate) {
-      const d = parseDataBR(day.data);
-      if (de) { const [dy,dm,dd]=de.split('-'); if (d < new Date(dy,dm-1,dd)) return false; }
-      if (ate) { const [ay,am,ad]=ate.split('-'); if (d > new Date(ay,am-1,ad)) return false; }
-    }
-    return true;
-  });
-
-  const { totals, totalAgend, totalFuturos, totalSlots } = calcPainel(filtDays, painelAnalista);
-  const taxaOcup = totalSlots > 0 ? Math.round(totalAgend/totalSlots*100) : 0;
-
-  let html = '';
-
-  // ── Toolbar ──
-  html += '<div class="painel-toolbar">';
-  html += '<div class="painel-chips">';
-  html += `<button class="pf-chip${painelAnalista==='todos'?' active':''}" id="pf-todos" onclick="setPainelAnalista('todos')">Todos</button>`;
-  ANALISTAS.forEach(an => {
-    html += `<button class="pf-chip ${an.toLowerCase()}${painelAnalista===an?' active':''}" id="pf-${an}" onclick="setPainelAnalista('${an}')">${an}</button>`;
-  });
-  html += '</div><div class="painel-datas">';
-  html += `<label class="p-label">De <input class="p-date" id="p-de" type="date" value="${de}" onchange="renderPainel()"></label>`;
-  html += `<label class="p-label">Até <input class="p-date" id="p-ate" type="date" value="${ate}" onchange="renderPainel()"></label>`;
-  html += `<button class="p-clear" onclick="document.getElementById('p-de').value='';document.getElementById('p-ate').value='';renderPainel()">✕ Limpar</button>`;
-  html += '</div></div>';
-
-  // ── 4 Cards de KPI ──
-  html += '<div class="kpi-row">';
-  html += `<div class="kpi-card"><div class="kpi-icon" style="background:#1a2a4a;color:var(--accent)">📋</div><div class="kpi-body"><div class="kpi-label">Atendimentos agendados</div><div class="kpi-val" style="color:var(--accent)">${totalAgend}</div></div></div>`;
-  html += `<div class="kpi-card"><div class="kpi-icon" style="background:#0a3320;color:var(--ruy)">🟢</div><div class="kpi-body"><div class="kpi-label">Horários livres futuros</div><div class="kpi-val" style="color:var(--ruy)">${totalFuturos}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">total geral do sistema</div></div></div>`;
-  html += `<div class="kpi-card"><div class="kpi-icon" style="background:#1a1a3a;color:#b06ef5">📊</div><div class="kpi-body"><div class="kpi-label">Taxa de ocupação</div><div class="kpi-val" style="color:#b06ef5">${taxaOcup}%</div></div></div>`;
-  html += `<div class="kpi-card"><div class="kpi-icon" style="background:#1a2a1a;color:var(--muted)">📅</div><div class="kpi-body"><div class="kpi-label">Dias no período</div><div class="kpi-val" style="color:var(--muted)">${filtDays.length}</div></div></div>`;
-  html += '</div>';
-
-  if (!filtDays.length) {
-    html += '<div class="empty" style="margin-top:20px"><div class="empty-icon">📭</div><div class="empty-text">Nenhum resultado para os filtros selecionados.</div></div>';
-    document.getElementById('view-painel').innerHTML = html;
-    return;
-  }
-
-  // ── Dashboard row: Pizza + Barras ──
-  html += '<div class="dashboard-row">';
-
-  // Pizza
-  const { slices, legend, CX, CY } = buildPie(totals, totalAgend);
-  html += `<div class="dash-card">
-    <div class="dash-card-title">Distribuição por analista</div>
-    <div class="pie-wrap">
-      <svg viewBox="0 0 180 180" class="pie-svg">${slices}
-        <circle cx="${CX}" cy="${CY}" r="34" fill="var(--card)"/>
-        <text x="${CX}" y="${CY-5}" text-anchor="middle" fill="var(--text)" font-size="16" font-weight="700" font-family="DM Sans">${totalAgend}</text>
-        <text x="${CX}" y="${CY+11}" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="DM Sans">agendados</text>
-      </svg>
-      <div class="pie-legend">${legend}</div>
-    </div>
-  </div>`;
-
-  // Barras de ocupação
-  const barDays = filtDays.length <= 16 ? filtDays : filtDays.slice(-16);
-  let barHtml = '<div class="bar-chart">';
-  barDays.forEach(day => {
-    const agend = HORARIOS.filter(h => day.slots[h].nome).length;
-    const pct = Math.round(agend/HORARIOS.length*100);
-    const past = !isFuturoOuHoje(day.data);
-    const [dd,mm] = day.data.split('/');
-    barHtml += `<div class="bar-col">
-      <div class="bar-val">${agend}</div>
-      <div class="bar-track"><div class="bar-fill${past?' bar-past':''}" style="height:${pct}%"></div></div>
-      <div class="bar-label">${dd}/${mm}</div>
-    </div>`;
-  });
-  barHtml += '</div>';
-
-  html += `<div class="dash-card" style="flex:1.6">
-    <div class="dash-card-title">Ocupação por dia <span style="font-size:10px;color:var(--muted);font-weight:400;text-transform:none">· cinza=passado  azul=futuro</span></div>
-    ${barHtml}
-  </div>`;
-
-  html += '</div>'; // dashboard-row
-
-  // ── Tabela de analistas ──
-  html += '<div class="dash-card" style="margin-top:14px">';
-  html += '<div class="dash-card-title">Resumo por analista</div>';
-  html += '<table class="an-table"><thead><tr><th>Analista</th><th>Atendimentos</th><th>% do total</th><th>Próximos agendados</th><th>Carga</th></tr></thead><tbody>';
-
-  ANALISTAS.forEach(an => {
-    if (painelAnalista !== 'todos' && painelAnalista !== an) return;
-    const val = totals[an];
-    const pct = totalAgend > 0 ? Math.round(val/totalAgend*100) : 0;
-    // Próximos agendados (futuros) para esse analista
-    let proximos = 0;
-    filtDays.forEach(day => {
-      if (!isFuturoOuHoje(day.data)) return;
-      HORARIOS.forEach(h => { if (day.slots[h].analista === an) proximos++; });
-    });
-    const barW = totalAgend > 0 ? Math.round(val/totalAgend*100) : 0;
-    const col = CORES_AN[an];
-    html += `<tr>
-      <td><span class="an-badge" style="background:${CORES_BG[an]};color:${col}">${an}</span></td>
-      <td style="font-weight:700;font-size:16px;color:${col}">${val}</td>
-      <td style="color:var(--muted)">${pct}%</td>
-      <td><span style="color:var(--ruy);font-weight:600">${proximos}</span></td>
-      <td style="min-width:120px"><div class="an-bar-track"><div class="an-bar-fill" style="width:${barW}%;background:${col}"></div></div></td>
-    </tr>`;
-  });
-
-  html += '</tbody></table></div>';
-
-  document.getElementById('view-painel').innerHTML = html;
-}
-
-// ── RENDER LIVRES ──────────────────────────────────────────────────────────
-function parseDataBR(dataBR) {
-  // Converte DD/MM/YYYY para Date (sem hora, só data)
-  const [d, m, y] = dataBR.split('/');
-  return new Date(parseInt(y), parseInt(m)-1, parseInt(d));
-}
-function isHoje(dataBR) {
-  const hoje = new Date();
-  const d = parseDataBR(dataBR);
-  return d.getFullYear()===hoje.getFullYear() && d.getMonth()===hoje.getMonth() && d.getDate()===hoje.getDate();
-}
-function isFuturoOuHoje(dataBR) {
-  const hoje = new Date(); hoje.setHours(0,0,0,0);
-  const d = parseDataBR(dataBR); d.setHours(0,0,0,0);
-  return d >= hoje;
-}
-
-function renderLivres() {
-  // Só horários livres em datas de hoje em diante
-  const list = [];
-  DAYS.forEach(day => {
-    if (!isFuturoOuHoje(day.data)) return;
-    HORARIOS.forEach(h => { if (!day.slots[h].nome) list.push({ day, h }); });
-  });
-
-  let html = `<div class="livres-header">
-    <div style="font-size:16px;font-weight:600">Próximas vagas disponíveis</div>
-    <div class="livres-count">${list.length} vaga${list.length!==1?'s':''} livre${list.length!==1?'s':''}</div>
-  </div>`;
-
-  if (!list.length) {
-    html += `<div class="empty"><div class="empty-icon">✅</div><div class="empty-text">Todos os horários estão preenchidos.</div></div>`;
-  } else {
-    html += '<div class="livres-grid">';
-    // Agrupa por dia para mostrar avisos
-    const daysSeen = new Set();
-    list.forEach(({ day, h }) => {
-      const showDayHeader = !daysSeen.has(day.id);
-      daysSeen.add(day.id);
-      // Avisos do dia
-      const avisoHtml = showDayHeader && day.avisos && day.avisos.length
-        ? `<div class="livre-avisos">${day.avisos.map(av => `<span class="aviso-tag" style="font-size:11px">⚠ ${av}</span>`).join('')}</div>`
-        : '';
-      html += `<div class="livre-row${showDayHeader && day.avisos && day.avisos.length ? ' has-aviso' : ''}">
-        ${avisoHtml}
-        <div class="livre-row-date">${day.data}</div>
-        <div class="livre-row-day">${day.weekday}</div>
-        <div class="livre-row-time">${h}</div>
-        <button class="btn-agendar-livre" onclick="openSlot('${day.id}','${h}');setView('agenda')">+ Agendar</button>
-      </div>`;
-    });
-    html += '</div>';
-  }
-  document.getElementById('view-livres').innerHTML = html;
-}
-
-// ── CONTROLES ──────────────────────────────────────────────────────────────
-function render() {
-  if (currentView === 'agenda') renderAgenda();
-  if (currentView === 'painel') renderPainel();
-  if (currentView === 'livres') renderLivres();
-  if (currentView === 'config') renderConfig();
-}
-
-function setView(v) {
-  currentView = v;
-  ['agenda','painel','livres','config'].forEach(x => {
-    document.getElementById(`view-${x}`).style.display = x===v?'block':'none';
-    document.getElementById(`btn-${x}`).classList.toggle('active', x===v);
-  });
-  const fw = document.getElementById('filters-wrap');
-  if (fw) {
-    const showFilters = (v === 'agenda');
-    fw.style.display = showFilters ? 'block' : 'none';
-    fw.style.visibility = showFilters ? 'visible' : 'hidden';
-    fw.style.height = showFilters ? '' : '0';
-    fw.style.padding = showFilters ? '' : '0';
-    fw.style.borderBottom = showFilters ? '' : 'none';
-    fw.style.margin = showFilters ? '' : '0';
-  }
-  render();
-}
-
-function setAnalista(an) {
-  currentAnalista = an;
-  document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
-  const id = an==='todos'?'chip-todos':an==='livres'?'chip-livres':`chip-${an}`;
-  document.getElementById(id)?.classList.add('active');
-  renderAgenda();
-}
-
-function toggleCard(cardId) { document.getElementById(cardId)?.classList.toggle('open'); }
-function toggleMonth(groupId) { document.getElementById(groupId)?.classList.toggle('closed'); }
-
-// ── TEMA ───────────────────────────────────────────────────────────────────
-const THEME_KEY = 'seplan_theme';
-
-function applyTheme(theme) {
-  const root = document.documentElement;
-  const icon = document.getElementById('theme-icon');
-  if (theme === 'light') {
-    root.setAttribute('data-theme', 'light');
-    if (icon) icon.textContent = '🌙';
-  } else {
-    root.setAttribute('data-theme', 'dark');
-    if (icon) icon.textContent = '☀️';
-  }
-}
-
-function toggleTheme() {
-  const current = document.documentElement.getAttribute('data-theme');
-  // detect effective current theme (might be from media query)
-  const isDark = current === 'dark' ||
-    (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  const next = isDark ? 'light' : 'dark';
-  localStorage.setItem(THEME_KEY, next);
-  applyTheme(next);
-}
-
-function initTheme() {
-  const saved = localStorage.getItem(THEME_KEY);
-  if (saved) {
-    applyTheme(saved);
-  } else {
-    // follow system — just set the icon correctly
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const icon = document.getElementById('theme-icon');
-    if (icon) icon.textContent = prefersDark ? '☀️' : '🌙';
-  }
-  // listen for system changes (only if no manual override saved)
-  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
-    if (!localStorage.getItem(THEME_KEY)) {
-      const icon = document.getElementById('theme-icon');
-      if (icon) icon.textContent = e.matches ? '☀️' : '🌙';
-    }
-  });
-}
-
-
-
-// ── BLOQUEIO DE ANALISTAS ──────────────────────────────────────────────────
-let BLOQUEIOS = {}; // { "NomeAnalista": [ "DD/MM/YYYY", "DD/MM/YYYY>DD/MM/YYYY", ... ] }
-
-function getBlockedAnalistas(dayId) {
-  const day = DAYS.find(d => d.id === dayId);
-  if (!day) return [];
-  const blocked = [];
-  Object.entries(BLOQUEIOS).forEach(([an, regras]) => {
-    if (!regras) return;
-    const lista = Array.isArray(regras) ? regras : Object.values(regras);
-    for (const regra of lista) {
-      if (regra.includes('>')) {
-        // Período: "DD/MM/YYYY>DD/MM/YYYY"
-        const [ini, fim] = regra.split('>');
-        const d = parseDataBR(day.data);
-        const dIni = parseDataBR(ini); dIni.setHours(0,0,0,0);
-        const dFim = parseDataBR(fim); dFim.setHours(23,59,59,999);
-        if (d >= dIni && d <= dFim) { blocked.push(an); break; }
-      } else {
-        // Dia específico
-        if (regra === day.data) { blocked.push(an); break; }
-      }
-    }
-  });
-  return blocked;
-}
-
-function saveBloqueios() {
-  window._fb.saveBloqueios(BLOQUEIOS);
-}
-
-function adicionarBloqueio(analista, tipo, dataIni, dataFim) {
-  if (!BLOQUEIOS[analista]) BLOQUEIOS[analista] = [];
-  const lista = Array.isArray(BLOQUEIOS[analista]) ? BLOQUEIOS[analista] : Object.values(BLOQUEIOS[analista]);
-  const regra = tipo === 'periodo' ? `${dataIni}>${dataFim}` : dataIni;
-  if (!lista.includes(regra)) lista.push(regra);
-  BLOQUEIOS[analista] = lista;
-  saveBloqueios();
-  toast(`${analista} bloqueado ✓`);
-  renderConfig();
-}
-
-function removerBloqueio(analista, idx) {
-  const lista = Array.isArray(BLOQUEIOS[analista]) ? BLOQUEIOS[analista] : Object.values(BLOQUEIOS[analista]);
-  lista.splice(idx, 1);
-  BLOQUEIOS[analista] = lista;
-  saveBloqueios();
-  toast('Bloqueio removido');
-  renderConfig();
-}
-
-// ── RENDER CONFIG ──────────────────────────────────────────────────────────
-function renderConfig() {
-  let html = '<div class="config-wrap">';
-
-  // ── Analistas ──
-  html += '<div class="config-section">';
-  html += '<div class="config-title">👥 Analistas</div>';
-  html += '<div class="config-desc">Gerencie a lista de analistas que aparecem no app. Alterações salvam automaticamente.</div>';
-  html += '<div class="config-list" id="analistas-list">';
-  ANALISTAS.forEach((an, i) => {
-    const cor = CORES_AN[an] || 'var(--accent)';
-    html += `<div class="config-item">
-      <span class="config-badge" style="background:${CORES_BG[an]||'var(--border)'};color:${cor}">${an}</span>
-      <button class="config-rm" onclick="removerAnalista(${i})" title="Remover">×</button>
-    </div>`;
-  });
-  html += '</div>';
-  html += '<div class="config-add-row">';
-  html += '<input class="form-input" id="novo-analista" placeholder="Nome do novo analista" style="flex:1" onkeydown="if(event.key===\'Enter\')addAnalista()">';
-  html += '<button class="btn-primary" style="white-space:nowrap;padding:10px 18px" onclick="addAnalista()">+ Adicionar</button>';
-  html += '</div></div>';
-
-  // ── Quem pode agendar ──
-  html += '<div class="config-section">';
-  html += '<div class="config-title">✍️ Quem agenda</div>';
-  html += '<div class="config-desc">Lista de pessoas que podem fazer agendamentos. Aparece no campo "Agendado por" ao criar um horário.</div>';
-  const agendadores = loadAgendadores();
-  html += '<div class="config-list" id="agendadores-list">';
-  agendadores.forEach((ag, i) => {
-    html += `<div class="config-item">
-      <span class="config-badge" style="background:var(--border);color:var(--text)">${ag}</span>
-      <button class="config-rm" onclick="removerAgendador(${i})" title="Remover">×</button>
-    </div>`;
-  });
-  html += '</div>';
-  html += '<div class="config-add-row">';
-  html += '<input class="form-input" id="novo-agendador" placeholder="Nome de quem agenda" style="flex:1" onkeydown="if(event.key===\'Enter\')addAgendador()">';
-  html += '<button class="btn-primary" style="white-space:nowrap;padding:10px 18px" onclick="addAgendador()">+ Adicionar</button>';
-  html += '</div></div>';
-
-  // ── Bloqueios ──
-  html += '<div class="config-section">';
-  html += '<div class="config-title">🚫 Bloqueios de Analistas</div>';
-  html += '<div class="config-desc">Bloqueie um analista para um dia específico ou período (ex: férias). Analistas bloqueados aparecem riscados no formulário de agendamento.</div>';
-  let temBloqueio = false;
-  html += '<div class="config-list" style="flex-direction:column;gap:6px">';
-  Object.entries(BLOQUEIOS).forEach(([an, regras]) => {
-    const lista = Array.isArray(regras) ? regras : Object.values(regras || {});
-    lista.forEach((regra, i) => {
-      if (!regra) return;
-      temBloqueio = true;
-      const cor = CORES_AN[an] || 'var(--accent)';
-      const label = regra.includes('>') ? regra.replace('>', ' → ') : regra;
-      const tipo  = regra.includes('>') ? 'período' : 'dia';
-      html += `<div class="config-item" style="background:var(--sabrina-b);border:1px solid var(--border);border-radius:8px;padding:6px 10px;width:100%;justify-content:space-between">
-        <span style="font-size:12px"><span class="config-badge" style="background:var(--border);color:${cor}">${an}</span><span style="color:var(--muted);margin:0 6px">·</span>${label}<span style="font-size:10px;color:var(--muted);margin-left:4px">(${tipo})</span></span>
-        <button class="config-rm" onclick="removerBloqueio('${an}',${i})">×</button>
-      </div>`;
-    });
-  });
-  if (!temBloqueio) html += '<div style="font-size:12px;color:var(--muted)">Nenhum bloqueio ativo.</div>';
-  html += '</div>';
-  html += '<div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">';
-  html += '<div class="config-add-row" style="flex-wrap:wrap;gap:8px">';
-  html += '<select class="form-select" id="bloq-analista" style="flex:1;min-width:120px"><option value="">Analista...</option>';
-  ANALISTAS.forEach(an => { html += `<option value="${an}">${an}</option>`; });
-  html += '</select>';
-  html += '<select class="form-select" id="bloq-tipo" style="flex:1;min-width:140px" onchange="toggleBloqFim()"><option value="dia">Dia específico</option><option value="periodo">Período</option></select>';
-  html += '</div>';
-  html += '<div class="config-add-row" style="flex-wrap:wrap;gap:8px">';
-  html += '<div style="flex:1;min-width:120px"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data início</div><input class="form-input" id="bloq-ini" type="date"></div>';
-  html += '<div style="flex:1;min-width:120px" id="bloq-fim-wrap" style="display:none"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data fim</div><input class="form-input" id="bloq-fim" type="date"></div>';
-  html += '<button class="btn-primary" style="align-self:flex-end;padding:10px 16px;white-space:nowrap" onclick="salvarBloqueio()">🚫 Bloquear</button>';
-  html += '</div></div></div>';
-
-  html += '</div>';
-  document.getElementById('view-config').innerHTML = html;
-  toggleBloqFim();
-}
-
-function toggleBloqFim() {
-  const tipo = document.getElementById('bloq-tipo')?.value;
-  const wrap = document.getElementById('bloq-fim-wrap');
-  if (wrap) wrap.style.display = tipo === 'periodo' ? 'block' : 'none';
-}
-
-function salvarBloqueio() {
-  const an   = document.getElementById('bloq-analista')?.value;
-  const tipo = document.getElementById('bloq-tipo')?.value;
-  const ini  = document.getElementById('bloq-ini')?.value;
-  const fim  = document.getElementById('bloq-fim')?.value;
-  if (!an)  { toast('Selecione o analista', true); return; }
-  if (!ini) { toast('Informe a data início', true); return; }
-  if (tipo === 'periodo' && !fim) { toast('Informe a data fim', true); return; }
-  adicionarBloqueio(an, tipo, dateToDDMMYYYY(ini), tipo === 'periodo' ? dateToDDMMYYYY(fim) : '');
-}
-
-// ── CONFIG HELPERS ──────────────────────────────────────────────────────────
-const AGENDADORES_KEY = 'seplan_agendadores';
-
-function loadAgendadores() {
-  try { return JSON.parse(localStorage.getItem(AGENDADORES_KEY)) || []; }
-  catch { return []; }
-}
-function saveAgendadores(list) { localStorage.setItem(AGENDADORES_KEY, JSON.stringify(list)); }
-
-function addAnalista() {
-  const input = document.getElementById('novo-analista');
-  const nome = input.value.trim();
-  if (!nome) { toast('Informe o nome do analista', true); return; }
-  if (ANALISTAS.includes(nome)) { toast('Analista já existe', true); return; }
-  ANALISTAS.push(nome);
-  // Salva no Firebase
-  window._fb.saveAnalistas(ANALISTAS);
-  input.value = '';
-  toast(`${nome} adicionado ✓`);
-  renderConfig();
-  rebuildFilters();
-}
-
-function removerAnalista(idx) {
-  const nome = ANALISTAS[idx];
-  if (!confirm(`Remover ${nome} da lista?`)) return;
-  ANALISTAS.splice(idx, 1);
-  window._fb.saveAnalistas(ANALISTAS);
-  toast(`${nome} removido`);
-  renderConfig();
-  rebuildFilters();
-}
-
-function addAgendador() {
-  const input = document.getElementById('novo-agendador');
-  const nome = input.value.trim();
-  if (!nome) { toast('Informe o nome', true); return; }
-  const list = loadAgendadores();
-  if (list.includes(nome)) { toast('Já existe', true); return; }
-  list.push(nome);
-  saveAgendadores(list);
-  input.value = '';
-  toast(`${nome} adicionado ✓`);
-  renderConfig();
-}
-
-function removerAgendador(idx) {
-  const list = loadAgendadores();
-  const nome = list[idx];
-  if (!confirm(`Remover ${nome}?`)) return;
-  list.splice(idx, 1);
-  saveAgendadores(list);
-  toast(`${nome} removido`);
-  renderConfig();
-}
-
-function rebuildFilters() {
-  // Reconstrói chips de filtro na agenda
-  const wrap = document.getElementById('filters');
-  if (!wrap) return;
-  let html = `<button class="filter-chip active" onclick="setAnalista('todos')" id="chip-todos">Todos</button>`;
-  ANALISTAS.forEach(an => {
-    html += `<button class="filter-chip" onclick="setAnalista('${an}')" id="chip-${an}">${an}</button>`;
-  });
-  html += `<button class="filter-chip" style="border-color:#3ecf7840;color:#3ecf78" onclick="setAnalista('livres')" id="chip-livres">Só livres</button>`;
-  wrap.innerHTML = html;
-  // Reconstrói grid de analistas no modal
-  rebuildAnalistaGrid();
-}
-
-function rebuildAnalistaGrid(dayId) {
-  const grid = document.getElementById('analista-grid');
-  if (!grid) return;
-  // Descobre analistas bloqueados para este dia
-  const blocked = dayId ? getBlockedAnalistas(dayId) : [];
-  let html = `<div class="analista-opt nenhum" onclick="selAnalista('')" id="opt-nenhum">—</div>`;
-  ANALISTAS.forEach(an => {
-    const cor = CORES_AN[an] || 'var(--accent)';
-    const isBlocked = blocked.includes(an);
-    if (isBlocked) {
-      html += `<div class="analista-opt blocked" id="opt-${an}" title="${an} bloqueado neste dia">
-        <span style="text-decoration:line-through;opacity:.5">${an}</span>
-        <span style="font-size:9px;color:var(--danger)">🚫</span>
-      </div>`;
-    } else {
-      html += `<div class="analista-opt" style="color:${cor}" onclick="selAnalista('${an}')" id="opt-${an}">${an}</div>`;
-    }
-  });
-  grid.innerHTML = html;
-}
-
-// ── INIT ───────────────────────────────────────────────────────────────────
-initTheme();
-
-// Tela de carregamento
-document.getElementById('view-agenda').innerHTML = `
-  <div class="empty">
-    <div class="empty-icon" style="animation:spin 1s linear infinite;display:inline-block">⏳</div>
-    <div class="empty-text" style="margin-top:12px">Conectando ao banco de dados...</div>
-  </div>`;
-
-// Listener analistas do Firebase
-window._fb.listenAnalistas(function(data) {
-  if (data && Array.isArray(data) && data.length > 0) {
-    ANALISTAS = data;
-    rebuildFilters();
-  }
-});
-
-// Listener bloqueios do Firebase
-window._fb.listenBloqueios(function(data) {
-  BLOQUEIOS = data || {};
-});
-
-// Listener bloqueios do Firebase
-window._fb.listenBloqueios(function(data) {
-  BLOQUEIOS = data || {};
-});
-
-// Listener Firebase em tempo real
-window._fb.listenDays(function(data) {
-  if (data) {
-    DAYS = Object.values(data)
-      .map(day => {
-        // Firebase pode converter arrays em objetos — normaliza
-        const avisos = day.avisos
-          ? (Array.isArray(day.avisos) ? day.avisos : Object.values(day.avisos))
-          : [];
-        // Garante que todos os horários existem
-        const slots = {};
-        HORARIOS.forEach(h => {
-          const s = day.slots && day.slots[h];
-          slots[h] = s ? { nome: s.nome||'', assunto: s.assunto||'', analista: s.analista||'', agendadopor: s.agendadopor||'' }
-                      : { nome:'', assunto:'', analista:'', agendadopor:'' };
-        });
-        return { ...day, avisos, slots };
-      })
-      .sort((a, b) => {
-        const toIso = d => d.split('/').reverse().join('-');
-        return toIso(a.data).localeCompare(toIso(b.data));
-      });
-  } else {
-    // Banco vazio — popula com dados base
-    DAYS = JSON.parse(JSON.stringify(BASE_DAYS));
-    window._fb.saveDays(DAYS);
-  }
-  window._appReady = true;
-  if (currentView === 'agenda') renderAgenda();
-  else if (currentView === 'painel') renderPainel();
-  else if (currentView === 'livres') renderLivres();
-});
-
-// Inicializar agenda quando navegar para ela
-function agendaInit() {
-  if(window._agendaReady) { render(); return; }
-  // Init tema baseado no app
-  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-  // Não chamar initTheme da agenda pois conflita — só carregar dados
-  window._fb.listenAnalistas(function(data) {
-    if(data && Array.isArray(data) && data.length > 0) {
-      ANALISTAS = data;
-      rebuildFilters();
-    }
-  });
-  window._fb.listenBloqueios(function(data) {
-    BLOQUEIOS = data || {};
-  });
-  window._fb.listenDays(function(data) {
-    if(data) {
-      DAYS = Object.values(data).map(day => {
-        const avisos = day.avisos ? (Array.isArray(day.avisos) ? day.avisos : Object.values(day.avisos)) : [];
-        const slots = {};
-        HORARIOS.forEach(h => {
-          const s = day.slots && day.slots[h];
-          slots[h] = s ? { nome:s.nome||'', assunto:s.assunto||'', analista:s.analista||'', analistas:s.analistas||[], agendadopor:s.agendadopor||'', _id:s._id, _data:s._data }
-                      : { nome:'', assunto:'', analista:'', analistas:[], agendadopor:'' };
-        });
-        return { ...day, avisos, slots };
-      }).sort((a,b) => {
-        const toIso = d => d.split('/').reverse().join('-');
-        return toIso(a.data).localeCompare(toIso(b.data));
-      });
-    } else {
-      DAYS = JSON.parse(JSON.stringify(BASE_DAYS));
-      window._fb.saveDays(DAYS);
-    }
-    window._agendaReady = true;
-    render();
-  });
 }
 
 function toggleSenha() {
