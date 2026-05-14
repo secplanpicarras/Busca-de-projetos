@@ -212,7 +212,33 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.5}
 .tag-amber{background:rgba(239,159,39,.1);color:var(--amber)}
 .tag-red{background:rgba(226,75,74,.1);color:var(--red)}
 
-/* ── PDF VIEWER ── */
+/* ── CONFIDENCE BADGES ── */
+.conf-badge{font-size:11px;padding:3px 10px;border-radius:999px;font-family:var(--mono);font-weight:500;white-space:nowrap;flex-shrink:0}
+.conf-alta{background:rgba(26,158,110,.15);color:#4ecb9e;border:0.5px solid rgba(26,158,110,.25)}
+.conf-media{background:rgba(239,159,39,.13);color:#f0ac3a;border:0.5px solid rgba(239,159,39,.2)}
+.conf-baixa{background:rgba(226,75,74,.12);color:#f07070;border:0.5px solid rgba(226,75,74,.2)}
+.del-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;line-height:1;padding:0 4px;transition:color .15s;flex-shrink:0}
+.del-btn:hover{color:var(--red)}
+.empty-note{font-size:13px;color:var(--text3);text-align:center;padding:1.5rem;font-family:var(--mono)}
+
+/* ── SEARCH STATUS ── */
+#searchStatusCard{display:none;margin-bottom:1rem}
+.search-fill{height:3px;background:var(--border);border-radius:999px;overflow:hidden;margin-bottom:.5rem}
+#searchFill{height:100%;background:var(--accent);border-radius:999px;transition:width .3s ease;width:0%}
+#searchMsg{font-size:12px;color:var(--text2);font-family:var(--mono)}
+
+/* ── RESULTADO PREVIEW ── */
+.f-resultado-preview,.fResultadoPreview{font-size:11px;padding:4px 10px;border-radius:4px;background:var(--input-bg);border:0.5px solid var(--border2);color:var(--text2);font-family:var(--mono);margin-top:.5rem}
+.fProcessosPreview{font-size:11px;padding:4px 10px;border-radius:4px;background:var(--input-bg);border:0.5px solid var(--border2);color:var(--text2);font-family:var(--mono);margin-top:.5rem}
+
+/* ── HIGHLIGHT PANEL ── */
+.highlight-page{margin-bottom:1rem;border-radius:var(--radius-card);overflow:hidden;border:0.5px solid var(--border)}
+.highlight-page canvas{width:100%;display:block}
+.highlight-label{font-size:11px;color:var(--text3);font-family:var(--mono);padding:6px 10px;background:var(--bg2);border-top:0.5px solid var(--border)}
+
+/* ── DIGITALIZACAO MODAL BADGES ── */
+.badge-analista{background:rgba(26,111,173,.12);color:#5aabef;border:0.5px solid rgba(26,111,173,.2)}
+.badge-busca{background:rgba(239,159,39,.1);color:#f0ac3a;border:0.5px solid rgba(239,159,39,.2)}
 #pdfPreviewContainer{display:none;margin-top:1rem;border:0.5px solid var(--border);border-radius:var(--radius-card);overflow:hidden;background:var(--bg)}
 canvas#pdfCanvas{width:100%;display:block}
 
@@ -644,7 +670,7 @@ async function checkLogin(){
   const btn = document.getElementById('loginBtn');
   btn.textContent='Entrando...';btn.disabled=true;
   try{
-    const resp = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
+    const resp = await authFetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
       method:'POST',
       headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON},
       body:JSON.stringify({email,password})
@@ -656,6 +682,7 @@ async function checkLogin(){
       return;
     }
     sessionStorage.setItem('seplan_token', data.access_token);
+    sessionStorage.setItem('seplan_refresh', data.refresh_token);
     sessionStorage.setItem('seplan_email', data.user.email);
     currentUser = data.user;
     showApp();
@@ -713,6 +740,42 @@ function applyTheme(theme){
 function getAuthHeaders(){
   const token = sessionStorage.getItem('seplan_token') || SUPABASE_ANON;
   return {'apikey':SUPABASE_ANON,'Authorization':`Bearer ${token}`,'Content-Type':'application/json'};
+}
+
+async function refreshToken(){
+  const refresh = sessionStorage.getItem('seplan_refresh');
+  if(!refresh) return false;
+  try{
+    const resp = await authFetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON},
+      body:JSON.stringify({refresh_token:refresh})
+    });
+    const data = await resp.json();
+    if(data.access_token){
+      sessionStorage.setItem('seplan_token', data.access_token);
+      sessionStorage.setItem('seplan_refresh', data.refresh_token);
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+// Fetch com refresh automático — usa no lugar de fetch direto
+async function authFetch(url, opts={}){
+  opts.headers = {...getAuthHeaders(), ...(opts.headers||{})};
+  let resp = await fetch(url, opts);
+  if(resp.status === 401){
+    const ok = await refreshToken();
+    if(ok){
+      opts.headers = {...getAuthHeaders(), ...(opts.headers||{})};
+      resp = await fetch(url, opts);
+    } else {
+      // Token expirado e sem refresh — faz logout
+      logout();
+    }
+  }
+  return resp;
 }
 
 // Verifica sessão ao carregar
@@ -808,7 +871,7 @@ async function callEdgeFunction(pdfBase64,pdfText,imageBase64,mediaType){
     if(imageBase64){body.imageBase64=imageBase64;body.mediaType=mediaType||'image/jpeg';}
     else if(pdfBase64){body.pdfBase64=pdfBase64;}
     if(pdfText) body.pdfText=pdfText;
-    const resp=await fetch(`${SUPABASE_URL}/functions/v1/extrair-nomes`,{
+    const resp=await authFetch(`${SUPABASE_URL}/functions/v1/extrair-nomes`,{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${SUPABASE_ANON}`},
       body:JSON.stringify(body)
@@ -1050,7 +1113,7 @@ async function salvarBusca(){
   const payload={protocolo,matricula,inscricao:currentSearch.inscricao,proprietarios:currentSearch.proprietarios,inscricao_resultados:currentSearch.inscricao_resultados,nome_resultados:confirmados,tem_resultado:temRes};
   const email=sessionStorage.getItem('seplan_email')||'';
   payload.usuario_email=email;
-  const resp=await fetch(`${SUPABASE_URL}/rest/v1/buscas`,{
+  const resp=await authFetch(`${SUPABASE_URL}/rest/v1/buscas`,{
     method:'POST',
     headers:{'Content-Type':'application/json',...getAuthHeaders(),'Prefer':'return=representation'},
     body:JSON.stringify(payload)
@@ -1063,7 +1126,7 @@ async function salvarBusca(){
 async function loadHistoricoPage(){
   const el=document.getElementById('histListPage');
   el.innerHTML='<div class="empty-note">Carregando...</div>';
-  const resp=await fetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=100`,{
+  const resp=await authFetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=100`,{
     headers:{...getAuthHeaders()}
   });
   const data=await resp.json();
@@ -1134,7 +1197,7 @@ function abrirEdicao(){
 async function salvarEdicao(){
   if(!buscaSelecionada) return;
   const payload={protocolo:document.getElementById('eProtocolo').value.trim(),matricula:document.getElementById('eMatricula').value.trim(),inscricao:document.getElementById('eInscricao').value.trim()};
-  const resp=await fetch(`${SUPABASE_URL}/rest/v1/buscas?id=eq.${buscaSelecionada.id}`,{
+  const resp=await authFetch(`${SUPABASE_URL}/rest/v1/buscas?id=eq.${buscaSelecionada.id}`,{
     method:'PATCH',
     headers:{'Content-Type':'application/json',...getAuthHeaders()},
     body:JSON.stringify(payload)
@@ -1218,7 +1281,7 @@ async function dgCarregarBuscas() {
   const list = document.getElementById('dg-busca-list');
   list.innerHTML = '<div style="padding:14px;font-size:12px;color:var(--text3);font-family:var(--mono);text-align:center">Carregando...</div>';
   try {
-    const resp = await fetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=100`, { headers:{...getAuthHeaders()} });
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=100`, { headers:{...getAuthHeaders()} });
     const data = await resp.json();
     if(!Array.isArray(data)||!data.length){
       list.innerHTML = '<div style="padding:14px;font-size:12px;color:var(--text3);font-family:var(--mono);text-align:center">Nenhuma busca salva</div>';
@@ -1288,7 +1351,7 @@ async function dgAdicionar() {
   const btn = document.querySelector('#dg-pane-novo .btn-primary');
   btn.textContent = 'Salvando...'; btn.disabled = true;
   try {
-    const resp = await fetch(`${SUPABASE_URL}/rest/v1/digitalizacao`, {
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao`, {
       method:'POST',
       headers:{'Content-Type':'application/json','Prefer':'return=representation',...getAuthHeaders()},
       body: JSON.stringify({ processo, data, motivo: dgMotivo, detalhe, obs, status:'pedido' })
@@ -1369,7 +1432,7 @@ function dgItemHtml(r) {
 async function dgToggleStatus(id, statusAtual) {
   const novoStatus = statusAtual === 'pedido' ? 'entregue' : 'pedido';
   try {
-    const resp = await fetch(`${SUPABASE_URL}/rest/v1/digitalizacao?id=eq.${id}`, {
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?id=eq.${id}`, {
       method:'PATCH',
       headers:{'Content-Type':'application/json','Prefer':'return=representation',...getAuthHeaders()},
       body: JSON.stringify({ status: novoStatus })
@@ -1385,7 +1448,7 @@ async function dgToggleStatus(id, statusAtual) {
 async function dgRemover(id) {
   if(!confirm('Remover este registro?')) return;
   try {
-    await fetch(`${SUPABASE_URL}/rest/v1/digitalizacao?id=eq.${id}`, {
+    await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?id=eq.${id}`, {
       method:'DELETE', headers:{...getAuthHeaders()}
     });
     const el = document.getElementById('dg-item-'+id);
@@ -1400,7 +1463,7 @@ async function dgCarregarAnalistas() {
   grid.style.display = '';
   grid.innerHTML = '<div style="grid-column:1/-1;font-size:12px;color:var(--text3);font-family:var(--mono);text-align:center;padding:.5rem">Carregando...</div>';
   try {
-    const resp = await fetch(`${SUPABASE_URL}/rest/v1/digitalizacao?motivo=eq.analista&order=criado_em.desc`, { headers:{...getAuthHeaders()} });
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?motivo=eq.analista&order=criado_em.desc`, { headers:{...getAuthHeaders()} });
     const data = await resp.json();
     const contagem = {};
     analistas.forEach(a => contagem[a] = 0);
@@ -1427,7 +1490,7 @@ async function dgVerAnalista(nome) {
   det.style.display = '';
   lista.innerHTML = '<div style="font-size:12px;color:var(--text3);font-family:var(--mono);padding:.75rem;text-align:center">Carregando...</div>';
   try {
-    const resp = await fetch(`${SUPABASE_URL}/rest/v1/digitalizacao?motivo=eq.analista&detalhe=eq.${encodeURIComponent(nome)}&order=criado_em.desc`, { headers:{...getAuthHeaders()} });
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?motivo=eq.analista&detalhe=eq.${encodeURIComponent(nome)}&order=criado_em.desc`, { headers:{...getAuthHeaders()} });
     const data = await resp.json();
     if(!Array.isArray(data)||!data.length){
       lista.innerHTML = '<div style="font-size:13px;color:var(--text3);text-align:center;padding:1.5rem;font-family:var(--mono)">Nenhum pedido de '+nome+'.</div>';
@@ -1454,7 +1517,7 @@ function dgFmtData(d) {
 async function loadHomeStats(){
   if(!sessionStorage.getItem('seplan_token')) return;
   try{
-    const resp = await fetch(`${SUPABASE_URL}/rest/v1/buscas?select=id&limit=1000`, {headers:{...getAuthHeaders()}});
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/buscas?select=id&limit=1000`, {headers:{...getAuthHeaders()}});
     const data = await resp.json();
     if(Array.isArray(data)){
       const n = data.length;
@@ -1465,7 +1528,7 @@ async function loadHomeStats(){
     }
   }catch(e){}
   try{
-    const resp = await fetch(`${SUPABASE_URL}/rest/v1/digitalizacao?select=id,status`, {headers:{...getAuthHeaders()}});
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?select=id,status`, {headers:{...getAuthHeaders()}});
     const data = await resp.json();
     if(Array.isArray(data)){
       const pend = data.filter(r=>r.status==='pedido').length;
