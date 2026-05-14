@@ -253,7 +253,7 @@ canvas#pdfCanvas{width:100%;display:block}
 </div>
 
 <!-- TOPBAR -->
-<div class="topbar" id="topbar" style="display:none">
+<div class="topbar" id="topbar">
   <div class="topbar-logo"><span>Central</span> SEPLAN · <span style="color:var(--text3);font-weight:400;font-size:12px">Balneário Piçarras</span></div>
   <div class="topbar-right">
     <div class="mode-pills">
@@ -323,7 +323,7 @@ canvas#pdfCanvas{width:100%;display:block}
       </div>
 
 <!-- PAGE BUSCA -->
-      <div id="page-busca">
+      <div id="page-busca" style="display:none">
         <div class="steps">
           <div class="step-pill active" id="pill1"><span>01</span> Matrícula</div>
           <div class="step-pill" id="pill2"><span>02</span> Proprietários</div>
@@ -586,10 +586,7 @@ canvas#pdfCanvas{width:100%;display:block}
 
 </div>
 
-</div>
-
-
-  <div class="sidebar" id="dock" style="display:none">
+<div class="sidebar" id="dock">
     <div class="dock-logo">
       <svg viewBox="0 0 16 16"><path d="M2 8h12M8 2v12"/></svg>
     </div>
@@ -617,6 +614,8 @@ canvas#pdfCanvas{width:100%;display:block}
       </button>
     </div>
   </div>
+
+</div>
 
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -666,8 +665,7 @@ async function checkLogin(){
 function showApp(){
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('app').style.display='block';
-  document.getElementById('topbar').style.display='flex';
-  document.getElementById('dock').style.display='flex';
+  // topbar e dock já visíveis dentro do #app
   const email = sessionStorage.getItem('seplan_email')||'';
   const av = document.getElementById('topbar-av');
   if(av && email) av.textContent = email.slice(0,2).toUpperCase();
@@ -720,12 +718,15 @@ if(sessionStorage.getItem('seplan_token')){
 
 // NAV
 function navTo(page){
-  ['busca','historico'].forEach(p=>{
-    document.getElementById('page-'+p).style.display=p===page?'block':'none';
+  ['home','busca','historico'].forEach(p=>{
+    const el=document.getElementById('page-'+p);
+    if(el) el.style.display=p===page?'block':'none';
     const btn=document.getElementById('nav-'+p);
-    if(btn) btn.className='nav-item'+(p===page?' active':'');
+    if(btn) btn.classList.toggle('active', p===page);
   });
   if(page==='historico') loadHistoricoPage();
+  if(page==='home'){ initHomeCanvas(); loadHomeStats(); }
+  if(page==='digitalizacao'){ abrirDigitalizacao(); }
 }
 
 // STEPS
