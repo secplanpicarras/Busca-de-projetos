@@ -936,7 +936,11 @@ function navTo(page){
     initHomeCanvas();
     loadHomeStats();
   }
-  if(page==='agenda'){ agInit(); }
+  if(page==='agenda'){
+    const pageAg = document.getElementById('page-agenda');
+    if(pageAg) pageAg.style.display = 'block';
+    agInit();
+  }
   if(page==='digitalizacao'){ abrirDigitalizacao(); }
 }
 
