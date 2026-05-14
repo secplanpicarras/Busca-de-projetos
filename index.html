@@ -792,7 +792,11 @@ function navTo(page){
     if(btn) btn.classList.toggle('active', p===page);
   });
   if(page==='historico') loadHistoricoPage();
-  if(page==='home'){ initHomeCanvas(); loadHomeStats(); }
+  if(page==='home'){
+    homeTick();
+    initHomeCanvas();
+    loadHomeStats();
+  }
   if(page==='digitalizacao'){ abrirDigitalizacao(); }
 }
 
@@ -1370,6 +1374,7 @@ async function dgAdicionar() {
     const st = document.getElementById('dg-status');
     st.textContent = '✓ Registrado!';
     setTimeout(()=>st.textContent='',3000);
+    diShow('digitalizacao');
   } catch(e) {
     alert('Erro ao salvar. Tente novamente.');
   } finally {
@@ -1515,9 +1520,14 @@ function dgFmtData(d) {
 
 // ── HOME PAGE ─────────────────────────────────────────────────────────────────
 async function loadHomeStats(){
-  if(!sessionStorage.getItem('seplan_token')) return;
+  // Skeleton loading
+  const feed = document.getElementById('home-feed');
+  if(feed) feed.innerHTML = `
+    <div class="feed-item" style="opacity:.4"><div class="fdot" style="background:var(--border2)"></div><div class="ftext" style="background:var(--border2);border-radius:4px;height:12px;width:60%"></div></div>
+    <div class="feed-item" style="opacity:.3"><div class="fdot" style="background:var(--border2)"></div><div class="ftext" style="background:var(--border2);border-radius:4px;height:12px;width:45%"></div></div>`;
+
   try{
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/buscas?select=id&limit=1000`, {headers:{...getAuthHeaders()}});
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/buscas?select=id&limit=1000`);
     const data = await resp.json();
     if(Array.isArray(data)){
       const n = data.length;
@@ -1527,8 +1537,9 @@ async function loadHomeStats(){
       if(badge){badge.textContent = n + ' registros'; badge.className='hmod-badge ok';}
     }
   }catch(e){}
+
   try{
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?select=id,status`, {headers:{...getAuthHeaders()}});
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?select=id,status`);
     const data = await resp.json();
     if(Array.isArray(data)){
       const pend = data.filter(r=>r.status==='pedido').length;
@@ -1539,24 +1550,28 @@ async function loadHomeStats(){
       if(badge){badge.textContent = pend + ' pend.'; badge.style.background=pend>0?'rgba(239,159,39,.15)':'rgba(26,158,110,.15)'; badge.style.color=pend>0?'#EF9F27':'#4ecb9e';}
     }
   }catch(e){}
-  // Feed
+
+  // Feed de atividade
   try{
     const [b,d] = await Promise.all([
-      fetch(`${SUPABASE_URL}/rest/v1/buscas?select=protocolo,criado_em&order=criado_em.desc&limit=3`,{headers:{...getAuthHeaders()}}).then(r=>r.json()),
-      fetch(`${SUPABASE_URL}/rest/v1/digitalizacao?select=processo,motivo,detalhe,criado_em&order=criado_em.desc&limit=3`,{headers:{...getAuthHeaders()}}).then(r=>r.json()),
+      authFetch(`${SUPABASE_URL}/rest/v1/buscas?select=protocolo,criado_em&order=criado_em.desc&limit=4`).then(r=>r.json()),
+      authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?select=processo,motivo,detalhe,criado_em&order=criado_em.desc&limit=4`).then(r=>r.json()),
     ]);
     const items = [];
     if(Array.isArray(b)) b.forEach(x=>items.push({color:'#1a6fad',text:'Busca — ',mono:x.protocolo||'—',time:x.criado_em}));
     if(Array.isArray(d)) d.forEach(x=>items.push({color:'#1a9e6e',text:(x.motivo==='analista'?x.detalhe+' — ':'Busca — '),mono:x.processo||'—',time:x.criado_em}));
     items.sort((a,b)=>new Date(b.time)-new Date(a.time));
-    const feed = document.getElementById('home-feed');
-    if(feed) feed.innerHTML = items.slice(0,4).map(i=>`
-      <div class="feed-item">
-        <div class="fdot" style="background:${i.color}"></div>
-        <div class="ftext">${i.text}<span class="fmono">${i.mono}</span></div>
-        <div class="ftime">${relTime(i.time)}</div>
-      </div>`).join('') || '<div class="empty-state">Sem atividade recente.</div>';
-  }catch(e){}
+    if(feed) feed.innerHTML = items.length
+      ? items.slice(0,4).map(i=>`
+          <div class="feed-item">
+            <div class="fdot" style="background:${i.color}"></div>
+            <div class="ftext">${i.text}<span class="fmono">${i.mono}</span></div>
+            <div class="ftime">${relTime(i.time)}</div>
+          </div>`).join('')
+      : '<div class="empty-state">Sem atividade recente.</div>';
+  }catch(e){
+    if(feed) feed.innerHTML = '<div class="empty-state">Sem atividade recente.</div>';
+  }
 }
 
 function relTime(iso){
