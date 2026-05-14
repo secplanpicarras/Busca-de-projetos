@@ -623,6 +623,9 @@ canvas#pdfCanvas{width:100%;display:block}
 const PASSWORD='@Ma07nu209970';
 const SUPABASE_URL='https://oqmiwgnxltfgmdmhmxmq.supabase.co';
 const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xbWl3Z254bHRmZ21kbWhteG1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNDQzMDksImV4cCI6MjA5MzcyMDMwOX0.XClbKEYt-DJezINAydYPn8enQoNT8Ub-J0xVeY3dfQE';
+let homeCanvasInited = false;
+let dgMotivo = 'analista';
+let _diBusy=false,_diTimer,_diAf,_diCleanup=null;
 const SHEET_ID='1AGrwH3KW1dgtvUr8H2uPlaj_Vleq7mwYDGoW6JHkOFI';
 
 const pdfjsLib=window['pdfjs-dist/build/pdf'];
@@ -1176,7 +1179,6 @@ function gerarCertidao(){
 }
 
 // ── DIGITALIZAÇÃO ─────────────────────────────────────────────────────────
-let dgMotivo = 'analista';
 
 function abrirDigitalizacao() {
   document.getElementById('dg-data').value = new Date().toISOString().slice(0,10);
@@ -1508,7 +1510,6 @@ function countTo(el, target, dur){
 }
 
 // Canvas ondas home
-let homeCanvasInited = false;
 function initHomeCanvas(){
   if(homeCanvasInited) return;
   homeCanvasInited = true;
@@ -1590,7 +1591,6 @@ function setModoApresentacao(on){
 // ── DYNAMIC ISLAND ────────────────────────────────────────────────────────────
 const _di=document.getElementById('di-island');
 const _diPad=document.getElementById('di-ipad');
-let _diBusy=false,_diTimer,_diAf,_diCleanup=null;
 const DI_O=650,DI_C=560;
 function _diEaseOut(t){return 1-Math.pow(1-t,3.2);}
 function _diEaseIn(t){return Math.pow(t,2.8);}
