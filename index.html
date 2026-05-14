@@ -502,6 +502,68 @@ canvas#pdfCanvas{width:100%;display:block}
         </div>
       </div>
 
+      <!-- PAGE AGENDA -->
+      <div id="page-agenda" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px">
+          <div style="display:flex;gap:4px;background:var(--bg2);border-radius:8px;padding:3px">
+            <button id="ag-btn-agenda" onclick="agSetView('agenda')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:0.5px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;font-family:var(--sans)">Agenda</button>
+            <button id="ag-btn-painel" onclick="agSetView('painel')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">Painel</button>
+            <button id="ag-btn-livres" onclick="agSetView('livres')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">Horários livres</button>
+            <button id="ag-btn-config" onclick="agSetView('config')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">⚙ Config</button>
+          </div>
+          <button onclick="agOpenModalNovoDia()" style="padding:7px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)">+ Novo dia</button>
+        </div>
+        <div id="ag-filters-wrap" style="margin-bottom:1rem"><div id="ag-filters" style="display:flex;gap:6px;flex-wrap:wrap"></div></div>
+        <div id="ag-view-agenda"></div>
+        <div id="ag-view-painel" style="display:none"></div>
+        <div id="ag-view-livres" style="display:none"></div>
+        <div id="ag-view-config" style="display:none"></div>
+        <div id="ag-toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg2);border:0.5px solid var(--border2);border-radius:10px;padding:10px 20px;font-size:13px;color:var(--text);font-family:var(--mono);opacity:0;transition:opacity .3s;pointer-events:none;z-index:9000"></div>
+        <div id="ag-overlay-slot" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;padding:1rem">
+          <div style="background:var(--modal-bg);border:0.5px solid var(--modal-border);border-radius:14px;padding:1.5rem;width:100%;max-width:480px;animation:fadeIn .2s ease">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+              <span style="font-family:var(--barlow);font-size:18px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.03em" id="ag-modal-slot-title">Agendar horário</span>
+              <button onclick="agCloseModal('ag-overlay-slot')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1">×</button>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem">
+              <div><label class="form-label">Data</label><input class="form-input" id="ag-slot-data" readonly></div>
+              <div><label class="form-label">Horário</label><input class="form-input" id="ag-slot-hora" readonly></div>
+            </div>
+            <div style="margin-bottom:.875rem"><label class="form-label">Nome do requerente *</label><input class="form-input" id="ag-slot-nome" placeholder="Ex: João Silva"></div>
+            <div style="margin-bottom:.875rem"><label class="form-label">Protocolo / Assunto</label><input class="form-input" id="ag-slot-assunto" placeholder="Ex: 12345/2026"></div>
+            <div style="margin-bottom:.875rem"><label class="form-label">Agendado por</label><input class="form-input" id="ag-slot-agendadopor" placeholder="Ex: Emanuel"></div>
+            <div style="margin-bottom:1.25rem">
+              <label class="form-label">Analista(s) — selecione até 2</label>
+              <div id="ag-analista-grid" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
+            </div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button onclick="agCloseModal('ag-overlay-slot')" class="btn">Cancelar</button>
+              <button onclick="agSalvarSlot()" class="btn btn-primary">Salvar</button>
+            </div>
+          </div>
+        </div>
+        <div id="ag-overlay-dia" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;padding:1rem">
+          <div style="background:var(--modal-bg);border:0.5px solid var(--modal-border);border-radius:14px;padding:1.5rem;width:100%;max-width:380px;animation:fadeIn .2s ease">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
+              <span style="font-family:var(--barlow);font-size:18px;font-weight:700;color:var(--text);text-transform:uppercase">Novo dia</span>
+              <button onclick="agCloseModal('ag-overlay-dia')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px">×</button>
+            </div>
+            <div style="margin-bottom:.875rem"><label class="form-label">Data *</label><input class="form-input" id="ag-novo-data" type="date"></div>
+            <div style="margin-bottom:.875rem"><label class="form-label">Dia da semana</label>
+              <select class="form-input" id="ag-novo-weekday"><option value="TERÇA-FEIRA">Terça-feira</option><option value="QUINTA-FEIRA">Quinta-feira</option></select>
+            </div>
+            <div style="margin-bottom:1.25rem"><label class="form-label">Aviso inicial (opcional)</label><input class="form-input" id="ag-novo-aviso" placeholder="Ex: Férias Gabriela"></div>
+            <div style="display:flex;gap:8px;justify-content:flex-end">
+              <button onclick="agCloseModal('ag-overlay-dia')" class="btn">Cancelar</button>
+              <button onclick="agSalvarNovoDia()" class="btn btn-primary">Criar dia</button>
+            </div>
+          </div>
+        </div>
+      </div>
+  </div>
+
+</div>
+
     </div>
   </div>
 
@@ -678,67 +740,6 @@ canvas#pdfCanvas{width:100%;display:block}
 
     </div>
 
-      <!-- PAGE AGENDA -->
-      <div id="page-agenda" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px">
-          <div style="display:flex;gap:4px;background:var(--bg2);border-radius:8px;padding:3px">
-            <button id="ag-btn-agenda" onclick="agSetView('agenda')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:0.5px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;font-family:var(--sans)">Agenda</button>
-            <button id="ag-btn-painel" onclick="agSetView('painel')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">Painel</button>
-            <button id="ag-btn-livres" onclick="agSetView('livres')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">Horários livres</button>
-            <button id="ag-btn-config" onclick="agSetView('config')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">⚙ Config</button>
-          </div>
-          <button onclick="agOpenModalNovoDia()" style="padding:7px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans)">+ Novo dia</button>
-        </div>
-        <div id="ag-filters-wrap" style="margin-bottom:1rem"><div id="ag-filters" style="display:flex;gap:6px;flex-wrap:wrap"></div></div>
-        <div id="ag-view-agenda"></div>
-        <div id="ag-view-painel" style="display:none"></div>
-        <div id="ag-view-livres" style="display:none"></div>
-        <div id="ag-view-config" style="display:none"></div>
-        <div id="ag-toast" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--bg2);border:0.5px solid var(--border2);border-radius:10px;padding:10px 20px;font-size:13px;color:var(--text);font-family:var(--mono);opacity:0;transition:opacity .3s;pointer-events:none;z-index:9000"></div>
-        <div id="ag-overlay-slot" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;padding:1rem">
-          <div style="background:var(--modal-bg);border:0.5px solid var(--modal-border);border-radius:14px;padding:1.5rem;width:100%;max-width:480px;animation:fadeIn .2s ease">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
-              <span style="font-family:var(--barlow);font-size:18px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.03em" id="ag-modal-slot-title">Agendar horário</span>
-              <button onclick="agCloseModal('ag-overlay-slot')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px;line-height:1">×</button>
-            </div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem">
-              <div><label class="form-label">Data</label><input class="form-input" id="ag-slot-data" readonly></div>
-              <div><label class="form-label">Horário</label><input class="form-input" id="ag-slot-hora" readonly></div>
-            </div>
-            <div style="margin-bottom:.875rem"><label class="form-label">Nome do requerente *</label><input class="form-input" id="ag-slot-nome" placeholder="Ex: João Silva"></div>
-            <div style="margin-bottom:.875rem"><label class="form-label">Protocolo / Assunto</label><input class="form-input" id="ag-slot-assunto" placeholder="Ex: 12345/2026"></div>
-            <div style="margin-bottom:.875rem"><label class="form-label">Agendado por</label><input class="form-input" id="ag-slot-agendadopor" placeholder="Ex: Emanuel"></div>
-            <div style="margin-bottom:1.25rem">
-              <label class="form-label">Analista(s) — selecione até 2</label>
-              <div id="ag-analista-grid" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px"></div>
-            </div>
-            <div style="display:flex;gap:8px;justify-content:flex-end">
-              <button onclick="agCloseModal('ag-overlay-slot')" class="btn">Cancelar</button>
-              <button onclick="agSalvarSlot()" class="btn btn-primary">Salvar</button>
-            </div>
-          </div>
-        </div>
-        <div id="ag-overlay-dia" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:500;align-items:center;justify-content:center;padding:1rem">
-          <div style="background:var(--modal-bg);border:0.5px solid var(--modal-border);border-radius:14px;padding:1.5rem;width:100%;max-width:380px;animation:fadeIn .2s ease">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem">
-              <span style="font-family:var(--barlow);font-size:18px;font-weight:700;color:var(--text);text-transform:uppercase">Novo dia</span>
-              <button onclick="agCloseModal('ag-overlay-dia')" style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:22px">×</button>
-            </div>
-            <div style="margin-bottom:.875rem"><label class="form-label">Data *</label><input class="form-input" id="ag-novo-data" type="date"></div>
-            <div style="margin-bottom:.875rem"><label class="form-label">Dia da semana</label>
-              <select class="form-input" id="ag-novo-weekday"><option value="TERÇA-FEIRA">Terça-feira</option><option value="QUINTA-FEIRA">Quinta-feira</option></select>
-            </div>
-            <div style="margin-bottom:1.25rem"><label class="form-label">Aviso inicial (opcional)</label><input class="form-input" id="ag-novo-aviso" placeholder="Ex: Férias Gabriela"></div>
-            <div style="display:flex;gap:8px;justify-content:flex-end">
-              <button onclick="agCloseModal('ag-overlay-dia')" class="btn">Cancelar</button>
-              <button onclick="agSalvarNovoDia()" class="btn btn-primary">Criar dia</button>
-            </div>
-          </div>
-        </div>
-      </div>
-  </div>
-
-</div>
 
 <div class="sidebar" id="dock">
     <div class="dock-logo">
