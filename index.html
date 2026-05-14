@@ -674,7 +674,8 @@ function showApp(){
   if(av && email) av.textContent = email.slice(0,2).toUpperCase();
   navTo('home');
   const nome = email.split('@')[0];
-  document.getElementById('usuarioLogado').textContent=nome;
+  const elUser = document.getElementById('usuarioLogado');
+  if(elUser) elUser.textContent=nome;
 }
 
 function logout(){
@@ -1451,6 +1452,7 @@ function dgFmtData(d) {
 
 // ── HOME PAGE ─────────────────────────────────────────────────────────────────
 async function loadHomeStats(){
+  if(!sessionStorage.getItem('seplan_token')) return;
   try{
     const resp = await fetch(`${SUPABASE_URL}/rest/v1/buscas?select=id&limit=1000`, {headers:{...getAuthHeaders()}});
     const data = await resp.json();
