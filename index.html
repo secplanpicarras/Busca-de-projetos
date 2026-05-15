@@ -1855,9 +1855,17 @@ async function salvarBusca(){
   if(!protocolo){alert('Informe o número/ano do protocolo.');return;}
   const confirmados=currentSearch._confirmados||[];
   const temRes=confirmados.length>0||(currentSearch.inscricao_resultados||[]).length>0;
-  const payload={protocolo,matricula,inscricao:currentSearch.inscricao,proprietarios:currentSearch.proprietarios,inscricao_resultados:currentSearch.inscricao_resultados,nome_resultados:confirmados,tem_resultado:temRes};
-  const email=sessionStorage.getItem('seplan_email')||'';
-  payload.usuario_email=email;
+  const payload={
+    protocolo,
+    matricula,
+    inscricao: currentSearch.inscricao||'',
+    nomes: currentSearch.proprietarios||[],
+    resultado: {
+      inscricao_resultados: currentSearch.inscricao_resultados||[],
+      nome_resultados: confirmados,
+      tem_resultado: temRes
+    }
+  };
   const resp=await authFetch(`${SUPABASE_URL}/rest/v1/buscas`,{
     method:'POST',
     headers:{'Content-Type':'application/json',...getAuthHeaders(),'Prefer':'return=representation'},
