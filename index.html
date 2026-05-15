@@ -704,6 +704,103 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.5}
 }
 
 
+
+/* ── AGENDA — adaptação para identidade Central SEPLAN ── */
+#page-agenda {
+  /* Mapear variáveis da agenda para as da Central */
+  --bg: var(--bg);
+  --surface: var(--bg2);
+  --card: var(--surface);
+  --border: var(--border);
+  --border2: var(--border2);
+  --text: var(--text);
+  --muted: var(--text3);
+  --accent: var(--accent);
+  --danger: var(--red);
+  --success: var(--accent);
+
+  /* Cores dos analistas */
+  --gabriela: #7F77DD; --gabriela-b: rgba(127,119,221,.15);
+  --ruy: #1a9e6e;      --ruy-b: rgba(26,158,110,.15);
+  --sabrina: #D85A30;  --sabrina-b: rgba(216,90,48,.15);
+  --vera: #D4537E;     --vera-b: rgba(212,83,126,.15);
+  --marco: #378ADD;    --marco-b: rgba(55,138,221,.15);
+  --livre-t: var(--text3);
+
+  --tint-gabriela: rgba(127,119,221,.08);
+  --tint-ruy:      rgba(26,158,110,.08);
+  --tint-sabrina:  rgba(216,90,48,.08);
+  --tint-vera:     rgba(212,83,126,.08);
+  --tint-marco:    rgba(55,138,221,.08);
+  --tint-livre:    rgba(255,255,255,.02);
+  --tint-panel-gabriela: rgba(127,119,221,.1);
+  --tint-panel-ruy:      rgba(26,158,110,.1);
+  --tint-panel-sabrina:  rgba(216,90,48,.1);
+  --tint-panel-vera:     rgba(212,83,126,.1);
+  --tint-panel-marco:    rgba(55,138,221,.1);
+  --row-alt: rgba(255,255,255,.02);
+  --aviso-bg: rgba(239,159,39,.08);
+  --aviso-bd: rgba(239,159,39,.3);
+  --aviso-txt: #EF9F27;
+  --aviso-field-bg: rgba(239,159,39,.05);
+  --aviso-field-bd: rgba(239,159,39,.3);
+  --aviso-field-bd2: rgba(239,159,39,.2);
+  --shadow: 0 4px 24px rgba(0,0,0,.35);
+  font-family: var(--sans);
+}
+
+/* Esconder header e nav da agenda — usamos o dock/topbar da Central */
+#page-agenda .header,
+#page-agenda .nav { display: none !important; }
+
+/* Ajustar o main para não ter padding extra */
+#page-agenda .main {
+  padding: 0;
+  max-width: 100%;
+}
+
+/* Filtros ficam no topo sem sticky (já temos topbar fixa) */
+#page-agenda .filters-wrap {
+  position: relative;
+  top: auto;
+  background: transparent;
+  padding: 0 0 16px 0;
+  margin: 0 0 8px 0;
+}
+
+/* Adaptar inputs para o tema da Central */
+#page-agenda input,
+#page-agenda select,
+#page-agenda textarea {
+  background: var(--input-bg) !important;
+  border-color: var(--border2) !important;
+  color: var(--text) !important;
+  font-family: var(--mono) !important;
+}
+#page-agenda input:focus,
+#page-agenda select:focus {
+  border-color: var(--accent) !important;
+  outline: none !important;
+}
+
+/* Botões primários */
+#page-agenda .btn-novo-dia,
+#page-agenda .btn-save {
+  background: var(--accent) !important;
+  font-family: var(--sans) !important;
+}
+
+/* Overlay dos modais */
+#page-agenda .overlay {
+  background: rgba(0,0,0,.65) !important;
+  backdrop-filter: blur(6px) !important;
+}
+#page-agenda .modal {
+  background: var(--bg2) !important;
+  border: 0.5px solid rgba(26,158,110,.15) !important;
+  border-radius: 14px !important;
+}
+
 /* ── CONFIDENCE BADGES ── */
 .conf-badge{font-size:11px;padding:3px 10px;border-radius:999px;font-family:var(--mono);font-weight:500;white-space:nowrap;flex-shrink:0}
 .conf-alta{background:rgba(26,158,110,.15);color:#4ecb9e;border:0.5px solid rgba(26,158,110,.25)}
@@ -927,17 +1024,16 @@ canvas#pdfCanvas{width:100%;display:block}
 
       <!-- PAGE AGENDA -->
       <div id="page-agenda" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
-  <div style="display:flex;gap:4px;background:var(--bg2);border-radius:8px;padding:3px">
-    <button class="nav-btn active" id="btn-agenda" onclick="setView('agenda')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:0.5px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;font-family:var(--sans)">Agenda</button>
-    <button class="nav-btn" id="btn-painel" onclick="setView('painel')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">Painel</button>
-    <button class="nav-btn" id="btn-livres" onclick="setView('livres')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">Horários Livres</button>
-    <button class="nav-btn" id="btn-config" onclick="setView('config')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">⚙ Config</button>
-  </div>
-  <button class="btn-novo-dia" onclick="openModalNovoDia()" style="padding:7px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:12px;font-weight:600;cursor:pointer">+ Novo dia</button>
-</div>
 
-        
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-brand">
+    <div class="header-logo">📋</div>
+    <div>
+      <div class="header-title">SEPLAN</div>
+      <div class="header-sub">Agendamentos de Analistas</div>
+    </div>
   </div>
   <div style="display:flex;gap:8px;align-items:center">
     <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
@@ -951,7 +1047,12 @@ canvas#pdfCanvas{width:100%;display:block}
 </div>
 
 <!-- NAV -->
-
+<div class="nav">
+  <button class="nav-btn active" onclick="setView('agenda')"  id="btn-agenda">Agenda</button>
+  <button class="nav-btn"        onclick="setView('painel')"  id="btn-painel">Painel Geral</button>
+  <button class="nav-btn"        onclick="setView('livres')"  id="btn-livres">Horários Livres</button>
+  <button class="nav-btn"        onclick="setView('config')"  id="btn-config">⚙ Configurações</button>
+</div>
 
 <div class="main">
   <div class="filters-wrap" id="filters-wrap">
@@ -1043,7 +1144,7 @@ canvas#pdfCanvas{width:100%;display:block}
   </div>
 </div>
 
-      </div>
+
       </div>
 
     </div>
@@ -2420,70 +2521,94 @@ function diShow(type){
 
 
 // ── SUPABASE ADAPTER (substitui Firebase) ────────────────────────────────────
+// ── SUPABASE ADAPTER (substitui Firebase) ───────────────────────────────────
 window._fb = {
   listenDays: async function(cb) {
-    async function load() {
-      try {
-        const resp = await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?order=data.asc,hora.asc`);
-        const rows = await resp.json();
-        if(!Array.isArray(rows)) { cb(null); return; }
-        const byDay = {};
-        rows.forEach(r => {
-          const dataFmt = r.data.split('-').reverse().join('/');
-          const dow = new Date(r.data+'T12:00:00').getDay();
-          const weekday = dow===2?'TERÇA-FEIRA':dow===4?'QUINTA-FEIRA':'OUTRO';
-          const id = (weekday.startsWith('TERÇA')?'TERÇA':'QUINTA') + ' ' + dataFmt.slice(0,5).replace('/','');
-          if(!byDay[id]) byDay[id] = { id, data: dataFmt, weekday, avisos:[], slots:{} };
-          byDay[id].slots[r.hora] = { nome:r.nome||'', assunto:r.assunto||'', analista:(r.analistas&&r.analistas[0])||'', analistas:r.analistas||[], agendadopor:r.agendado_por||'', _id:r.id, _data:r.data };
-        });
-        cb(Object.keys(byDay).length ? byDay : null);
-      } catch(e) { console.error(e); cb(null); }
-    }
-    load();
-    // Sem polling automático — recarrega só quando o usuário salva
+    try {
+      const resp = await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?order=data.asc,hora.asc`);
+      const rows = await resp.json();
+      if(!Array.isArray(rows) || !rows.length) { cb(null); return; }
+      const byDay = {};
+      rows.forEach(r => {
+        const dataFmt = r.data.split('-').reverse().join('/');
+        const dow = new Date(r.data+'T12:00:00').getDay();
+        const weekday = dow===2?'TERÇA-FEIRA':dow===4?'QUINTA-FEIRA':'OUTRO';
+        const id = (weekday.startsWith('TERÇA')?'TERÇA':'QUINTA') + ' ' + dataFmt.slice(0,5).replace('/','');
+        if(!byDay[id]) byDay[id] = { id, data: dataFmt, weekday, avisos:[], slots:{} };
+        byDay[id].slots[r.hora] = {
+          nome: r.nome||'', assunto: r.assunto||'',
+          analista: (r.analistas&&r.analistas[0])||'',
+          analistas: r.analistas||[], agendadopor: r.agendado_por||'',
+          _id: r.id, _data: r.data
+        };
+      });
+      cb(Object.keys(byDay).length ? byDay : null);
+    } catch(e) { console.error('listenDays error', e); cb(null); }
   },
   saveDays: async function(daysArr) {
-    // Coleta apenas slots com nome (não salva vazios)
+    // Salva só slots preenchidos em batch
     const payload = [];
     for(const day of daysArr) {
       const isoDate = day.data.split('/').reverse().join('-');
       for(const [hora, slot] of Object.entries(day.slots||{})) {
-        if(!slot.nome) continue; // só salva slots preenchidos
+        if(!slot.nome) continue;
         payload.push({
           data: isoDate, hora,
-          nome: slot.nome||'',
-          assunto: slot.assunto||'',
+          nome: slot.nome||'', assunto: slot.assunto||'',
           agendado_por: slot.agendadopor||'',
           analistas: slot.analistas||(slot.analista?[slot.analista]:[])
         });
       }
     }
     if(!payload.length) return;
-    // Salva em batch único
     try {
       await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos`, {
-        method:'POST',
-        headers:{'Prefer':'return=minimal'},
+        method:'POST', headers:{'Prefer':'return=minimal'},
         body: JSON.stringify(payload)
       });
     } catch(e) { console.error('saveDays error', e); }
+  },
+  saveSlot: async function(day, hora, slot) {
+    // Salvar/atualizar slot individual
+    const isoDate = day.data.split('/').reverse().join('-');
+    const payload = {
+      data: isoDate, hora,
+      nome: slot.nome||'', assunto: slot.assunto||'',
+      agendado_por: slot.agendadopor||'',
+      analistas: slot.analistas||(slot.analista?[slot.analista]:[])
+    };
+    try {
+      if(slot._id) {
+        await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?id=eq.${slot._id}`, {
+          method:'PATCH', body:JSON.stringify(payload)
+        });
+      } else {
+        const r = await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos`, {
+          method:'POST', headers:{'Prefer':'return=representation'},
+          body:JSON.stringify(payload)
+        });
+        if(r.ok) { const d=await r.json(); if(d&&d[0]) slot._id=d[0].id; }
+      }
+    } catch(e) { console.error('saveSlot error', e); }
+  },
+  deleteSlot: async function(slot) {
+    if(!slot._id) return;
+    try {
+      await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?id=eq.${slot._id}`, { method:'DELETE' });
+    } catch(e) { console.error('deleteSlot error', e); }
   },
   saveAnalistas: async function(list) {
     localStorage.setItem('seplan_analistas', JSON.stringify(list));
   },
   listenAnalistas: async function(cb) {
-    // Carregar do Supabase
     try {
       const resp = await authFetch(`${SUPABASE_URL}/rest/v1/analistas_config?order=nome.asc`);
       const data = await resp.json();
       if(Array.isArray(data) && data.length) {
         cb(data.map(a=>a.nome));
-        // Guardar cores
         window._analistasCores = {};
         data.forEach(a=>{ window._analistasCores[a.nome]=a.cor||'#888'; });
-      } else {
-        cb(null);
-      }
+      } else { cb(null); }
     } catch(e) { cb(null); }
   },
   saveBloqueios: function(obj) { localStorage.setItem('seplan_bloqueios', JSON.stringify(obj)); },
@@ -2492,6 +2617,44 @@ window._fb = {
     catch { cb({}); }
   }
 };
+
+// ── agendaInit: carrega e inicia a agenda ────────────────────────────────────
+function agendaInit() {
+  if(window._agendaReady) { render(); return; }
+  window._fb.listenAnalistas(function(data) {
+    if(data && Array.isArray(data) && data.length > 0) {
+      ANALISTAS = data;
+      rebuildFilters();
+    }
+  });
+  window._fb.listenBloqueios(function(data) {
+    BLOQUEIOS = data || {};
+  });
+  window._fb.listenDays(function(data) {
+    if(data) {
+      DAYS = Object.values(data).map(day => {
+        const avisos = day.avisos
+          ? (Array.isArray(day.avisos) ? day.avisos : Object.values(day.avisos))
+          : [];
+        const slots = {};
+        HORARIOS.forEach(h => {
+          const s = day.slots && day.slots[h];
+          slots[h] = s
+            ? { nome:s.nome||'', assunto:s.assunto||'', analista:s.analista||'',
+                analistas:s.analistas||[], agendadopor:s.agendadopor||'',
+                _id:s._id, _data:s._data }
+            : { nome:'', assunto:'', analista:'', analistas:[], agendadopor:'' };
+        });
+        return { ...day, avisos, slots };
+      }).sort((a,b) => a.data.split('/').reverse().join('-').localeCompare(b.data.split('/').reverse().join('-')));
+    } else {
+      DAYS = JSON.parse(JSON.stringify(BASE_DAYS));
+      window._fb.saveDays(DAYS);
+    }
+    window._agendaReady = true;
+    render();
+  });
+}
 
 // ── DADOS BASE ─────────────────────────────────────────────────────────────
 const HORARIOS = ["08:30","09:00","09:30","10:00","10:30","11:00","11:30"];
@@ -2510,7 +2673,7 @@ window.BASE_DAYS    = BASE_DAYS;
 
 // saveDays: envia para o Firebase — propaga para todos em tempo real
 function saveDays() {
-  window._fb.saveDays(DAYS);
+  // Não faz nada — salvamos slot por slot
 }
 
 function loadDays() {
@@ -2521,8 +2684,7 @@ function loadDays() {
 function analClass(an) { return an ? an.toLowerCase() : ''; }
 function badgeHtml(an) {
   if (!an) return '';
-  const cor = (window._analistasCores&&window._analistasCores[an])||'#888';
-  return `<span class="analista-badge" style="background:${cor}22;color:${cor};border:0.5px solid ${cor}44;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;font-family:var(--mono)">${an}</span>`;
+  return `<span class="analista-badge badge-${an.toLowerCase()}">${an}</span>`;
 }
 function dateToDDMMYYYY(iso) {
   const [y,m,d] = iso.split('-');
@@ -2574,20 +2736,8 @@ function salvarSlot() {
   if (!nome) { toast('Informe o nome do requerente', true); return; }
   const { dayId, hora } = editCtx;
   const day = DAYS.find(d => d.id === dayId);
-  const analistas2 = selAnalistaVal ? (window._selAnalistas2||[selAnalistaVal]) : [];
-  const slotOld = day.slots[hora];
-  day.slots[hora] = { nome, assunto: document.getElementById('slot-assunto').value.trim(), analista: selAnalistaVal, analistas: analistas2, agendadopor: document.getElementById('slot-agendadopor').value.trim(), _id: slotOld._id, _data: slotOld._data };
-  
-  // Salvar só este slot no Supabase
-  const isoDate = day.data.split('/').reverse().join('-');
-  const payload = { data:isoDate, hora, nome, assunto:day.slots[hora].assunto, agendado_por:day.slots[hora].agendadopor, analistas:analistas2 };
-  if(slotOld._id) {
-    authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?id=eq.${slotOld._id}`, { method:'PATCH', body:JSON.stringify(payload) });
-  } else {
-    authFetch(`${SUPABASE_URL}/rest/v1/agendamentos`, { method:'POST', headers:{'Prefer':'return=representation'}, body:JSON.stringify(payload) })
-      .then(r=>r.json()).then(d=>{ if(d&&d[0]) day.slots[hora]._id=d[0].id; }).catch(()=>{});
-  }
-
+  day.slots[hora] = { nome, assunto: document.getElementById('slot-assunto').value.trim(), analista: selAnalistaVal, agendadopor: document.getElementById('slot-agendadopor').value.trim() };
+  saveDays();
   closeModal('overlay-slot');
   toast('Agendamento salvo ✓');
   render();
@@ -3417,45 +3567,6 @@ window._fb.listenDays(function(data) {
   else if (currentView === 'painel') renderPainel();
   else if (currentView === 'livres') renderLivres();
 });
-
-// Inicializar agenda quando navegar para ela
-function agendaInit() {
-  if(window._agendaReady) { render(); return; }
-  // Init tema baseado no app
-  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
-  // Não chamar initTheme da agenda pois conflita — só carregar dados
-  window._fb.listenAnalistas(function(data) {
-    if(data && Array.isArray(data) && data.length > 0) {
-      ANALISTAS = data;
-      rebuildFilters();
-    }
-  });
-  window._fb.listenBloqueios(function(data) {
-    BLOQUEIOS = data || {};
-  });
-  window._fb.listenDays(function(data) {
-    if(data) {
-      DAYS = Object.values(data).map(day => {
-        const avisos = day.avisos ? (Array.isArray(day.avisos) ? day.avisos : Object.values(day.avisos)) : [];
-        const slots = {};
-        HORARIOS.forEach(h => {
-          const s = day.slots && day.slots[h];
-          slots[h] = s ? { nome:s.nome||'', assunto:s.assunto||'', analista:s.analista||'', analistas:s.analistas||[], agendadopor:s.agendadopor||'', _id:s._id, _data:s._data }
-                      : { nome:'', assunto:'', analista:'', analistas:[], agendadopor:'' };
-        });
-        return { ...day, avisos, slots };
-      }).sort((a,b) => {
-        const toIso = d => d.split('/').reverse().join('-');
-        return toIso(a.data).localeCompare(toIso(b.data));
-      });
-    } else {
-      DAYS = JSON.parse(JSON.stringify(BASE_DAYS));
-      window._fb.saveDays(DAYS);
-    }
-    window._agendaReady = true;
-    render();
-  });
-}
 
 function toggleSenha() {
   const inp = document.getElementById('loginInput');
