@@ -2643,42 +2643,6 @@ function saveDays() {
 function loadDays() {
   // Dados chegam via listener Firebase — não faz nada aqui
 }
-function agendaInit() {
-  if(window._agendaReady) { render(); return; }
-  window._fb.listenAnalistas(function(data) {
-    if(data && Array.isArray(data) && data.length > 0) {
-      ANALISTAS = data;
-      rebuildFilters();
-    }
-  });
-  window._fb.listenBloqueios(function(data) {
-    BLOQUEIOS = data || {};
-  });
-  window._fb.listenDays(function(data) {
-    if(data) {
-      DAYS = Object.values(data).map(day => {
-        const avisos = day.avisos
-          ? (Array.isArray(day.avisos) ? day.avisos : Object.values(day.avisos))
-          : [];
-        const slots = {};
-        HORARIOS.forEach(h => {
-          const s = day.slots && day.slots[h];
-          slots[h] = s
-            ? { nome:s.nome||'', assunto:s.assunto||'', analista:s.analista||'',
-                analistas:s.analistas||[], agendadopor:s.agendadopor||'',
-                _id:s._id, _data:s._data }
-            : { nome:'', assunto:'', analista:'', analistas:[], agendadopor:'' };
-        });
-        return { ...day, avisos, slots };
-      }).sort((a,b) => a.data.split('/').reverse().join('-').localeCompare(b.data.split('/').reverse().join('-')));
-    } else {
-      DAYS = JSON.parse(JSON.stringify(BASE_DAYS));
-      window._fb.saveDays(DAYS);
-    }
-    window._agendaReady = true;
-    render();
-  });
-}
 
 // ── HELPERS ────────────────────────────────────────────────────────────────
 function analClass(an) { return an ? an.toLowerCase() : ''; }
@@ -3516,6 +3480,44 @@ document.getElementById('view-agenda').innerHTML = `
     <div class="empty-icon" style="animation:spin 1s linear infinite;display:inline-block">⏳</div>
     <div class="empty-text" style="margin-top:12px">Conectando ao banco de dados...</div>
   </div>`;
+
+
+function agendaInit() {
+  if(window._agendaReady) { render(); return; }
+  window._fb.listenAnalistas(function(data) {
+    if(data && Array.isArray(data) && data.length > 0) {
+      ANALISTAS = data;
+      rebuildFilters();
+    }
+  });
+  window._fb.listenBloqueios(function(data) {
+    BLOQUEIOS = data || {};
+  });
+  window._fb.listenDays(function(data) {
+    if(data) {
+      DAYS = Object.values(data).map(day => {
+        const avisos = day.avisos
+          ? (Array.isArray(day.avisos) ? day.avisos : Object.values(day.avisos))
+          : [];
+        const slots = {};
+        HORARIOS.forEach(h => {
+          const s = day.slots && day.slots[h];
+          slots[h] = s
+            ? { nome:s.nome||'', assunto:s.assunto||'', analista:s.analista||'',
+                analistas:s.analistas||[], agendadopor:s.agendadopor||'',
+                _id:s._id, _data:s._data }
+            : { nome:'', assunto:'', analista:'', analistas:[], agendadopor:'' };
+        });
+        return { ...day, avisos, slots };
+      }).sort((a,b) => a.data.split('/').reverse().join('-').localeCompare(b.data.split('/').reverse().join('-')));
+    } else {
+      DAYS = JSON.parse(JSON.stringify(BASE_DAYS));
+      window._fb.saveDays(DAYS);
+    }
+    window._agendaReady = true;
+    render();
+  });
+}
 
 function toggleSenha() {
   const inp = document.getElementById('loginInput');
