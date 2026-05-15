@@ -212,6 +212,498 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.5}
 .tag-amber{background:rgba(239,159,39,.1);color:var(--amber)}
 .tag-red{background:rgba(226,75,74,.1);color:var(--red)}
 
+
+
+/* ── AGENDA CSS ── */
+
+/* ── TEMA ESCURO (padrão) ── */
+
+
+/* ── TEMA CLARO ── */
+
+
+/* Segue preferência do sistema se não houver escolha manual */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg:       #f2f4f8;
+    --surface:  #ffffff;
+    --card:     #ffffff;
+    --border:   #dde1ec;
+    --border2:  #c8cede;
+    --text:     #1a1f36;
+    --muted:    #8890a8;
+    --accent:   #2563eb;
+    --danger:   #dc2626;
+    --success:  #16a34a;
+
+    --gabriela: #2563eb; --gabriela-b: #dbeafe;
+    --ruy:      #16a34a; --ruy-b:      #dcfce7;
+    --sabrina:  #dc2626; --sabrina-b:  #fee2e2;
+    --vera:     #d97706; --vera-b:     #fef3c7;
+    --marco:    #7c3aed; --marco-b:    #ede9fe;
+    --livre-t:  #94a3b8;
+
+    --tint-gabriela: rgba(37,99,235,.07);
+    --tint-ruy:      rgba(22,163,74,.07);
+    --tint-sabrina:  rgba(220,38,38,.07);
+    --tint-vera:     rgba(217,119,6,.07);
+    --tint-marco:    rgba(124,58,237,.07);
+    --tint-livre:    rgba(200,206,222,.25);
+    --tint-panel-gabriela: rgba(37,99,235,.08);
+    --tint-panel-ruy:      rgba(22,163,74,.08);
+    --tint-panel-sabrina:  rgba(220,38,38,.08);
+    --tint-panel-vera:     rgba(217,119,6,.08);
+    --tint-panel-marco:    rgba(124,58,237,.1);
+    --row-alt: rgba(242,244,248,.8);
+    --aviso-bg: #fffbeb; --aviso-bd: #d97706; --aviso-txt: #92400e;
+    --aviso-field-bg: #fffdf0; --aviso-field-bd: #f59e0b; --aviso-field-bd2: #fde68a;
+    --shadow: 0 4px 24px rgba(0,0,0,.10);
+  }
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+
+/* HEADER */
+#page-agenda .header {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
+  height: 60px; position: sticky; top: 0; z-index: 100;
+}
+#page-agenda .header-brand { display: flex; align-items: center; gap: 12px; }
+#page-agenda .header-logo { width: 34px; height: 34px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+#page-agenda .header-title { font-size: 15px; font-weight: 700; }
+#page-agenda .header-sub { font-size: 11px; color: var(--muted); }
+.theme-toggle {
+  width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--border2);
+  background: var(--card); cursor: pointer; display: flex; align-items: center;
+  justify-content: center; font-size: 16px; transition: all .2s;
+}
+.theme-toggle:hover { background: var(--border); transform: rotate(20deg); }
+.btn-novo-dia {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 14px; background: var(--accent); color: #fff;
+  border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity .15s;
+}
+.btn-novo-dia:hover { opacity: .85; }
+
+/* NAV */
+#page-agenda .nav {
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  padding: 0 20px; display: flex; gap: 4px; overflow-x: auto;
+}
+.nav::-webkit-scrollbar { height: 0; }
+.nav-btn {
+  padding: 10px 16px; border: none; background: transparent; color: var(--muted);
+  font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+  cursor: pointer; border-bottom: 2px solid transparent; white-space: nowrap; transition: all .15s;
+}
+.nav-btn:hover { color: var(--text); }
+.nav-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* MAIN */
+#page-agenda .main { padding: 20px; max-width: 1100px; margin: 0 auto; }
+
+/* FILTERS */
+#page-agenda .filters-wrap {
+  position: sticky;
+  top: 60px;
+  z-index: 90;
+  background: var(--bg);
+  padding: 10px 20px;
+  border-bottom: 1px solid var(--border);
+  margin: 0 -20px 20px;
+}
+#page-agenda .filters { display: flex; gap: 8px; flex-wrap: wrap; max-width: 1100px; margin: 0 auto; }
+.filter-chip {
+  padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border2);
+  background: var(--card); color: var(--muted); font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all .15s;
+}
+.filter-chip:hover { border-color: var(--accent); color: var(--text); }
+.filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.filter-chip.gabriela.active { background: var(--gabriela); border-color: var(--gabriela); }
+.filter-chip.ruy.active      { background: var(--ruy); border-color: var(--ruy); color: #0a2010; }
+.filter-chip.sabrina.active  { background: var(--sabrina); border-color: var(--sabrina); }
+.filter-chip.vera.active     { background: var(--vera); border-color: var(--vera); color: #1a1000; }
+.filter-chip.marco.active    { background: var(--marco); border-color: var(--marco); }
+
+/* PAST DAYS */
+.day-card.past-day { opacity: .55; }
+.day-card.past-day .day-header { background: var(--bg); }
+.slot.past-slot { cursor: default; opacity: .6; }
+.slot.past-slot:hover { filter: none; }
+
+/* MONTH GROUP */
+.month-group { margin-bottom: 8px; }
+.month-header {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 4px; margin-bottom: 10px; cursor: pointer; user-select: none;
+}
+.month-title {
+  font-size: 13px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 1px; color: var(--muted);
+}
+.month-count {
+  font-size: 11px; color: var(--muted);
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 2px 8px;
+}
+.month-chevron { width: 14px; height: 14px; color: var(--muted); transition: transform .2s; margin-left: auto; }
+.month-group.closed .month-chevron { transform: rotate(-90deg); }
+.month-group.closed .month-
+.month-
+
+/* DAY CARDS */
+.days-grid { display: flex; flex-direction: column; gap: 14px; }
+.day-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+.day-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 13px 18px; background: var(--surface); border-bottom: 1px solid var(--border);
+  cursor: pointer; user-select: none;
+}
+.day-header-left { display: flex; align-items: center; gap: 12px; }
+.day-badge { padding: 3px 10px; border-radius: 6px; font-size: 10px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; }
+.badge-terca  { background: #1a2a4a; color: var(--accent); }
+.badge-quinta { background: #1a3020; color: var(--ruy); }
+.day-date { font-size: 15px; font-weight: 600; }
+.day-meta { font-size: 12px; color: var(--muted); margin-top: 1px; }
+.day-actions { display: flex; gap: 6px; align-items: center; }
+.icon-btn {
+  width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--border2);
+  background: transparent; color: var(--muted); cursor: pointer; display: flex;
+  align-items: center; justify-content: center; font-size: 14px; transition: all .15s;
+}
+.icon-btn:hover { background: var(--border); color: var(--text); }
+.icon-btn.danger:hover { background: var(--sabrina-b); border-color: var(--sabrina); color: var(--sabrina); }
+.chevron { width: 16px; height: 16px; color: var(--muted); transition: transform .2s; }
+.day-card.open .chevron { transform: rotate(180deg); }
+.day-
+.day-card.open .day-
+
+/* AVISOS BAR */
+.avisos-bar { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; align-items: center; }
+.aviso-tag {
+  display: flex; align-items: center; gap: 5px; padding: 4px 10px;
+  background: var(--aviso-bg); border: 1px solid var(--aviso-bd); border-radius: 6px;
+  font-size: 11px; color: var(--aviso-txt); font-weight: 500;
+}
+.aviso-tag .rm-aviso {
+  background: none; border: none; color: var(--aviso-txt); cursor: pointer;
+  font-size: 13px; line-height: 1; padding: 0 0 0 2px; opacity: .6;
+}
+.aviso-tag .rm-aviso:hover { opacity: 1; }
+.btn-add-aviso {
+  padding: 4px 10px; border-radius: 6px; border: 1px dashed #5a3d00;
+  background: transparent; color: #f5a623; font-size: 11px; cursor: pointer; transition: all .15s;
+}
+.btn-add-aviso:hover { background: #2a2010; }
+
+/* SLOTS */
+.slots { display: flex; flex-direction: column; gap: 5px; }
+.slot {
+  display: grid; grid-template-columns: 68px 1fr auto auto;
+  align-items: center; gap: 8px; padding: 9px 12px;
+  border-radius: 8px; border-left: 3px solid transparent; cursor: pointer; transition: filter .15s;
+}
+.slot:hover { filter: brightness(1.1); }
+.slot.livre    { background: var(--tint-livre);    border-left-color: var(--livre-t); }
+.slot.gabriela { border-left-color: var(--gabriela); background: var(--tint-gabriela); }
+.slot.ruy      { border-left-color: var(--ruy);      background: var(--tint-ruy); }
+.slot.sabrina  { border-left-color: var(--sabrina);  background: var(--tint-sabrina); }
+.slot.vera     { border-left-color: var(--vera);     background: var(--tint-vera); }
+.slot.marco    { border-left-color: var(--marco);    background: var(--tint-marco); }
+.slot.dimmed   { opacity: .22; }
+.slot-time { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--muted); }
+.slot-nome { font-size: 14px; font-weight: 600; }
+.slot-assunto { font-size: 11px; color: var(--muted); margin-top: 1px; font-family: 'DM Mono', monospace; }
+.slot-livre-label { font-size: 13px; color: var(--livre-t); font-style: italic; }
+.analista-badge {
+  padding: 3px 9px; border-radius: 5px; font-size: 10px; font-weight: 700;
+  letter-spacing: .5px; text-transform: uppercase; white-space: nowrap;
+}
+.badge-gabriela { background: var(--gabriela-b); color: var(--gabriela); }
+.badge-ruy      { background: var(--ruy-b);      color: var(--ruy); }
+.badge-sabrina  { background: var(--sabrina-b);  color: var(--sabrina); }
+.badge-vera     { background: var(--vera-b);     color: var(--vera); }
+.badge-marco    { background: var(--marco-b);    color: var(--marco); }
+.slot-rm {
+  width: 22px; height: 22px; border-radius: 5px; border: none; background: transparent;
+  color: var(--muted); cursor: pointer; font-size: 14px; display: flex;
+  align-items: center; justify-content: center; opacity: 0; transition: opacity .15s;
+}
+.slot:hover .slot-rm { opacity: 1; }
+.slot-rm:hover { color: var(--danger); background: var(--sabrina-b); }
+
+/* PAINEL */
+/* PAINEL */
+.painel-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 12px;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px 16px;
+}
+.painel-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+.pf-chip {
+  padding: 5px 13px; border-radius: 16px; border: 1px solid var(--border2);
+  background: var(--surface); color: var(--muted); font-family: 'DM Sans', sans-serif;
+  font-size: 12px; font-weight: 500; cursor: pointer; transition: all .15s;
+}
+.pf-chip:hover { color: var(--text); border-color: var(--accent); }
+.pf-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pf-chip.gabriela.active { background: var(--gabriela); border-color: var(--gabriela); }
+.pf-chip.ruy.active      { background: var(--ruy); border-color: var(--ruy); color: #0a2010; }
+.pf-chip.sabrina.active  { background: var(--sabrina); border-color: var(--sabrina); }
+.pf-chip.vera.active     { background: var(--vera); border-color: var(--vera); color: #1a1000; }
+.pf-chip.marco.active    { background: var(--marco); border-color: var(--marco); }
+.painel-datas { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.p-label { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+.p-date {
+  background: var(--surface); border: 1px solid var(--border2); border-radius: 6px;
+  color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 12px;
+  padding: 5px 8px; outline: none; cursor: pointer;
+}
+.p-date:focus { border-color: var(--accent); }
+.p-clear {
+  padding: 5px 10px; background: transparent; border: 1px solid var(--border2);
+  border-radius: 6px; color: var(--muted); font-size: 11px; cursor: pointer;
+  font-family: 'DM Sans', sans-serif; transition: all .15s;
+}
+.p-clear:hover { background: var(--sabrina-b); color: var(--sabrina); border-color: var(--sabrina); }
+
+/* KPI CARDS */
+.kpi-row { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:10px; margin:16px 0; }
+.kpi-card { background:var(--card); border:1px solid var(--border); border-radius:10px; padding:14px 16px; display:flex; align-items:center; gap:12px; }
+.kpi-icon { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+.kpi-label { font-size:11px; color:var(--muted); margin-bottom:3px; font-weight:500; }
+.kpi-val { font-size:26px; font-weight:700; line-height:1; }
+
+/* ANALISTA TABLE */
+.an-table { width:100%; border-collapse:collapse; font-size:13px; }
+.an-table th { font-size:10px; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; padding:8px 12px; border-bottom:1px solid var(--border); text-align:left; }
+.an-table td { padding:10px 12px; border-bottom:1px solid var(--border); vertical-align:middle; }
+.an-table tr:last-child td { border-bottom:none; }
+.an-table tr:hover td { background:var(--surface); }
+.an-badge { padding:4px 12px; border-radius:6px; font-size:11px; font-weight:700; }
+.an-bar-track { height:6px; background:var(--border); border-radius:3px; overflow:hidden; }
+.an-bar-fill { height:100%; border-radius:3px; transition:width .4s; }
+
+/* PIE */
+.pie-leg-pct { color:var(--muted); font-size:10px; margin-left:4px; }
+
+/* DASHBOARD */
+.dashboard-row {
+  display: flex; gap: 14px; margin: 16px 0; flex-wrap: wrap;
+}
+.dash-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 20px; flex: 1; min-width: 260px;
+}
+.dash-card-title {
+  font-size: 12px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .6px; color: var(--muted); margin-bottom: 14px;
+}
+.pie-wrap { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+.pie-svg { width: 160px; height: 145px; flex-shrink: 0; }
+.pie-legend { display: flex; flex-direction: column; gap: 7px; flex: 1; }
+.pie-leg-item { display: flex; align-items: center; gap: 7px; font-size: 12px; }
+.pie-leg-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.pie-leg-name { flex: 1; font-weight: 500; }
+.pie-leg-val { font-weight: 600; white-space: nowrap; }
+
+/* BAR CHART */
+.bar-chart {
+  display: flex; align-items: flex-end; gap: 6px;
+  height: 130px; padding-bottom: 20px; position: relative;
+  overflow-x: auto;
+}
+.bar-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex-shrink: 0; min-width: 32px; }
+.bar-val { font-size: 9px; font-weight: 700; color: var(--muted); }
+.bar-track {
+  width: 26px; flex: 1; background: var(--border);
+  border-radius: 4px; display: flex; align-items: flex-end; overflow: hidden;
+}
+.bar-fill {
+  width: 100%; background: var(--accent); border-radius: 4px;
+  min-height: 3px; transition: height .3s;
+}
+.bar-fill.bar-past { background: var(--muted); opacity: .5; }
+.bar-label { font-size: 9px; color: var(--muted); text-align: center; white-space: nowrap; }
+
+/* PAINEL TABLE */
+.painel-table-wrap { overflow-x: auto; margin-top: 16px; border-radius: 10px; border: 1px solid var(--border); }
+.painel-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.painel-table thead tr { background: var(--surface); }
+.painel-table th {
+  padding: 8px 10px; text-align: left; font-size: 10px; font-weight: 700;
+  color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
+  border-bottom: 1px solid var(--border); white-space: nowrap;
+}
+.painel-table tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+.painel-table tbody tr:hover { background: var(--surface); }
+.painel-table tbody tr:last-child { border-bottom: none; }
+.painel-table td { padding: 7px 10px; vertical-align: middle; }
+.row-past { opacity: .45; }
+.td-date { font-weight: 600; white-space: nowrap; font-size: 12px; }
+.td-slot { min-width: 110px; }
+.td-slot.gabriela { background: var(--tint-gabriela); }
+.td-slot.ruy      { background: var(--tint-ruy); }
+.td-slot.sabrina  { background: var(--tint-sabrina); }
+.td-slot.vera     { background: var(--tint-vera); }
+.td-slot.marco    { background: var(--tint-marco); }
+.td-slot.livre-cell { text-align: center; color: var(--border2); }
+.td-nome { font-weight: 500; font-size: 11px; }
+.td-an   { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: .3px; margin-top: 1px; }
+.td-total { white-space: nowrap; font-size: 12px; text-align: center; }
+.livre-dot { color: var(--ruy); font-size: 8px; }
+
+.stats-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px,1fr)); gap: 10px; margin-bottom: 20px; }
+.stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 14px; }
+.stat-label { font-size: 11px; color: var(--muted); font-weight: 500; text-transform: uppercase; letter-spacing: .5px; }
+.stat-value { font-size: 28px; font-weight: 700; margin-top: 4px; }
+.stat-value.gabriela { color: var(--gabriela); }
+.stat-value.ruy      { color: var(--ruy); }
+.stat-value.sabrina  { color: var(--sabrina); }
+.stat-value.vera     { color: var(--vera); }
+.stat-value.marco    { color: var(--marco); }
+.panel-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px,1fr)); gap: 12px; }
+.panel-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+.panel-card-header { padding: 10px 14px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.panel-card-date { font-size: 13px; font-weight: 600; }
+.panel-card-day { font-size: 10px; color: var(--muted); }
+.panel-slots { padding: 8px; display: flex; flex-direction: column; gap: 3px; }
+.panel-slot { display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; border-radius: 5px; font-size: 11px; }
+.panel-slot.livre    { color: var(--livre-t); }
+.panel-slot.gabriela { background: var(--tint-panel-gabriela); }
+.panel-slot.ruy      { background: var(--tint-panel-ruy); }
+.panel-slot.sabrina  { background: var(--tint-panel-sabrina); }
+.panel-slot.vera     { background: var(--tint-panel-vera); }
+.panel-slot.marco    { background: var(--tint-panel-marco); }
+.panel-slot-time { font-family: 'DM Mono', monospace; color: var(--muted); font-size: 10px; flex-shrink: 0; }
+.panel-slot-nome { font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; padding: 0 6px; }
+
+/* LIVRES */
+.livres-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.livres-count { padding: 4px 12px; background: rgba(62,207,120,.1); border: 1px solid rgba(62,207,120,.25); border-radius: 20px; font-size: 13px; color: var(--ruy); font-weight: 600; }
+.livres-grid { display: flex; flex-direction: column; gap: 5px; }
+.livre-row { display: grid; grid-template-columns: 120px 140px 90px auto; align-items: center; gap: 10px; padding: 10px 16px; background: var(--card); border: 1px solid var(--border); border-left: 3px solid var(--ruy); border-radius: 8px; font-size: 13px; }
+.livre-row-date { font-weight: 600; }
+.livre-row-day  { color: var(--muted); font-size: 12px; }
+.livre-row-time { font-family: 'DM Mono', monospace; color: var(--ruy); font-weight: 500; }
+.btn-agendar-livre {
+  padding: 5px 12px; background: rgba(62,207,120,.1); border: 1px solid rgba(62,207,120,.3);
+  border-radius: 6px; color: var(--ruy); font-size: 11px; font-weight: 600;
+  cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all .15s; white-space: nowrap;
+}
+.btn-agendar-livre:hover { background: rgba(62,207,120,.2); }
+
+/* MODAL */
+#page-agenda .overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.7);
+  z-index: 200; display: flex; align-items: center; justify-content: center;
+  padding: 20px; opacity: 0; pointer-events: none; transition: opacity .2s;
+}
+#page-agenda .overlay.open { opacity: 1; pointer-events: all; }
+#page-agenda .modal {
+  background: var(--surface); border: 1px solid var(--border2); border-radius: 14px;
+  width: 100%; max-width: 480px; max-height: 90vh; overflow-y: auto;
+  transform: translateY(16px); transition: transform .2s;
+}
+#page-agenda .overlay.open #page-agenda .modal { transform: translateY(0); }
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 20px 14px; border-bottom: 1px solid var(--border);
+}
+.modal-title { font-size: 16px; font-weight: 700; }
+.modal-close {
+  width: 30px; height: 30px; border-radius: 7px; border: 1px solid var(--border2);
+  background: transparent; color: var(--muted); cursor: pointer; font-size: 18px;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { background: var(--border); color: var(--text); }
+.modal-
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; }
+.form-input, .form-select {
+  background: var(--card); border: 1px solid var(--border2); border-radius: 8px;
+  padding: 10px 12px; color: var(--text); font-family: 'DM Sans', sans-serif;
+  font-size: 14px; outline: none; width: 100%; transition: border-color .15s;
+}
+.form-input:focus, .form-select:focus { border-color: var(--accent); }
+.form-select option { background: var(--card); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modal-footer { padding: 14px 20px 18px; display: flex; gap: 10px; border-top: 1px solid var(--border); }
+.btn-primary {
+  flex: 1; padding: 10px; background: var(--accent); color: #fff; border: none;
+  border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px;
+  font-weight: 600; cursor: pointer; transition: opacity .15s;
+}
+.btn-primary:hover { opacity: .85; }
+.btn-secondary {
+  padding: 10px 18px; background: transparent; color: var(--muted);
+  border: 1px solid var(--border2); border-radius: 8px; font-family: 'DM Sans', sans-serif;
+  font-size: 14px; cursor: pointer; transition: all .15s;
+}
+.btn-secondary:hover { background: var(--border); color: var(--text); }
+
+/* ANALISTA SELECTOR */
+.analista-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.analista-opt {
+  padding: 8px 4px; border-radius: 8px; border: 2px solid var(--border2);
+  background: var(--card); text-align: center; font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: all .15s;
+}
+.analista-opt:hover { border-color: var(--border2); filter: brightness(1.15); }
+.analista-opt.sel-Gabriela { border-color: var(--gabriela); background: var(--gabriela-b); color: var(--gabriela); }
+.analista-opt.sel-Ruy      { border-color: var(--ruy);      background: var(--ruy-b);      color: var(--ruy); }
+.analista-opt.sel-Sabrina  { border-color: var(--sabrina);  background: var(--sabrina-b);  color: var(--sabrina); }
+.analista-opt.sel-Vera     { border-color: var(--vera);     background: var(--vera-b);     color: var(--vera); }
+.analista-opt.sel-Marco    { border-color: var(--marco);    background: var(--marco-b);    color: var(--marco); }
+.analista-opt.nenhum.sel-nenhum { border-color: var(--border2); background: var(--border); color: var(--text); }
+
+/* EMPTY / TOAST */
+.empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+#page-agenda .toast {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
+  background: var(--success); color: #0a2010; padding: 10px 20px; border-radius: 8px;
+  font-weight: 600; font-size: 13px; z-index: 300; transition: transform .25s; pointer-events: none;
+}
+#page-agenda .toast.show { transform: translateX(-50%) translateY(0); }
+#page-agenda .toast.err { background: var(--danger); color: #fff; }
+
+
+
+/* SLOT AGENDADO POR */
+.slot-agendadopor { font-size: 10px; color: var(--muted); margin-top: 1px; font-style: italic; }
+.analista-opt.blocked { opacity: .45; cursor: not-allowed; border-color: var(--border); }
+.livre-avisos { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; padding-bottom: 4px; }
+.livre-row.has-aviso { flex-wrap: wrap; }
+
+/* CONFIG SCREEN */
+.config-wrap { max-width: 640px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; }
+.config-section { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.config-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.config-desc { font-size: 12px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+.config-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; min-height: 36px; }
+.config-item { display: flex; align-items: center; gap: 6px; }
+.config-badge { padding: 5px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+.config-rm { background: transparent; border: none; color: var(--muted); cursor: pointer; font-size: 16px; line-height: 1; padding: 2px 4px; border-radius: 4px; transition: all .15s; }
+.config-rm:hover { background: var(--sabrina-b); color: var(--sabrina); }
+.config-add-row { display: flex; gap: 10px; align-items: center; }
+
+@media (max-width: 600px) {
+  #page-agenda .main { padding: 12px; }
+  .slot { grid-template-columns: 60px 1fr auto; }
+  .slot .analista-badge { display: none; }
+  .slot-assunto { display: none; }
+  .livre-row { grid-template-columns: 90px 1fr 70px auto; }
+  .analista-grid { grid-template-columns: repeat(3,1fr); }
+  .form-row { grid-template-columns: 1fr; }
+  .stats-row { grid-template-columns: repeat(3,1fr); }
+}
+
+
 /* ── CONFIDENCE BADGES ── */
 .conf-badge{font-size:11px;padding:3px 10px;border-radius:999px;font-family:var(--mono);font-weight:500;white-space:nowrap;flex-shrink:0}
 .conf-alta{background:rgba(26,158,110,.15);color:#4ecb9e;border:0.5px solid rgba(26,158,110,.25)}
@@ -325,10 +817,11 @@ canvas#pdfCanvas{width:100%;display:block}
             <div class="hmod-name">Buscas salvas</div>
             <span class="hchip hchip-g">Ver registros</span>
           </div>
-          <div class="hmod hmod-sm">
+          <div class="hmod hmod-sm" onclick="navTo('agenda')" style="cursor:pointer">
+            <div class="hmod-badge ok" id="hbadge-agenda" style="position:absolute;top:10px;right:10px;font-size:10px;padding:2px 8px;border-radius:999px;font-family:var(--mono)">—</div>
             <div class="hmod-lbl">Agendamentos</div>
-            <div class="hmod-name">Em breve</div>
-            <span class="hchip hchip-b">Integração</span>
+            <div class="hmod-name">Agenda</div>
+            <span class="hchip hchip-b" id="hchip-agenda">carregando</span>
           </div>
           <div class="hmod hmod-sm" onclick="navTo('digitalizacao')">
             <div class="hmod-badge warn" id="hbadge-dig" style="position:absolute;top:10px;right:10px;font-size:10px;padding:2px 8px;border-radius:999px;font-family:var(--mono)">—</div>
@@ -431,6 +924,126 @@ canvas#pdfCanvas{width:100%;display:block}
         <div class="card">
           <div id="histListPage"><div class="empty-note">Carregando...</div></div>
         </div>
+
+      <!-- PAGE AGENDA -->
+      <div id="page-agenda" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+  <div style="display:flex;gap:4px;background:var(--bg2);border-radius:8px;padding:3px">
+    <button class="nav-btn active" id="btn-agenda" onclick="setView('agenda')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:0.5px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;font-family:var(--sans)">Agenda</button>
+    <button class="nav-btn" id="btn-painel" onclick="setView('painel')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">Painel</button>
+    <button class="nav-btn" id="btn-livres" onclick="setView('livres')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">Horários Livres</button>
+    <button class="nav-btn" id="btn-config" onclick="setView('config')" style="font-size:11px;padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--text2);cursor:pointer;font-family:var(--sans)">⚙ Config</button>
+  </div>
+  <button class="btn-novo-dia" onclick="openModalNovoDia()" style="padding:7px 14px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:12px;font-weight:600;cursor:pointer">+ Novo dia</button>
+</div>
+
+        
+  </div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Alternar tema">
+      <span id="theme-icon">☀️</span>
+    </button>
+    <button class="btn-novo-dia" onclick="openModalNovoDia()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    Novo dia
+  </button>
+  </div>
+</div>
+
+<!-- NAV -->
+
+
+<div class="main">
+  <div class="filters-wrap" id="filters-wrap">
+    <div class="filters" id="filters">
+      <button class="filter-chip active"    onclick="setAnalista('todos')"    id="chip-todos">Todos</button>
+      <button class="filter-chip gabriela" onclick="setAnalista('Gabriela')" id="chip-Gabriela">Gabriela</button>
+      <button class="filter-chip ruy"      onclick="setAnalista('Ruy')"      id="chip-Ruy">Ruy</button>
+      <button class="filter-chip sabrina"  onclick="setAnalista('Sabrina')"  id="chip-Sabrina">Sabrina</button>
+      <button class="filter-chip vera"     onclick="setAnalista('Vera')"     id="chip-Vera">Vera</button>
+      <button class="filter-chip marco"    onclick="setAnalista('Marco')"    id="chip-Marco">Marco</button>
+      <button class="filter-chip" style="border-color:#3ecf7840;color:#3ecf78" onclick="setAnalista('livres')" id="chip-livres">Só livres</button>
+    </div>
+  </div>
+  <div id="view-agenda"></div>
+  <div id="view-painel" style="display:none"></div>
+  <div id="view-livres" style="display:none"></div>
+  <div id="view-config" style="display:none"></div>
+</div>
+
+<!-- MODAL AGENDAMENTO -->
+<div class="overlay" id="overlay-slot" onclick="overlayClick(event,'overlay-slot')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-slot-title">Agendar horário</div>
+      <button class="modal-close" onclick="closeModal('overlay-slot')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <div class="form-label">Data · Horário</div>
+        <div style="display:flex;gap:8px">
+          <input class="form-input" id="slot-data" readonly style="flex:.6">
+          <input class="form-input" id="slot-hora" readonly style="flex:.4">
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Nome do requerente</div>
+        <input class="form-input" id="slot-nome" placeholder="Ex: João Silva" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Protocolo / Assunto</div>
+        <input class="form-input" id="slot-assunto" placeholder="Ex: 12345/2026">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Agendado por</div>
+        <input class="form-input" id="slot-agendadopor" placeholder="Ex: Emanuel" autocomplete="off">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Analista responsável</div>
+        <div class="analista-grid" id="analista-grid">
+          <!-- preenchido dinamicamente por rebuildAnalistaGrid() -->
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('overlay-slot')">Cancelar</button>
+      <button class="btn-primary" onclick="salvarSlot()">Salvar agendamento</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL NOVO DIA -->
+<div class="overlay" id="overlay-dia" onclick="overlayClick(event,'overlay-dia')">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Adicionar novo dia</div>
+      <button class="modal-close" onclick="closeModal('overlay-dia')">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <div class="form-label">Data</div>
+        <input class="form-input" id="novo-data" type="date">
+      </div>
+      <div class="form-group">
+        <div class="form-label">Dia da semana</div>
+        <select class="form-select" id="novo-weekday">
+          <option value="TERÇA-FEIRA">Terça-feira</option>
+          <option value="QUINTA-FEIRA">Quinta-feira</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <div class="form-label">Aviso inicial (opcional)</div>
+        <input class="form-input" id="novo-aviso" placeholder="Ex: Férias Gabriela">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-secondary" onclick="closeModal('overlay-dia')">Cancelar</button>
+      <button class="btn-primary" onclick="salvarNovoDia()">Criar dia</button>
+    </div>
+  </div>
+</div>
+
+      </div>
       </div>
 
     </div>
@@ -608,9 +1221,7 @@ canvas#pdfCanvas{width:100%;display:block}
       </div>
 
     </div>
-  </div>
 
-</div>
 
 <div class="sidebar" id="dock">
     <div class="dock-logo">
@@ -628,6 +1239,10 @@ canvas#pdfCanvas{width:100%;display:block}
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
       <div class="dock-tip">Histórico</div>
     </button>
+    <button class="dock-item" id="nav-agenda" onclick="navTo('agenda')">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path stroke-linecap="round" d="M16 2v4M8 2v4M3 10h18"/></svg>
+      <div class="dock-tip">Agenda</div>
+    </button>
     <button class="dock-item" id="nav-digitalizacao" onclick="navTo('digitalizacao')">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 0 0-3.375-3.375h-1.5A1.125 1.125 0 0 1 13.5 7.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 0 0-9-9Z"/></svg>
       <div class="dock-tip">Digitalização</div>
@@ -643,6 +1258,7 @@ canvas#pdfCanvas{width:100%;display:block}
 
 </div>
 
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
@@ -670,7 +1286,8 @@ async function checkLogin(){
   const btn = document.getElementById('loginBtn');
   btn.textContent='Entrando...';btn.disabled=true;
   try{
-    const resp = await authFetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
+    // Usa fetch direto — sem authFetch — pois ainda não temos token
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`,{
       method:'POST',
       headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON},
       body:JSON.stringify({email,password})
@@ -714,8 +1331,16 @@ function showApp(){
 
 function logout(){
   sessionStorage.removeItem('seplan_token');
+  sessionStorage.removeItem('seplan_refresh');
   sessionStorage.removeItem('seplan_email');
-  location.reload();
+  // Só recarrega se não estiver já na tela de login
+  if(document.getElementById('app').style.display !== 'none'){
+    location.reload();
+  } else {
+    // Já está no login — não faz reload
+    document.getElementById('loginScreen').style.display='flex';
+    document.getElementById('app').style.display='none';
+  }
 }
 
 // THEME TOGGLE
@@ -753,7 +1378,8 @@ async function refreshToken(){
   const refresh = sessionStorage.getItem('seplan_refresh');
   if(!refresh) return false;
   try{
-    const resp = await authFetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,{
+    // Usa fetch direto — não authFetch — para evitar loop infinito
+    const resp = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`,{
       method:'POST',
       headers:{'Content-Type':'application/json','apikey':SUPABASE_ANON},
       body:JSON.stringify({refresh_token:refresh})
@@ -792,7 +1418,7 @@ if(sessionStorage.getItem('seplan_token')){
 
 // NAV
 function navTo(page){
-  ['home','busca','historico'].forEach(p=>{
+  ['home','busca','historico','agenda'].forEach(p=>{
     const el=document.getElementById('page-'+p);
     if(el) el.style.display=p===page?'block':'none';
     const btn=document.getElementById('nav-'+p);
@@ -803,6 +1429,11 @@ function navTo(page){
     homeTick();
     initHomeCanvas();
     loadHomeStats();
+  }
+  if(page==='agenda'){
+    const pageAg = document.getElementById('page-agenda');
+    if(pageAg) pageAg.style.display = 'block';
+    agendaInit();
   }
   if(page==='digitalizacao'){ abrirDigitalizacao(); }
 }
@@ -1218,7 +1849,7 @@ async function salvarEdicao(){
     buscaSelecionada=buscasCache[buscaSelecionada.id];
     closeModal('modalEditar');
     loadHistoricoPage();
-    alert('Alterações salvas!');
+    diShow('salvo');
   } else { alert('Erro ao salvar alterações.'); }
 }
 
@@ -1481,22 +2112,40 @@ async function dgRemover(id) {
 async function dgCarregarAnalistas() {
   const grid = document.getElementById('dg-analistas-grid');
   const analistas = ['Gabriela','Ruy','Sabrina','Vera','Marco','Julia','Anderson','Chris','Maurício','Bruna'];
+  // Cores individuais por analista
+  const cores = {
+    'Gabriela':'#7F77DD','Ruy':'#1a9e6e','Sabrina':'#D85A30','Vera':'#D4537E',
+    'Marco':'#378ADD','Julia':'#BA7517','Anderson':'#1a6fad','Chris':'#639922',
+    'Maurício':'#E24B4A','Bruna':'#EF9F27'
+  };
   document.getElementById('dg-analista-detalhe').style.display = 'none';
   grid.style.display = '';
   grid.innerHTML = '<div style="grid-column:1/-1;font-size:12px;color:var(--text3);font-family:var(--mono);text-align:center;padding:.5rem">Carregando...</div>';
   try {
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?motivo=eq.analista&order=criado_em.desc`, { headers:{...getAuthHeaders()} });
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?motivo=eq.analista&order=criado_em.desc`);
     const data = await resp.json();
-    const contagem = {};
-    analistas.forEach(a => contagem[a] = 0);
-    if(Array.isArray(data)) data.forEach(r => { if(contagem[r.detalhe]!==undefined) contagem[r.detalhe]++; });
+    const contagem = {}, pendentes = {};
+    analistas.forEach(a => { contagem[a] = 0; pendentes[a] = 0; });
+    if(Array.isArray(data)) data.forEach(r => {
+      if(contagem[r.detalhe]!==undefined) {
+        contagem[r.detalhe]++;
+        if(r.status==='pedido') pendentes[r.detalhe]++;
+      }
+    });
     grid.innerHTML = analistas.map(a => {
       const n = contagem[a] || 0;
+      const pend = pendentes[a] || 0;
+      const cor = cores[a] || '#888';
       const initials = a.slice(0,2).toUpperCase();
-      return `<div onclick="dgVerAnalista('${a}')" style="padding:.875rem .75rem;border:1px solid var(--border);border-radius:var(--radius);cursor:pointer;text-align:center;transition:all .15s;background:var(--bg3)" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
-        <div style="width:36px;height:36px;border-radius:50%;background:var(--accent);color:var(--accent-text);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto .5rem">${initials}</div>
-        <div style="font-size:12px;font-weight:600;color:var(--text)">${a}</div>
-        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:2px">${n} pedido(s)</div>
+      return `<div onclick="dgVerAnalista('${a}')"
+        style="padding:14px 12px;border:0.5px solid var(--border);border-radius:12px;cursor:pointer;text-align:center;transition:all .2s;background:var(--surface);position:relative;overflow:hidden"
+        onmouseover="this.style.borderColor='${cor}';this.style.transform='translateY(-2px)'"
+        onmouseout="this.style.borderColor='var(--border)';this.style.transform='translateY(0)'">
+        <div style="position:absolute;top:0;left:0;right:0;height:2.5px;background:${cor};border-radius:12px 12px 0 0"></div>
+        <div style="width:38px;height:38px;border-radius:50%;background:${cor}22;border:1.5px solid ${cor}66;color:${cor};font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;margin:0 auto 8px">${initials}</div>
+        <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:4px">${a}</div>
+        <div style="font-size:10px;color:var(--text3);font-family:var(--mono)">${n} pedido(s)</div>
+        ${pend>0?`<div style="margin-top:5px;font-size:10px;padding:2px 7px;border-radius:999px;background:rgba(239,159,39,.12);color:#EF9F27;font-family:var(--mono);display:inline-block">${pend} pend.</div>`:''}
       </div>`;
     }).join('');
   } catch(e) {
@@ -1565,6 +2214,19 @@ async function loadHomeStats(){
       const badge = document.getElementById('hbadge-dig');
       if(chip){chip.textContent = pend + ' pendentes'; chip.className = pend>0?'hchip hchip-a':'hchip hchip-g';}
       if(badge){badge.textContent = pend + ' pend.'; badge.style.background=pend>0?'rgba(239,159,39,.15)':'rgba(26,158,110,.15)'; badge.style.color=pend>0?'#EF9F27':'#4ecb9e';}
+    }
+  }catch(e){}
+
+  try{
+    const hoje = new Date().toISOString().slice(0,10);
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?select=id,data,nome&order=data.asc`);
+    const data = await resp.json();
+    if(Array.isArray(data)){
+      const futuros = data.filter(r=>r.data>=hoje&&r.nome);
+      const chip = document.getElementById('hchip-agenda');
+      const badge = document.getElementById('hbadge-agenda');
+      if(chip){chip.textContent = futuros.length + ' agendado(s)'; chip.className='hchip hchip-b';}
+      if(badge){badge.textContent = futuros.length + ' slots'; badge.style.background='rgba(26,111,173,.15)'; badge.style.color='#5aabef';}
     }
   }catch(e){}
 
@@ -1754,6 +2416,1045 @@ function diShow(type){
       _diAnim({fromW:cw,fromH:ch,toW:10,toH:10,dur:DI_C,closing:true,onDone:()=>{_diBusy=false;_diPad.innerHTML='';}});
     },cfg.dur);
   }});
+}
+
+
+// ── SUPABASE ADAPTER (substitui Firebase) ────────────────────────────────────
+window._fb = {
+  listenDays: async function(cb) {
+    async function load() {
+      try {
+        const resp = await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?order=data.asc,hora.asc`);
+        const rows = await resp.json();
+        if(!Array.isArray(rows)) { cb(null); return; }
+        const byDay = {};
+        rows.forEach(r => {
+          const dataFmt = r.data.split('-').reverse().join('/');
+          const dow = new Date(r.data+'T12:00:00').getDay();
+          const weekday = dow===2?'TERÇA-FEIRA':dow===4?'QUINTA-FEIRA':'OUTRO';
+          const id = (weekday.startsWith('TERÇA')?'TERÇA':'QUINTA') + ' ' + dataFmt.slice(0,5).replace('/','');
+          if(!byDay[id]) byDay[id] = { id, data: dataFmt, weekday, avisos:[], slots:{} };
+          byDay[id].slots[r.hora] = { nome:r.nome||'', assunto:r.assunto||'', analista:(r.analistas&&r.analistas[0])||'', analistas:r.analistas||[], agendadopor:r.agendado_por||'', _id:r.id, _data:r.data };
+        });
+        cb(Object.keys(byDay).length ? byDay : null);
+      } catch(e) { console.error(e); cb(null); }
+    }
+    load();
+    // Sem polling automático — recarrega só quando o usuário salva
+  },
+  saveDays: async function(daysArr) {
+    // Coleta apenas slots com nome (não salva vazios)
+    const payload = [];
+    for(const day of daysArr) {
+      const isoDate = day.data.split('/').reverse().join('-');
+      for(const [hora, slot] of Object.entries(day.slots||{})) {
+        if(!slot.nome) continue; // só salva slots preenchidos
+        payload.push({
+          data: isoDate, hora,
+          nome: slot.nome||'',
+          assunto: slot.assunto||'',
+          agendado_por: slot.agendadopor||'',
+          analistas: slot.analistas||(slot.analista?[slot.analista]:[])
+        });
+      }
+    }
+    if(!payload.length) return;
+    // Salva em batch único
+    try {
+      await authFetch(`${SUPABASE_URL}/rest/v1/agendamentos`, {
+        method:'POST',
+        headers:{'Prefer':'return=minimal'},
+        body: JSON.stringify(payload)
+      });
+    } catch(e) { console.error('saveDays error', e); }
+  },
+  saveAnalistas: async function(list) {
+    localStorage.setItem('seplan_analistas', JSON.stringify(list));
+  },
+  listenAnalistas: async function(cb) {
+    // Carregar do Supabase
+    try {
+      const resp = await authFetch(`${SUPABASE_URL}/rest/v1/analistas_config?order=nome.asc`);
+      const data = await resp.json();
+      if(Array.isArray(data) && data.length) {
+        cb(data.map(a=>a.nome));
+        // Guardar cores
+        window._analistasCores = {};
+        data.forEach(a=>{ window._analistasCores[a.nome]=a.cor||'#888'; });
+      } else {
+        cb(null);
+      }
+    } catch(e) { cb(null); }
+  },
+  saveBloqueios: function(obj) { localStorage.setItem('seplan_bloqueios', JSON.stringify(obj)); },
+  listenBloqueios: function(cb) {
+    try { cb(JSON.parse(localStorage.getItem('seplan_bloqueios'))||{}); }
+    catch { cb({}); }
+  }
+};
+
+// ── DADOS BASE ─────────────────────────────────────────────────────────────
+const HORARIOS = ["08:30","09:00","09:30","10:00","10:30","11:00","11:30"];
+let ANALISTAS = ["Gabriela","Ruy","Sabrina","Vera","Marco","Andressa"];
+
+const BASE_DAYS = [{"id":"TERÇA 0601","data":"06/01/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Sidnei KZA","assunto":"5538/2025 - Ruy","analista":"Ruy"},"09:00":{"nome":"","assunto":"","analista":""},"09:30":{"nome":"Ronaldo","assunto":"43278/2025 - Ruy","analista":"Ruy"},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"Pedro Henrique","assunto":"41825/2025 - Ruy","analista":"Ruy"},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"QUINTA 0801","data":"08/01/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Jean Ricardo","assunto":"47110/2025 - Sabrina","analista":"Sabrina"},"09:00":{"nome":"Pedro Henrique","assunto":"11283/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Kaique","assunto":"39977/2025 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Lucas","assunto":"35064/2025 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Gabriel","assunto":"36604/2025 - Gabriela","analista":"Gabriela"},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 1301","data":"13/01/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Rosangela Pepe","assunto":"32689/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Adriano","assunto":"28231/2025 - Ruy","analista":"Ruy"},"09:30":{"nome":"Amabile","assunto":"40041/2025 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Adalberto","assunto":"12536/2025 - Sabrina","analista":"Sabrina"},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"QUINTA 1501","data":"15/01/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Sidnei","assunto":"10696/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Danilo","assunto":"26911/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"David","assunto":"26541- Gabriela","analista":"Gabriela"},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 2001","data":"20/01/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Jennifer","assunto":"41153/2025 - Sabrina","analista":"Sabrina"},"09:00":{"nome":"Bruna","assunto":"41938/2025 - Sabrina","analista":"Sabrina"},"09:30":{"nome":"Danyelly Barbosa","assunto":"15002/2025 - Ruy","analista":"Ruy"},"10:00":{"nome":"André Luiz","assunto":"17606/2025 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Jonas","assunto":"32143/2025 - Sabrina","analista":"Sabrina"},"11:00":{"nome":"Priscila Rodrigues","assunto":"43049/2025 - Gabriela","analista":"Gabriela"},"11:30":{"nome":"Fernando Mazao / Tainara","assunto":"35019/2025 - Ruy","analista":"Ruy"}}},{"id":"QUINTA 2201","data":"22/01/2026","weekday":"QUINTA-FEIRA","avisos":["Férias Gabriela"],"slots":{"08:30":{"nome":"Akes","assunto":"40333/2025","analista":""},"09:00":{"nome":"Shark","assunto":"44528/2025 - Vera","analista":"Vera"},"09:30":{"nome":"Ariel Augusto Hille","assunto":"40892/2025 - Ruy","analista":"Ruy"},"10:00":{"nome":"Thaiss e Aníbal","assunto":"19852/2025 - Ruy","analista":"Ruy"},"10:30":{"nome":"Mariana","assunto":"2397/2025 - Vera","analista":"Vera"},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"Katuana","assunto":"25799/2025 - Marco","analista":"Marco"}}},{"id":"TERÇA 2701","data":"27/01/2026","weekday":"TERÇA-FEIRA","avisos":["Férias Gabriela"],"slots":{"08:30":{"nome":"","assunto":"","analista":""},"09:00":{"nome":"Douglas","assunto":"47415/2025 - Sabrina","analista":"Sabrina"},"09:30":{"nome":"","assunto":"","analista":""},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"Juan Pianecer","assunto":"37550/2025 - Ruy","analista":"Ruy"},"11:30":{"nome":"Juan Pianecer","assunto":"25799/2025 - Marco","analista":"Marco"}}},{"id":"QUINTA 2901","data":"29/01/2026","weekday":"QUINTA-FEIRA","avisos":["Férias Gabriela"],"slots":{"08:30":{"nome":"","assunto":"","analista":""},"09:00":{"nome":"Liziane","assunto":"44095/2025 - Sabrina","analista":"Sabrina"},"09:30":{"nome":"Fernando","assunto":"47431/2025 - Vera","analista":"Vera"},"10:00":{"nome":"Djionas","assunto":"38902/2025 - Vera","analista":"Vera"},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 0302","data":"03/02/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Ralf / Arnaldo Bosco Câmera","assunto":"32804/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Gabriel","assunto":"36604/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Alexandre","assunto":"31623/2025 - Sabrina","analista":"Sabrina"},"10:00":{"nome":"Rogga","assunto":"36260/2025 - Ruy","analista":"Ruy"},"10:30":{"nome":"Akes","assunto":"40220/2025 - Ruy","analista":"Ruy"},"11:00":{"nome":"Alex","assunto":"48780/2025 - Sabrina","analista":"Sabrina"},"11:30":{"nome":"Mariana Vetter","assunto":"2397/2025 - Vera","analista":"Vera"}}},{"id":"QUINTA 0502","data":"05/02/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Thais","assunto":"20037/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Rogga","assunto":"36260/2025 - Ruy","analista":"Ruy"},"09:30":{"nome":"Rogga","assunto":"46608 e 46407/2025 - Vera","analista":"Vera"},"10:00":{"nome":"Leandro","assunto":"22266/2025 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Wgb","assunto":"38495/2025 - Gabriela","analista":"Gabriela"},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 1002","data":"10/02/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Kassio","assunto":"45932/2025 - Sabrina","analista":"Sabrina"},"09:00":{"nome":"Priscila","assunto":"35330/2025 - Marco","analista":"Marco"},"09:30":{"nome":"Emanuelly","assunto":"22448/2025 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Edson","assunto":"41637/2025 - Marco","analista":"Marco"},"10:30":{"nome":"Brunna","assunto":"21028/2025 - Sabrina","analista":"Sabrina"},"11:00":{"nome":"Annie","assunto":"39994/2025 - Marco","analista":"Marco"},"11:30":{"nome":"Arnaldo","assunto":"12094/2025 - Gabriela","analista":"Gabriela"}}},{"id":"QUINTA 1202","data":"12/02/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Mayron","assunto":"2459/2026 - Vera","analista":"Vera"},"09:00":{"nome":"","assunto":"","analista":""},"09:30":{"nome":"","assunto":"","analista":""},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"Maiã Priscila Kohls","assunto":"26541/2025 - Gabriela","analista":"Gabriela"}}},{"id":"QUINTA 1902","data":"19/02/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Katuana","assunto":"8875/2025 - Marco","analista":"Marco"},"09:00":{"nome":"Liziane","assunto":"35621/2025 - Ruy","analista":"Ruy"},"09:30":{"nome":"Douglas","assunto":"13243/2025 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Liziani","assunto":"17601/2025 - Sabrina","analista":"Sabrina"},"10:30":{"nome":"Ottavio","assunto":"30237/2025 - Marco","analista":"Marco"},"11:00":{"nome":"Duda","assunto":"39677/2025 - Gabriela","analista":"Gabriela"},"11:30":{"nome":"EDSON HAGEMANN","assunto":"14813/2025 - Gabriela","analista":"Gabriela"}}},{"id":"TERÇA 2402","data":"24/02/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Elço Poleza","assunto":"3158/2026 - Sabrina","analista":"Sabrina"},"09:00":{"nome":"Giovanni Minatti","assunto":"38089/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Dionel","assunto":"EIV - Azure (Frechal) - Vera","analista":"Vera"},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"Mayron Rodrigo","assunto":"15491/2025 - Marco","analista":"Marco"},"11:00":{"nome":"Jonathan","assunto":"13819/2025 - Sabrina","analista":"Sabrina"},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"QUINTA 2602","data":"26/02/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Maria Eduarda","assunto":"39677/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"","assunto":"","analista":""},"09:30":{"nome":"","assunto":"","analista":""},"10:00":{"nome":"Paulo","assunto":"30139/2025 - Marco","analista":"Marco"},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 0303","data":"03/03/2026","weekday":"TERÇA-FEIRA","avisos":["Emanuel","Carol"],"slots":{"08:30":{"nome":"Lizi","assunto":"28485/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Dani Ferretti","assunto":"43145/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Jannice","assunto":"1998/2026 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"João Delgado","assunto":"26101/2025 - Ruy","analista":"Ruy"},"10:30":{"nome":"WGB - Greici","assunto":"40178/2025 - Sabrina","analista":"Sabrina"},"11:00":{"nome":"Igor","assunto":"45531/2025 - Gabriela","analista":"Gabriela"},"11:30":{"nome":"Jonathan Gomes","assunto":"4206/2026 - Marco","analista":"Marco"}}},{"id":"QUINTA 0503","data":"05/03/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Wesley","assunto":"43822/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Augusto","assunto":"37585/2025 - Sabrina","analista":"Sabrina"},"09:30":{"nome":"Marina","assunto":"17606/2025 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Paulo Rosa","assunto":"3467/2026 - Marco","analista":"Marco"},"10:30":{"nome":"Jocinei","assunto":"21738/2024 - Gabriela","analista":"Gabriela"},"11:00":{"nome":"Augusto","assunto":"43278/2025 - Ruy","analista":"Ruy"},"11:30":{"nome":"Djionas Antônio Paludo","assunto":"17606/2025 - Gabriela","analista":"Gabriela"}}},{"id":"TERÇA 1003","data":"10/03/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Paulo Roberto da Rosa","assunto":"3467/2026 - Marco","analista":"Marco"},"09:00":{"nome":"Arnaldo Bosco","assunto":"3624/2026 - Ruy","analista":"Ruy"},"09:30":{"nome":"Cássia","assunto":"7817/2026 - Sabrina","analista":"Sabrina"},"10:00":{"nome":"Danilo","assunto":"26911/2025 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Leo Souza","assunto":"31515/2025 - Sabrina","analista":"Sabrina"},"11:00":{"nome":"Joice","assunto":"41637/2025 - Marco","analista":"Marco"},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"QUINTA 1203","data":"12/03/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Lizi","assunto":"17606/2025 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"","assunto":"","analista":""},"09:30":{"nome":"Tainara","assunto":"35416/2025 - Ruy","analista":"Ruy"},"10:00":{"nome":"Tainara","assunto":"901/2025 - Sabrina","analista":"Sabrina"},"10:30":{"nome":"Antonio","assunto":"45521/2025 - Marco","analista":"Marco"},"11:00":{"nome":"David","assunto":"26541/2025 - Gabriela","analista":"Gabriela"},"11:30":{"nome":"Eng. Adriano","assunto":"28231/2025","analista":""}}},{"id":"TERÇA 1703","data":"17/03/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"","assunto":"","analista":""},"09:00":{"nome":"Eng Valdecir Nogueira","assunto":"4252/2026 - Sabrina","analista":"Sabrina"},"09:30":{"nome":"Tainara","assunto":"9911/2024 - Sabrina","analista":"Sabrina"},"10:00":{"nome":"Jannice","assunto":"41969/2025 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Rogga","assunto":"46407/2025 - Vera","analista":"Vera"},"11:00":{"nome":"Rogga","assunto":"46608/2025 - Vera","analista":"Vera"},"11:30":{"nome":"RKA arquitetura","assunto":"26911/2025 - Gabriela","analista":"Gabriela"}}},{"id":"QUINTA 1903","data":"19/03/2026","weekday":"QUINTA-FEIRA","avisos":["Não marcar nada para a Vera"],"slots":{"08:30":{"nome":"JHONATHAN","assunto":"4206/2026 - Marco","analista":"Marco"},"09:00":{"nome":"Rogga","assunto":"15002/2025 - Ruy","analista":"Ruy"},"09:30":{"nome":"Lucas","assunto":"38945/2025 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Lizi","assunto":"7503/2026 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Gerson","assunto":"40142/2025 - Gabriela","analista":"Gabriela"},"11:00":{"nome":"David","assunto":"26541/2025 - Gabriela","analista":"Gabriela"},"11:30":{"nome":"WGB","assunto":"6650/2026 - Gabriela","analista":"Gabriela"}}},{"id":"TERÇA 2403","data":"24/03/2026","weekday":"TERÇA-FEIRA","avisos":["Não marcar com o Ruy"],"slots":{"08:30":{"nome":"WGB","assunto":"5478/2026 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"ENG ALAN","assunto":"38629/2025 - Ruy","analista":"Ruy"},"09:30":{"nome":"Douglas Vinicius","assunto":"7913/2026 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Rogga","assunto":"46407/2025 - Vera","analista":"Vera"},"10:30":{"nome":"Douglas","assunto":"36986/2025 - Sabrina","analista":"Sabrina"},"11:00":{"nome":"Cleber","assunto":"36696/2025 - Marco","analista":"Marco"},"11:30":{"nome":"Gerson","assunto":"40142/2025 - Gabriela","analista":"Gabriela"}}},{"id":"QUINTA 2603","data":"26/03/2026","weekday":"QUINTA-FEIRA","avisos":["Não marcar nada para a Vera","Não marcar nada para a Gabriela/Sabrina"],"slots":{"08:30":{"nome":"Jannice","assunto":"1998/2026 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Vetter","assunto":"4114/2026 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Alexssandro","assunto":"6994/2026 - Sabrina","analista":"Sabrina"},"10:00":{"nome":"Douglas","assunto":"36986/2025 - Sabrina","analista":"Sabrina"},"10:30":{"nome":"Derner","assunto":"Gabriela","analista":"Gabriela"},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 3103","data":"31/03/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Vetter","assunto":"4114/2026 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Arnon Cardoso Cornette","assunto":"43822/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Cleber e Clodoaldo","assunto":"36696/2025 - Marco","analista":"Marco"},"10:00":{"nome":"Adrieli","assunto":"45508/2025 - Ruy","analista":"Ruy"},"10:30":{"nome":"Fernando Luz","assunto":"19476/2025","analista":""},"11:00":{"nome":"Barbara","assunto":"34397/2025","analista":""},"11:30":{"nome":"Akes","assunto":"8928/2026","analista":""}}},{"id":"QUINTA 0204","data":"02/04/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Dionel","assunto":"Frechal - Gabriela","analista":"Gabriela"},"09:00":{"nome":"Gabriela - WGB Engenharia","assunto":"5159/2026 - Ruy","analista":"Ruy"},"09:30":{"nome":"Lizi","assunto":"7503/2026 - Gabriela","analista":"Gabriela"},"10:00":{"nome":"Liege Scremin","assunto":"9640/2026","analista":""},"10:30":{"nome":"Natalino Fuck","assunto":"4206/2026 - Marco","analista":"Marco"},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 0704","data":"07/04/2026","weekday":"TERÇA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"Amanda e Mayara","assunto":"22181/2024 - Vera","analista":"Vera"},"09:00":{"nome":"Gabriela","assunto":"40650/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"Julian","assunto":"36700/2025 - Ruy","analista":"Ruy"},"10:00":{"nome":"Vetter","assunto":"48862/2025 - Ruy","analista":"Ruy"},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"QUINTA 0904","data":"09/04/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"WGB","assunto":"5478/2026 - Gabriela","analista":"Gabriela"},"09:00":{"nome":"","assunto":"","analista":""},"09:30":{"nome":"","assunto":"","analista":""},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"Joice","assunto":"3459/2026 - Gabriela","analista":"Gabriela"}}},{"id":"TERÇA 1404","data":"14/04/2026","weekday":"TERÇA-FEIRA","avisos":["Emanuel","Sabrina"],"slots":{"08:30":{"nome":"Lizi","assunto":"8636/2026 - Sabrina","analista":"Sabrina"},"09:00":{"nome":"Jannice","assunto":"8353/2026 - Ruy","analista":"Ruy"},"09:30":{"nome":"Rauf","assunto":"48876/2025 - Marco","analista":"Marco"},"10:00":{"nome":"Edilaine","assunto":"40270/2025 - Gabriela","analista":"Gabriela"},"10:30":{"nome":"Tainara Manorov","assunto":"2072/2026 - Marco","analista":"Marco"},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"QUINTA 1604","data":"16/04/2026","weekday":"QUINTA-FEIRA","avisos":[],"slots":{"08:30":{"nome":"J&I administradora de bens","assunto":"31623/2025 - Sabrina","analista":"Sabrina"},"09:00":{"nome":"","assunto":"","analista":""},"09:30":{"nome":"","assunto":"","analista":""},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}},{"id":"TERÇA 2804","data":"28/04/2026","weekday":"TERÇA-FEIRA","avisos":["NÃO AGENDAR GABRIELA"],"slots":{"08:30":{"nome":"","assunto":"","analista":""},"09:00":{"nome":"ROSANE","assunto":"36717/2025 - Gabriela","analista":"Gabriela"},"09:30":{"nome":"","assunto":"","analista":""},"10:00":{"nome":"","assunto":"","analista":""},"10:30":{"nome":"","assunto":"","analista":""},"11:00":{"nome":"","assunto":"","analista":""},"11:30":{"nome":"","assunto":"","analista":""}}}];
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+let DAYS            = [];
+let currentView     = 'agenda';
+let currentAnalista = 'todos';
+let editCtx         = null;
+let selAnalistaVal  = '';
+window._appReady    = false;
+window.BASE_DAYS    = BASE_DAYS;
+
+// saveDays: envia para o Firebase — propaga para todos em tempo real
+function saveDays() {
+  window._fb.saveDays(DAYS);
+}
+
+function loadDays() {
+  // Dados chegam via listener Firebase — não faz nada aqui
+}
+
+// ── HELPERS ────────────────────────────────────────────────────────────────
+function analClass(an) { return an ? an.toLowerCase() : ''; }
+function badgeHtml(an) {
+  if (!an) return '';
+  const cor = (window._analistasCores&&window._analistasCores[an])||'#888';
+  return `<span class="analista-badge" style="background:${cor}22;color:${cor};border:0.5px solid ${cor}44;padding:2px 8px;border-radius:999px;font-size:10px;font-weight:600;font-family:var(--mono)">${an}</span>`;
+}
+function dateToDDMMYYYY(iso) {
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function toast(msg, err=false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (err?' err':'');
+  setTimeout(() => t.className = 'toast', 2500);
+}
+function overlayClick(e, id) { if (e.target.id === id) closeModal(id); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ── ANALISTA SELECTOR ──────────────────────────────────────────────────────
+function selAnalista(an) {
+  selAnalistaVal = an;
+  document.querySelectorAll('.analista-opt').forEach(el => {
+    el.className = el.className.replace(/\bsel-\S+/g,'').trim();
+  });
+  const key = an || 'nenhum';
+  const el = document.getElementById('opt-' + (an || 'nenhum'));
+  if (el) el.classList.add('sel-' + key);
+}
+
+// ── MODAL SLOT ─────────────────────────────────────────────────────────────
+function openSlot(dayId, hora) {
+  const day = DAYS.find(d => d.id === dayId);
+  const slot = day.slots[hora];
+  editCtx = { dayId, hora };
+
+  document.getElementById('slot-data').value = day.data;
+  document.getElementById('slot-hora').value = hora;
+  document.getElementById('slot-nome').value = slot.nome;
+  document.getElementById('slot-assunto').value = slot.assunto;
+  document.getElementById('slot-agendadopor').value = slot.agendadopor || '';
+  document.getElementById('modal-slot-title').textContent =
+    slot.nome ? 'Editar agendamento' : 'Agendar horário';
+
+  // Reconstrói grid com analistas atuais, marcando bloqueados para este dia
+  rebuildAnalistaGrid(dayId);
+  selAnalista(slot.analista);
+  document.getElementById('overlay-slot').classList.add('open');
+  setTimeout(() => document.getElementById('slot-nome').focus(), 200);
+}
+
+function salvarSlot() {
+  const nome = document.getElementById('slot-nome').value.trim();
+  if (!nome) { toast('Informe o nome do requerente', true); return; }
+  const { dayId, hora } = editCtx;
+  const day = DAYS.find(d => d.id === dayId);
+  const analistas2 = selAnalistaVal ? (window._selAnalistas2||[selAnalistaVal]) : [];
+  const slotOld = day.slots[hora];
+  day.slots[hora] = { nome, assunto: document.getElementById('slot-assunto').value.trim(), analista: selAnalistaVal, analistas: analistas2, agendadopor: document.getElementById('slot-agendadopor').value.trim(), _id: slotOld._id, _data: slotOld._data };
+  
+  // Salvar só este slot no Supabase
+  const isoDate = day.data.split('/').reverse().join('-');
+  const payload = { data:isoDate, hora, nome, assunto:day.slots[hora].assunto, agendado_por:day.slots[hora].agendadopor, analistas:analistas2 };
+  if(slotOld._id) {
+    authFetch(`${SUPABASE_URL}/rest/v1/agendamentos?id=eq.${slotOld._id}`, { method:'PATCH', body:JSON.stringify(payload) });
+  } else {
+    authFetch(`${SUPABASE_URL}/rest/v1/agendamentos`, { method:'POST', headers:{'Prefer':'return=representation'}, body:JSON.stringify(payload) })
+      .then(r=>r.json()).then(d=>{ if(d&&d[0]) day.slots[hora]._id=d[0].id; }).catch(()=>{});
+  }
+
+  closeModal('overlay-slot');
+  toast('Agendamento salvo ✓');
+  render();
+}
+
+function limparSlot(dayId, hora, e) {
+  e.stopPropagation();
+  if (!confirm('Remover este agendamento?')) return;
+  const day = DAYS.find(d => d.id === dayId);
+  day.slots[hora] = { nome:'', assunto:'', analista:'' };
+  saveDays();
+  toast('Agendamento removido');
+  render();
+}
+
+// ── AVISOS ─────────────────────────────────────────────────────────────────
+function addAviso(dayId) {
+  const txt = prompt('Novo aviso:');
+  if (!txt || !txt.trim()) return;
+  const day = DAYS.find(d => d.id === dayId);
+  day.avisos.push(txt.trim());
+  saveDays(); render();
+}
+function rmAviso(dayId, idx, e) {
+  e.stopPropagation();
+  const day = DAYS.find(d => d.id === dayId);
+  day.avisos.splice(idx, 1);
+  saveDays(); render();
+}
+
+// ── MODAL NOVO DIA ─────────────────────────────────────────────────────────
+function openModalNovoDia() {
+  document.getElementById('novo-data').value = '';
+  document.getElementById('novo-aviso').value = '';
+  document.getElementById('overlay-dia').classList.add('open');
+  setTimeout(() => document.getElementById('novo-data').focus(), 200);
+}
+
+function salvarNovoDia() {
+  const isoDate = document.getElementById('novo-data').value;
+  if (!isoDate) { toast('Selecione uma data', true); return; }
+  const weekday = document.getElementById('novo-weekday').value;
+  const aviso   = document.getElementById('novo-aviso').value.trim();
+  const data    = dateToDDMMYYYY(isoDate);
+  const parts   = isoDate.split('-');
+  const dd = parts[2], mm = parts[1];
+  const pre = weekday.startsWith('TERÇA') ? 'TERÇA' : 'QUINTA';
+  const id  = `${pre} ${dd}${mm}`;
+
+  if (DAYS.find(d => d.id === id)) { toast('Este dia já existe', true); return; }
+
+  const emptySlots = {};
+  HORARIOS.forEach(h => { emptySlots[h] = { nome:'', assunto:'', analista:'' }; });
+  const newDay = { id, data, weekday, avisos: aviso ? [aviso] : [], slots: emptySlots };
+  DAYS.push(newDay);
+  DAYS.sort((a,b) => {
+    const toIso = d => d.split('/').reverse().join('-');
+    return toIso(a.data).localeCompare(toIso(b.data));
+  });
+  saveDays();
+  closeModal('overlay-dia');
+  toast(`Dia ${data} criado ✓`);
+  render();
+}
+
+function excluirDia(dayId, e) {
+  e.stopPropagation();
+  const day = DAYS.find(d => d.id === dayId);
+  if (!confirm(`Excluir o dia ${day.data}? Esta ação não pode ser desfeita.`)) return;
+  DAYS = DAYS.filter(d => d.id !== dayId);
+  saveDays(); toast('Dia removido'); render();
+}
+
+// ── RENDER AGENDA ──────────────────────────────────────────────────────────
+const MESES = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho',
+               'Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function renderAgenda() {
+  const filt = currentAnalista;
+
+  // Preserva quais cards/meses estão abertos
+  const openCards = new Set();
+  document.querySelectorAll('.day-card.open').forEach(el => openCards.add(el.id));
+  const openMonths = new Set();
+  document.querySelectorAll('.month-group:not(.closed)').forEach(el => openMonths.add(el.id));
+  const firstRender = openMonths.size === 0 && openCards.size === 0;
+
+  // Agrupa por mês
+  const byMonth = {};
+  let anyDay = false;
+  DAYS.forEach((day) => {
+    const slots = HORARIOS.map(h => ({ h, ...day.slots[h] }));
+    if (filt === 'livres' && !slots.some(s => !s.nome)) return;
+    if (filt !== 'todos' && filt !== 'livres' && !slots.some(s => s.analista === filt)) return;
+    anyDay = true;
+    const parts = day.data.split('/');
+    const monthKey = parts[2] + '-' + parts[1];
+    if (!byMonth[monthKey]) byMonth[monthKey] = [];
+    byMonth[monthKey].push(day);
+  });
+
+  if (!anyDay) {
+    document.getElementById('view-agenda').innerHTML =
+      '<div class="empty"><div class="empty-icon">📭</div><div class="empty-text">Nenhum resultado para este filtro.</div></div>';
+    return;
+  }
+
+  const sortedMonths = Object.keys(byMonth).sort();
+  const lastMonth = sortedMonths[sortedMonths.length - 1];
+  const todayStr = new Date().toLocaleDateString('pt-BR');
+
+  let html = '';
+  sortedMonths.forEach(monthKey => {
+    const parts = monthKey.split('-');
+    const monthLabel = MESES[parseInt(parts[1])-1] + ' ' + parts[0];
+    const groupId = 'month-' + monthKey;
+    const hasToday = byMonth[monthKey].some(d => d.data === todayStr);
+    const monthOpen = firstRender ? (monthKey === lastMonth || hasToday) : openMonths.has(groupId);
+
+    html += '<div class="month-group' + (monthOpen ? '' : ' closed') + '" id="' + groupId + '">';
+    html += `<div class="month-header" onclick="toggleMonth('${groupId}')">`;
+    html += '<div class="month-title">' + monthLabel + '</div>';
+    html += '<div class="month-count">' + byMonth[monthKey].length + ' dia' + (byMonth[monthKey].length !== 1 ? 's' : '') + '</div>';
+    html += '<svg class="month-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
+    html += '</div><div class="month-body">';
+
+    byMonth[monthKey].forEach(day => {
+      const slots = HORARIOS.map(h => ({ h, ...day.slots[h] }));
+      const ocupados = slots.filter(s => s.nome).length;
+      const livres   = HORARIOS.length - ocupados;
+      const wl = day.weekday.toLowerCase();
+      const isTerca = wl.includes('terça') || wl.includes('terca');
+      const isToday = day.data === todayStr;
+      const isPast  = parseDataBR(day.data) < (() => { const h = new Date(); h.setHours(0,0,0,0); return h; })() && !isToday;
+      const cardId  = 'card-' + day.id.replace(/[^a-zA-Z0-9]/g, '_');
+      const cardOpen = isToday || openCards.has(cardId);
+
+      html += '<div class="day-card' + (cardOpen ? ' open' : '') + (isPast ? ' past-day' : '') + '" id="' + cardId + '">';
+      html += `<div class="day-header" onclick="toggleCard('${cardId}')">`;
+      html += '<div class="day-header-left">';
+      html += '<span class="day-badge ' + (isTerca ? 'badge-terca' : 'badge-quinta') + '">' + (isTerca ? 'Terça' : 'Quinta') + '</span>';
+      html += '<div><div class="day-date">' + day.data + (isToday ? ' <span style="font-size:10px;color:var(--success)">● hoje</span>' : '') + (isPast ? ' <span style="font-size:10px;color:var(--muted)">• encerrado</span>' : '') + '</div>';
+      html += '<div class="day-meta">' + ocupados + ' agendamento' + (ocupados!==1?'s':'') + ' · ' + livres + ' livre' + (livres!==1?'s':'') + '</div></div></div>';
+      html += '<div class="day-actions">';
+      html += `<button class="icon-btn" onclick="addAviso('${day.id}');event.stopPropagation()" title="Adicionar aviso">⚠</button>`;
+      html += `<button class="icon-btn danger" onclick="excluirDia('${day.id}',event)" title="Excluir dia">🗑</button>`;
+      html += '<svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>';
+      html += '</div></div><div class="day-body">';
+
+      if (day.avisos.length) {
+        html += '<div class="avisos-bar">';
+        day.avisos.forEach((av, ai) => {
+          html += `<span class="aviso-tag">⚠ ${av}<button class="rm-aviso" onclick="rmAviso('${day.id}',${ai},event)">×</button></span>`;
+        });
+        html += '</div>';
+      }
+
+      html += '<div class="slots">';
+      slots.forEach(s => {
+        const isLivre = !s.nome;
+        const anClass = analClass(s.analista);
+        let cls = isLivre ? 'livre' : (anClass || 'ocupado');
+        let dimmed = false;
+        if (filt !== 'todos') {
+          if (filt === 'livres' && !isLivre) dimmed = true;
+          if (filt !== 'livres' && !isLivre && s.analista !== filt) dimmed = true;
+        }
+        html += `<div class="slot ${cls}${dimmed ? ' dimmed' : ''}${isPast ? ' past-slot' : ''}" ${isPast ? '' : `onclick="openSlot('${day.id}','${s.h}')"`}>`;
+        html += '<div class="slot-time">' + s.h + '</div>';
+        html += '<div class="slot-info">';
+        if (isLivre) {
+          html += `<div class="slot-livre-label">${isPast ? '— livre' : '— livre — clique para agendar'}</div>`;
+        } else {
+          html += '<div class="slot-nome">' + s.nome + '</div>';
+          if (s.assunto) html += '<div class="slot-assunto">' + s.assunto + '</div>';
+          if (s.agendadopor) html += '<div class="slot-agendadopor">por ' + s.agendadopor + '</div>';
+        }
+        html += '</div>' + badgeHtml(s.analista);
+        if (!isLivre && !isPast) html += `<button class="slot-rm" onclick="limparSlot('${day.id}','${s.h}',event)" title="Remover">×</button>`;
+        html += '</div>';
+      });
+      html += '</div></div></div>';
+    });
+    html += '</div></div>';
+  });
+
+  document.getElementById('view-agenda').innerHTML = html;
+}
+
+// ── PAINEL STATE ───────────────────────────────────────────────────────────
+let painelAnalista = 'todos';
+let painelDe = '';
+let painelAte = '';
+
+function setPainelAnalista(an) {
+  painelAnalista = an;
+  document.querySelectorAll('.pf-chip').forEach(el => el.classList.remove('active'));
+  const id = an === 'todos' ? 'pf-todos' : 'pf-' + an;
+  document.getElementById(id)?.classList.add('active');
+  renderPainel();
+}
+
+// ── RENDER PAINEL ──────────────────────────────────────────────────────────
+const CORES_AN = { Gabriela:'#4f8ef7', Ruy:'#3ecf78', Sabrina:'#f75b6b', Vera:'#f5a623', Marco:'#b06ef5' };
+const CORES_BG = { Gabriela:'#0f2d6b', Ruy:'#0a3320', Sabrina:'#3d0f14', Vera:'#3d2900', Marco:'#280f40' };
+
+function calcPainel(filtDays, anFiltro) {
+  const totals = { Gabriela:0, Ruy:0, Sabrina:0, Vera:0, Marco:0 };
+  let totalAgend = 0, totalSlots = 0;
+  filtDays.forEach(day => {
+    HORARIOS.forEach(h => {
+      const s = day.slots[h];
+      if (anFiltro !== 'todos') {
+        // Conta só atendimentos do analista filtrado
+        if (s.analista === anFiltro) {
+          totalSlots++;
+          totalAgend++;
+          totals[anFiltro]++;
+        }
+      } else {
+        totalSlots++;
+        if (s.nome) {
+          totalAgend++;
+          if (totals[s.analista] !== undefined) totals[s.analista]++;
+        }
+      }
+    });
+  });
+
+  // Vagas futuras = sempre total geral de todos os dias, independente do filtro
+  let totalFuturos = 0;
+  const allDays = (typeof DAYS !== 'undefined' && DAYS.length) ? DAYS : [];
+  allDays.forEach(day => {
+    if (!isFuturoOuHoje(day.data)) return;
+    HORARIOS.forEach(h => {
+      if (!day.slots[h] || !day.slots[h].nome) totalFuturos++;
+    });
+  });
+
+  // Taxa de ocupação: slots do analista / total de slots do período
+  const slotsBase = anFiltro === 'todos'
+    ? totalSlots
+    : filtDays.reduce((acc) => acc + HORARIOS.length, 0);
+  return { totals, totalAgend, totalFuturos, totalSlots: slotsBase };
+}
+
+function buildPie(totals, totalAgend) {
+  const pieData = ANALISTAS.map(an => ({ an, val: totals[an] })).filter(d => d.val > 0);
+  const semAn = totalAgend - pieData.reduce((s,d) => s+d.val, 0);
+  if (semAn > 0) pieData.push({ an:'Sem analista', val: semAn });
+  const tot = pieData.reduce((s,d) => s+d.val, 0) || 1;
+  const R = 72, CX = 90, CY = 90;
+  let slices = '', angle = -Math.PI/2;
+  pieData.forEach(d => {
+    const sw = (d.val/tot)*2*Math.PI;
+    const ea = angle + sw;
+    const x1 = CX+R*Math.cos(angle), y1 = CY+R*Math.sin(angle);
+    const x2 = CX+R*Math.cos(ea),   y2 = CY+R*Math.sin(ea);
+    const lg = sw > Math.PI ? 1 : 0;
+    const col = CORES_AN[d.an] || '#8890a8';
+    const pct = Math.round(d.val/tot*100);
+    slices += `<path d="M${CX},${CY} L${x1.toFixed(1)},${y1.toFixed(1)} A${R},${R} 0 ${lg},1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" fill="${col}" opacity=".88" stroke="var(--bg)" stroke-width="2"><title>${d.an}: ${d.val} (${pct}%)</title></path>`;
+    angle = ea;
+  });
+  let legend = '';
+  pieData.forEach(d => {
+    const col = CORES_AN[d.an] || '#8890a8';
+    const pct = Math.round(d.val/tot*100);
+    legend += `<div class="pie-leg-item"><span class="pie-leg-dot" style="background:${col}"></span><span class="pie-leg-name">${d.an}</span><span class="pie-leg-val">${d.val}<span class="pie-leg-pct">${pct}%</span></span></div>`;
+  });
+  return { slices, legend, CX, CY, R };
+}
+
+function renderPainel() {
+  const de  = document.getElementById('p-de')?.value  || '';
+  const ate = document.getElementById('p-ate')?.value || '';
+
+  const filtDays = DAYS.filter(day => {
+    if (painelAnalista !== 'todos' && !HORARIOS.some(h => day.slots[h].analista === painelAnalista)) return false;
+    if (de || ate) {
+      const d = parseDataBR(day.data);
+      if (de) { const [dy,dm,dd]=de.split('-'); if (d < new Date(dy,dm-1,dd)) return false; }
+      if (ate) { const [ay,am,ad]=ate.split('-'); if (d > new Date(ay,am-1,ad)) return false; }
+    }
+    return true;
+  });
+
+  const { totals, totalAgend, totalFuturos, totalSlots } = calcPainel(filtDays, painelAnalista);
+  const taxaOcup = totalSlots > 0 ? Math.round(totalAgend/totalSlots*100) : 0;
+
+  let html = '';
+
+  // ── Toolbar ──
+  html += '<div class="painel-toolbar">';
+  html += '<div class="painel-chips">';
+  html += `<button class="pf-chip${painelAnalista==='todos'?' active':''}" id="pf-todos" onclick="setPainelAnalista('todos')">Todos</button>`;
+  ANALISTAS.forEach(an => {
+    html += `<button class="pf-chip ${an.toLowerCase()}${painelAnalista===an?' active':''}" id="pf-${an}" onclick="setPainelAnalista('${an}')">${an}</button>`;
+  });
+  html += '</div><div class="painel-datas">';
+  html += `<label class="p-label">De <input class="p-date" id="p-de" type="date" value="${de}" onchange="renderPainel()"></label>`;
+  html += `<label class="p-label">Até <input class="p-date" id="p-ate" type="date" value="${ate}" onchange="renderPainel()"></label>`;
+  html += `<button class="p-clear" onclick="document.getElementById('p-de').value='';document.getElementById('p-ate').value='';renderPainel()">✕ Limpar</button>`;
+  html += '</div></div>';
+
+  // ── 4 Cards de KPI ──
+  html += '<div class="kpi-row">';
+  html += `<div class="kpi-card"><div class="kpi-icon" style="background:#1a2a4a;color:var(--accent)">📋</div><div class="kpi-body"><div class="kpi-label">Atendimentos agendados</div><div class="kpi-val" style="color:var(--accent)">${totalAgend}</div></div></div>`;
+  html += `<div class="kpi-card"><div class="kpi-icon" style="background:#0a3320;color:var(--ruy)">🟢</div><div class="kpi-body"><div class="kpi-label">Horários livres futuros</div><div class="kpi-val" style="color:var(--ruy)">${totalFuturos}</div><div style="font-size:10px;color:var(--muted);margin-top:2px">total geral do sistema</div></div></div>`;
+  html += `<div class="kpi-card"><div class="kpi-icon" style="background:#1a1a3a;color:#b06ef5">📊</div><div class="kpi-body"><div class="kpi-label">Taxa de ocupação</div><div class="kpi-val" style="color:#b06ef5">${taxaOcup}%</div></div></div>`;
+  html += `<div class="kpi-card"><div class="kpi-icon" style="background:#1a2a1a;color:var(--muted)">📅</div><div class="kpi-body"><div class="kpi-label">Dias no período</div><div class="kpi-val" style="color:var(--muted)">${filtDays.length}</div></div></div>`;
+  html += '</div>';
+
+  if (!filtDays.length) {
+    html += '<div class="empty" style="margin-top:20px"><div class="empty-icon">📭</div><div class="empty-text">Nenhum resultado para os filtros selecionados.</div></div>';
+    document.getElementById('view-painel').innerHTML = html;
+    return;
+  }
+
+  // ── Dashboard row: Pizza + Barras ──
+  html += '<div class="dashboard-row">';
+
+  // Pizza
+  const { slices, legend, CX, CY } = buildPie(totals, totalAgend);
+  html += `<div class="dash-card">
+    <div class="dash-card-title">Distribuição por analista</div>
+    <div class="pie-wrap">
+      <svg viewBox="0 0 180 180" class="pie-svg">${slices}
+        <circle cx="${CX}" cy="${CY}" r="34" fill="var(--card)"/>
+        <text x="${CX}" y="${CY-5}" text-anchor="middle" fill="var(--text)" font-size="16" font-weight="700" font-family="DM Sans">${totalAgend}</text>
+        <text x="${CX}" y="${CY+11}" text-anchor="middle" fill="var(--muted)" font-size="9" font-family="DM Sans">agendados</text>
+      </svg>
+      <div class="pie-legend">${legend}</div>
+    </div>
+  </div>`;
+
+  // Barras de ocupação
+  const barDays = filtDays.length <= 16 ? filtDays : filtDays.slice(-16);
+  let barHtml = '<div class="bar-chart">';
+  barDays.forEach(day => {
+    const agend = HORARIOS.filter(h => day.slots[h].nome).length;
+    const pct = Math.round(agend/HORARIOS.length*100);
+    const past = !isFuturoOuHoje(day.data);
+    const [dd,mm] = day.data.split('/');
+    barHtml += `<div class="bar-col">
+      <div class="bar-val">${agend}</div>
+      <div class="bar-track"><div class="bar-fill${past?' bar-past':''}" style="height:${pct}%"></div></div>
+      <div class="bar-label">${dd}/${mm}</div>
+    </div>`;
+  });
+  barHtml += '</div>';
+
+  html += `<div class="dash-card" style="flex:1.6">
+    <div class="dash-card-title">Ocupação por dia <span style="font-size:10px;color:var(--muted);font-weight:400;text-transform:none">· cinza=passado  azul=futuro</span></div>
+    ${barHtml}
+  </div>`;
+
+  html += '</div>'; // dashboard-row
+
+  // ── Tabela de analistas ──
+  html += '<div class="dash-card" style="margin-top:14px">';
+  html += '<div class="dash-card-title">Resumo por analista</div>';
+  html += '<table class="an-table"><thead><tr><th>Analista</th><th>Atendimentos</th><th>% do total</th><th>Próximos agendados</th><th>Carga</th></tr></thead><tbody>';
+
+  ANALISTAS.forEach(an => {
+    if (painelAnalista !== 'todos' && painelAnalista !== an) return;
+    const val = totals[an];
+    const pct = totalAgend > 0 ? Math.round(val/totalAgend*100) : 0;
+    // Próximos agendados (futuros) para esse analista
+    let proximos = 0;
+    filtDays.forEach(day => {
+      if (!isFuturoOuHoje(day.data)) return;
+      HORARIOS.forEach(h => { if (day.slots[h].analista === an) proximos++; });
+    });
+    const barW = totalAgend > 0 ? Math.round(val/totalAgend*100) : 0;
+    const col = CORES_AN[an];
+    html += `<tr>
+      <td><span class="an-badge" style="background:${CORES_BG[an]};color:${col}">${an}</span></td>
+      <td style="font-weight:700;font-size:16px;color:${col}">${val}</td>
+      <td style="color:var(--muted)">${pct}%</td>
+      <td><span style="color:var(--ruy);font-weight:600">${proximos}</span></td>
+      <td style="min-width:120px"><div class="an-bar-track"><div class="an-bar-fill" style="width:${barW}%;background:${col}"></div></div></td>
+    </tr>`;
+  });
+
+  html += '</tbody></table></div>';
+
+  document.getElementById('view-painel').innerHTML = html;
+}
+
+// ── RENDER LIVRES ──────────────────────────────────────────────────────────
+function parseDataBR(dataBR) {
+  // Converte DD/MM/YYYY para Date (sem hora, só data)
+  const [d, m, y] = dataBR.split('/');
+  return new Date(parseInt(y), parseInt(m)-1, parseInt(d));
+}
+function isHoje(dataBR) {
+  const hoje = new Date();
+  const d = parseDataBR(dataBR);
+  return d.getFullYear()===hoje.getFullYear() && d.getMonth()===hoje.getMonth() && d.getDate()===hoje.getDate();
+}
+function isFuturoOuHoje(dataBR) {
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  const d = parseDataBR(dataBR); d.setHours(0,0,0,0);
+  return d >= hoje;
+}
+
+function renderLivres() {
+  // Só horários livres em datas de hoje em diante
+  const list = [];
+  DAYS.forEach(day => {
+    if (!isFuturoOuHoje(day.data)) return;
+    HORARIOS.forEach(h => { if (!day.slots[h].nome) list.push({ day, h }); });
+  });
+
+  let html = `<div class="livres-header">
+    <div style="font-size:16px;font-weight:600">Próximas vagas disponíveis</div>
+    <div class="livres-count">${list.length} vaga${list.length!==1?'s':''} livre${list.length!==1?'s':''}</div>
+  </div>`;
+
+  if (!list.length) {
+    html += `<div class="empty"><div class="empty-icon">✅</div><div class="empty-text">Todos os horários estão preenchidos.</div></div>`;
+  } else {
+    html += '<div class="livres-grid">';
+    // Agrupa por dia para mostrar avisos
+    const daysSeen = new Set();
+    list.forEach(({ day, h }) => {
+      const showDayHeader = !daysSeen.has(day.id);
+      daysSeen.add(day.id);
+      // Avisos do dia
+      const avisoHtml = showDayHeader && day.avisos && day.avisos.length
+        ? `<div class="livre-avisos">${day.avisos.map(av => `<span class="aviso-tag" style="font-size:11px">⚠ ${av}</span>`).join('')}</div>`
+        : '';
+      html += `<div class="livre-row${showDayHeader && day.avisos && day.avisos.length ? ' has-aviso' : ''}">
+        ${avisoHtml}
+        <div class="livre-row-date">${day.data}</div>
+        <div class="livre-row-day">${day.weekday}</div>
+        <div class="livre-row-time">${h}</div>
+        <button class="btn-agendar-livre" onclick="openSlot('${day.id}','${h}');setView('agenda')">+ Agendar</button>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  document.getElementById('view-livres').innerHTML = html;
+}
+
+// ── CONTROLES ──────────────────────────────────────────────────────────────
+function render() {
+  if (currentView === 'agenda') renderAgenda();
+  if (currentView === 'painel') renderPainel();
+  if (currentView === 'livres') renderLivres();
+  if (currentView === 'config') renderConfig();
+}
+
+function setView(v) {
+  currentView = v;
+  ['agenda','painel','livres','config'].forEach(x => {
+    document.getElementById(`view-${x}`).style.display = x===v?'block':'none';
+    document.getElementById(`btn-${x}`).classList.toggle('active', x===v);
+  });
+  const fw = document.getElementById('filters-wrap');
+  if (fw) {
+    const showFilters = (v === 'agenda');
+    fw.style.display = showFilters ? 'block' : 'none';
+    fw.style.visibility = showFilters ? 'visible' : 'hidden';
+    fw.style.height = showFilters ? '' : '0';
+    fw.style.padding = showFilters ? '' : '0';
+    fw.style.borderBottom = showFilters ? '' : 'none';
+    fw.style.margin = showFilters ? '' : '0';
+  }
+  render();
+}
+
+function setAnalista(an) {
+  currentAnalista = an;
+  document.querySelectorAll('.filter-chip').forEach(el => el.classList.remove('active'));
+  const id = an==='todos'?'chip-todos':an==='livres'?'chip-livres':`chip-${an}`;
+  document.getElementById(id)?.classList.add('active');
+  renderAgenda();
+}
+
+function toggleCard(cardId) { document.getElementById(cardId)?.classList.toggle('open'); }
+function toggleMonth(groupId) { document.getElementById(groupId)?.classList.toggle('closed'); }
+
+// ── TEMA ───────────────────────────────────────────────────────────────────
+const THEME_KEY = 'seplan_theme';
+
+function applyTheme(theme) {
+  const root = document.documentElement;
+  const icon = document.getElementById('theme-icon');
+  if (theme === 'light') {
+    root.setAttribute('data-theme', 'light');
+    if (icon) icon.textContent = '🌙';
+  } else {
+    root.setAttribute('data-theme', 'dark');
+    if (icon) icon.textContent = '☀️';
+  }
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme');
+  // detect effective current theme (might be from media query)
+  const isDark = current === 'dark' ||
+    (!current && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  const next = isDark ? 'light' : 'dark';
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+}
+
+function initTheme() {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved) {
+    applyTheme(saved);
+  } else {
+    // follow system — just set the icon correctly
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const icon = document.getElementById('theme-icon');
+    if (icon) icon.textContent = prefersDark ? '☀️' : '🌙';
+  }
+  // listen for system changes (only if no manual override saved)
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+    if (!localStorage.getItem(THEME_KEY)) {
+      const icon = document.getElementById('theme-icon');
+      if (icon) icon.textContent = e.matches ? '☀️' : '🌙';
+    }
+  });
+}
+
+
+
+// ── BLOQUEIO DE ANALISTAS ──────────────────────────────────────────────────
+let BLOQUEIOS = {}; // { "NomeAnalista": [ "DD/MM/YYYY", "DD/MM/YYYY>DD/MM/YYYY", ... ] }
+
+function getBlockedAnalistas(dayId) {
+  const day = DAYS.find(d => d.id === dayId);
+  if (!day) return [];
+  const blocked = [];
+  Object.entries(BLOQUEIOS).forEach(([an, regras]) => {
+    if (!regras) return;
+    const lista = Array.isArray(regras) ? regras : Object.values(regras);
+    for (const regra of lista) {
+      if (regra.includes('>')) {
+        // Período: "DD/MM/YYYY>DD/MM/YYYY"
+        const [ini, fim] = regra.split('>');
+        const d = parseDataBR(day.data);
+        const dIni = parseDataBR(ini); dIni.setHours(0,0,0,0);
+        const dFim = parseDataBR(fim); dFim.setHours(23,59,59,999);
+        if (d >= dIni && d <= dFim) { blocked.push(an); break; }
+      } else {
+        // Dia específico
+        if (regra === day.data) { blocked.push(an); break; }
+      }
+    }
+  });
+  return blocked;
+}
+
+function saveBloqueios() {
+  window._fb.saveBloqueios(BLOQUEIOS);
+}
+
+function adicionarBloqueio(analista, tipo, dataIni, dataFim) {
+  if (!BLOQUEIOS[analista]) BLOQUEIOS[analista] = [];
+  const lista = Array.isArray(BLOQUEIOS[analista]) ? BLOQUEIOS[analista] : Object.values(BLOQUEIOS[analista]);
+  const regra = tipo === 'periodo' ? `${dataIni}>${dataFim}` : dataIni;
+  if (!lista.includes(regra)) lista.push(regra);
+  BLOQUEIOS[analista] = lista;
+  saveBloqueios();
+  toast(`${analista} bloqueado ✓`);
+  renderConfig();
+}
+
+function removerBloqueio(analista, idx) {
+  const lista = Array.isArray(BLOQUEIOS[analista]) ? BLOQUEIOS[analista] : Object.values(BLOQUEIOS[analista]);
+  lista.splice(idx, 1);
+  BLOQUEIOS[analista] = lista;
+  saveBloqueios();
+  toast('Bloqueio removido');
+  renderConfig();
+}
+
+// ── RENDER CONFIG ──────────────────────────────────────────────────────────
+function renderConfig() {
+  let html = '<div class="config-wrap">';
+
+  // ── Analistas ──
+  html += '<div class="config-section">';
+  html += '<div class="config-title">👥 Analistas</div>';
+  html += '<div class="config-desc">Gerencie a lista de analistas que aparecem no app. Alterações salvam automaticamente.</div>';
+  html += '<div class="config-list" id="analistas-list">';
+  ANALISTAS.forEach((an, i) => {
+    const cor = CORES_AN[an] || 'var(--accent)';
+    html += `<div class="config-item">
+      <span class="config-badge" style="background:${CORES_BG[an]||'var(--border)'};color:${cor}">${an}</span>
+      <button class="config-rm" onclick="removerAnalista(${i})" title="Remover">×</button>
+    </div>`;
+  });
+  html += '</div>';
+  html += '<div class="config-add-row">';
+  html += '<input class="form-input" id="novo-analista" placeholder="Nome do novo analista" style="flex:1" onkeydown="if(event.key===\'Enter\')addAnalista()">';
+  html += '<button class="btn-primary" style="white-space:nowrap;padding:10px 18px" onclick="addAnalista()">+ Adicionar</button>';
+  html += '</div></div>';
+
+  // ── Quem pode agendar ──
+  html += '<div class="config-section">';
+  html += '<div class="config-title">✍️ Quem agenda</div>';
+  html += '<div class="config-desc">Lista de pessoas que podem fazer agendamentos. Aparece no campo "Agendado por" ao criar um horário.</div>';
+  const agendadores = loadAgendadores();
+  html += '<div class="config-list" id="agendadores-list">';
+  agendadores.forEach((ag, i) => {
+    html += `<div class="config-item">
+      <span class="config-badge" style="background:var(--border);color:var(--text)">${ag}</span>
+      <button class="config-rm" onclick="removerAgendador(${i})" title="Remover">×</button>
+    </div>`;
+  });
+  html += '</div>';
+  html += '<div class="config-add-row">';
+  html += '<input class="form-input" id="novo-agendador" placeholder="Nome de quem agenda" style="flex:1" onkeydown="if(event.key===\'Enter\')addAgendador()">';
+  html += '<button class="btn-primary" style="white-space:nowrap;padding:10px 18px" onclick="addAgendador()">+ Adicionar</button>';
+  html += '</div></div>';
+
+  // ── Bloqueios ──
+  html += '<div class="config-section">';
+  html += '<div class="config-title">🚫 Bloqueios de Analistas</div>';
+  html += '<div class="config-desc">Bloqueie um analista para um dia específico ou período (ex: férias). Analistas bloqueados aparecem riscados no formulário de agendamento.</div>';
+  let temBloqueio = false;
+  html += '<div class="config-list" style="flex-direction:column;gap:6px">';
+  Object.entries(BLOQUEIOS).forEach(([an, regras]) => {
+    const lista = Array.isArray(regras) ? regras : Object.values(regras || {});
+    lista.forEach((regra, i) => {
+      if (!regra) return;
+      temBloqueio = true;
+      const cor = CORES_AN[an] || 'var(--accent)';
+      const label = regra.includes('>') ? regra.replace('>', ' → ') : regra;
+      const tipo  = regra.includes('>') ? 'período' : 'dia';
+      html += `<div class="config-item" style="background:var(--sabrina-b);border:1px solid var(--border);border-radius:8px;padding:6px 10px;width:100%;justify-content:space-between">
+        <span style="font-size:12px"><span class="config-badge" style="background:var(--border);color:${cor}">${an}</span><span style="color:var(--muted);margin:0 6px">·</span>${label}<span style="font-size:10px;color:var(--muted);margin-left:4px">(${tipo})</span></span>
+        <button class="config-rm" onclick="removerBloqueio('${an}',${i})">×</button>
+      </div>`;
+    });
+  });
+  if (!temBloqueio) html += '<div style="font-size:12px;color:var(--muted)">Nenhum bloqueio ativo.</div>';
+  html += '</div>';
+  html += '<div style="display:flex;flex-direction:column;gap:10px;margin-top:12px">';
+  html += '<div class="config-add-row" style="flex-wrap:wrap;gap:8px">';
+  html += '<select class="form-select" id="bloq-analista" style="flex:1;min-width:120px"><option value="">Analista...</option>';
+  ANALISTAS.forEach(an => { html += `<option value="${an}">${an}</option>`; });
+  html += '</select>';
+  html += '<select class="form-select" id="bloq-tipo" style="flex:1;min-width:140px" onchange="toggleBloqFim()"><option value="dia">Dia específico</option><option value="periodo">Período</option></select>';
+  html += '</div>';
+  html += '<div class="config-add-row" style="flex-wrap:wrap;gap:8px">';
+  html += '<div style="flex:1;min-width:120px"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data início</div><input class="form-input" id="bloq-ini" type="date"></div>';
+  html += '<div style="flex:1;min-width:120px" id="bloq-fim-wrap" style="display:none"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data fim</div><input class="form-input" id="bloq-fim" type="date"></div>';
+  html += '<button class="btn-primary" style="align-self:flex-end;padding:10px 16px;white-space:nowrap" onclick="salvarBloqueio()">🚫 Bloquear</button>';
+  html += '</div></div></div>';
+
+  html += '</div>';
+  document.getElementById('view-config').innerHTML = html;
+  toggleBloqFim();
+}
+
+function toggleBloqFim() {
+  const tipo = document.getElementById('bloq-tipo')?.value;
+  const wrap = document.getElementById('bloq-fim-wrap');
+  if (wrap) wrap.style.display = tipo === 'periodo' ? 'block' : 'none';
+}
+
+function salvarBloqueio() {
+  const an   = document.getElementById('bloq-analista')?.value;
+  const tipo = document.getElementById('bloq-tipo')?.value;
+  const ini  = document.getElementById('bloq-ini')?.value;
+  const fim  = document.getElementById('bloq-fim')?.value;
+  if (!an)  { toast('Selecione o analista', true); return; }
+  if (!ini) { toast('Informe a data início', true); return; }
+  if (tipo === 'periodo' && !fim) { toast('Informe a data fim', true); return; }
+  adicionarBloqueio(an, tipo, dateToDDMMYYYY(ini), tipo === 'periodo' ? dateToDDMMYYYY(fim) : '');
+}
+
+// ── CONFIG HELPERS ──────────────────────────────────────────────────────────
+const AGENDADORES_KEY = 'seplan_agendadores';
+
+function loadAgendadores() {
+  try { return JSON.parse(localStorage.getItem(AGENDADORES_KEY)) || []; }
+  catch { return []; }
+}
+function saveAgendadores(list) { localStorage.setItem(AGENDADORES_KEY, JSON.stringify(list)); }
+
+function addAnalista() {
+  const input = document.getElementById('novo-analista');
+  const nome = input.value.trim();
+  if (!nome) { toast('Informe o nome do analista', true); return; }
+  if (ANALISTAS.includes(nome)) { toast('Analista já existe', true); return; }
+  ANALISTAS.push(nome);
+  // Salva no Firebase
+  window._fb.saveAnalistas(ANALISTAS);
+  input.value = '';
+  toast(`${nome} adicionado ✓`);
+  renderConfig();
+  rebuildFilters();
+}
+
+function removerAnalista(idx) {
+  const nome = ANALISTAS[idx];
+  if (!confirm(`Remover ${nome} da lista?`)) return;
+  ANALISTAS.splice(idx, 1);
+  window._fb.saveAnalistas(ANALISTAS);
+  toast(`${nome} removido`);
+  renderConfig();
+  rebuildFilters();
+}
+
+function addAgendador() {
+  const input = document.getElementById('novo-agendador');
+  const nome = input.value.trim();
+  if (!nome) { toast('Informe o nome', true); return; }
+  const list = loadAgendadores();
+  if (list.includes(nome)) { toast('Já existe', true); return; }
+  list.push(nome);
+  saveAgendadores(list);
+  input.value = '';
+  toast(`${nome} adicionado ✓`);
+  renderConfig();
+}
+
+function removerAgendador(idx) {
+  const list = loadAgendadores();
+  const nome = list[idx];
+  if (!confirm(`Remover ${nome}?`)) return;
+  list.splice(idx, 1);
+  saveAgendadores(list);
+  toast(`${nome} removido`);
+  renderConfig();
+}
+
+function rebuildFilters() {
+  // Reconstrói chips de filtro na agenda
+  const wrap = document.getElementById('filters');
+  if (!wrap) return;
+  let html = `<button class="filter-chip active" onclick="setAnalista('todos')" id="chip-todos">Todos</button>`;
+  ANALISTAS.forEach(an => {
+    html += `<button class="filter-chip" onclick="setAnalista('${an}')" id="chip-${an}">${an}</button>`;
+  });
+  html += `<button class="filter-chip" style="border-color:#3ecf7840;color:#3ecf78" onclick="setAnalista('livres')" id="chip-livres">Só livres</button>`;
+  wrap.innerHTML = html;
+  // Reconstrói grid de analistas no modal
+  rebuildAnalistaGrid();
+}
+
+function rebuildAnalistaGrid(dayId) {
+  const grid = document.getElementById('analista-grid');
+  if (!grid) return;
+  // Descobre analistas bloqueados para este dia
+  const blocked = dayId ? getBlockedAnalistas(dayId) : [];
+  let html = `<div class="analista-opt nenhum" onclick="selAnalista('')" id="opt-nenhum">—</div>`;
+  ANALISTAS.forEach(an => {
+    const cor = CORES_AN[an] || 'var(--accent)';
+    const isBlocked = blocked.includes(an);
+    if (isBlocked) {
+      html += `<div class="analista-opt blocked" id="opt-${an}" title="${an} bloqueado neste dia">
+        <span style="text-decoration:line-through;opacity:.5">${an}</span>
+        <span style="font-size:9px;color:var(--danger)">🚫</span>
+      </div>`;
+    } else {
+      html += `<div class="analista-opt" style="color:${cor}" onclick="selAnalista('${an}')" id="opt-${an}">${an}</div>`;
+    }
+  });
+  grid.innerHTML = html;
+}
+
+// ── INIT ───────────────────────────────────────────────────────────────────
+initTheme();
+
+// Tela de carregamento
+document.getElementById('view-agenda').innerHTML = `
+  <div class="empty">
+    <div class="empty-icon" style="animation:spin 1s linear infinite;display:inline-block">⏳</div>
+    <div class="empty-text" style="margin-top:12px">Conectando ao banco de dados...</div>
+  </div>`;
+
+// Listener analistas do Firebase
+window._fb.listenAnalistas(function(data) {
+  if (data && Array.isArray(data) && data.length > 0) {
+    ANALISTAS = data;
+    rebuildFilters();
+  }
+});
+
+// Listener bloqueios do Firebase
+window._fb.listenBloqueios(function(data) {
+  BLOQUEIOS = data || {};
+});
+
+// Listener bloqueios do Firebase
+window._fb.listenBloqueios(function(data) {
+  BLOQUEIOS = data || {};
+});
+
+// Listener Firebase em tempo real
+window._fb.listenDays(function(data) {
+  if (data) {
+    DAYS = Object.values(data)
+      .map(day => {
+        // Firebase pode converter arrays em objetos — normaliza
+        const avisos = day.avisos
+          ? (Array.isArray(day.avisos) ? day.avisos : Object.values(day.avisos))
+          : [];
+        // Garante que todos os horários existem
+        const slots = {};
+        HORARIOS.forEach(h => {
+          const s = day.slots && day.slots[h];
+          slots[h] = s ? { nome: s.nome||'', assunto: s.assunto||'', analista: s.analista||'', agendadopor: s.agendadopor||'' }
+                      : { nome:'', assunto:'', analista:'', agendadopor:'' };
+        });
+        return { ...day, avisos, slots };
+      })
+      .sort((a, b) => {
+        const toIso = d => d.split('/').reverse().join('-');
+        return toIso(a.data).localeCompare(toIso(b.data));
+      });
+  } else {
+    // Banco vazio — popula com dados base
+    DAYS = JSON.parse(JSON.stringify(BASE_DAYS));
+    window._fb.saveDays(DAYS);
+  }
+  window._appReady = true;
+  if (currentView === 'agenda') renderAgenda();
+  else if (currentView === 'painel') renderPainel();
+  else if (currentView === 'livres') renderLivres();
+});
+
+// Inicializar agenda quando navegar para ela
+function agendaInit() {
+  if(window._agendaReady) { render(); return; }
+  // Init tema baseado no app
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+  // Não chamar initTheme da agenda pois conflita — só carregar dados
+  window._fb.listenAnalistas(function(data) {
+    if(data && Array.isArray(data) && data.length > 0) {
+      ANALISTAS = data;
+      rebuildFilters();
+    }
+  });
+  window._fb.listenBloqueios(function(data) {
+    BLOQUEIOS = data || {};
+  });
+  window._fb.listenDays(function(data) {
+    if(data) {
+      DAYS = Object.values(data).map(day => {
+        const avisos = day.avisos ? (Array.isArray(day.avisos) ? day.avisos : Object.values(day.avisos)) : [];
+        const slots = {};
+        HORARIOS.forEach(h => {
+          const s = day.slots && day.slots[h];
+          slots[h] = s ? { nome:s.nome||'', assunto:s.assunto||'', analista:s.analista||'', analistas:s.analistas||[], agendadopor:s.agendadopor||'', _id:s._id, _data:s._data }
+                      : { nome:'', assunto:'', analista:'', analistas:[], agendadopor:'' };
+        });
+        return { ...day, avisos, slots };
+      }).sort((a,b) => {
+        const toIso = d => d.split('/').reverse().join('-');
+        return toIso(a.data).localeCompare(toIso(b.data));
+      });
+    } else {
+      DAYS = JSON.parse(JSON.stringify(BASE_DAYS));
+      window._fb.saveDays(DAYS);
+    }
+    window._agendaReady = true;
+    render();
+  });
 }
 
 function toggleSenha() {
