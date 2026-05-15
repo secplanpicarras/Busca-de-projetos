@@ -1194,6 +1194,7 @@ canvas#pdfCanvas{width:100%;display:block}
       <div id="detalheBody"></div>
       <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:1.25rem;flex-wrap:wrap">
         <button class="btn" onclick="closeModal('modalDetalhe')">Fechar</button>
+        <button class="btn" style="color:var(--red);border-color:var(--red)" onclick="excluirBusca()">🗑 Excluir</button>
         <button class="btn" onclick="abrirEdicao()">✏️ Editar</button>
         <button class="btn btn-primary" id="btnCertidao" onclick="gerarCertidao()" style="display:none">📄 Gerar certidão</button>
       </div>
@@ -1975,6 +1976,20 @@ function closeModal(id){
       return pg && pg.style.display!=='none';
     });
     if(!anyVisible) navTo('home');
+  }
+}
+
+async function excluirBusca(){
+  if(!buscaSelecionada) return;
+  if(!confirm('Excluir esta busca? Esta ação não pode ser desfeita.')) return;
+  const resp = await authFetch(`${SUPABASE_URL}/rest/v1/buscas?id=eq.${buscaSelecionada.id}`, {method:'DELETE'});
+  if(resp.ok){
+    closeModal('modalDetalhe');
+    diShow('salvo');
+    loadHistoricoPage();
+    loadHomeStats();
+  } else {
+    alert('Erro ao excluir.');
   }
 }
 
