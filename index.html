@@ -1965,12 +1965,14 @@ async function salvarEdicao(){
 }
 
 function closeModal(id){
-  document.getElementById(id).style.display='none';
-  // Ao fechar digitalização, volta pra home se não tiver nenhuma page ativa
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.classList.remove('open');
+  el.style.display='none';
   if(id==='modalDigitalizacao'){
     const anyVisible = ['home','busca','historico'].some(p=>{
-      const el=document.getElementById('page-'+p);
-      return el && el.style.display!=='none';
+      const pg=document.getElementById('page-'+p);
+      return pg && pg.style.display!=='none';
     });
     if(!anyVisible) navTo('home');
   }
@@ -2671,7 +2673,6 @@ function toast(msg, err=false) {
   setTimeout(() => t.className = 'toast', 2500);
 }
 function overlayClick(e, id) { if (e.target.id === id) closeModal(id); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 // ── ANALISTA SELECTOR ──────────────────────────────────────────────────────
 function selAnalista(an) {
