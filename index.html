@@ -831,6 +831,98 @@ textarea.form-input{resize:vertical;min-height:60px;line-height:1.5}
 #pdfPreviewContainer{display:none;margin-top:1rem;border:0.5px solid var(--border);border-radius:var(--radius-card);overflow:hidden;background:var(--bg)}
 canvas#pdfCanvas{width:100%;display:block}
 
+/* --- MESA DE CONTROLE --- */
+.controle-wrap{display:grid;gap:12px}
+.controle-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.controle-kpi{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-card);padding:14px}
+.controle-kpi span{display:block;font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.controle-kpi strong{font-family:var(--barlow);font-size:30px;line-height:1;color:var(--text)}
+.controle-board{display:grid;grid-template-columns:290px minmax(0,1fr);gap:12px;align-items:start}
+.controle-panel{background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-card);padding:14px}
+.controle-panel-title{font-size:11px;color:var(--text3);font-family:var(--mono);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.controle-form{display:grid;gap:9px}
+.controle-form .form-input{font-size:12px}
+.controle-row-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.controle-actions{display:flex;gap:7px;flex-wrap:wrap}
+.controle-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.controle-chip{border:0.5px solid var(--border2);background:transparent;color:var(--text2);border-radius:999px;padding:5px 11px;font-size:11px;font-weight:600;cursor:pointer}
+.controle-chip.active{background:rgba(26,158,110,.14);border-color:rgba(26,158,110,.35);color:var(--accent)}
+.controle-list{display:grid;gap:7px}
+.controle-item{display:grid;grid-template-columns:11px minmax(0,1fr) auto;gap:10px;align-items:start;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-card);padding:12px;transition:border-color .15s,background .15s}
+.controle-item:hover{border-color:var(--border2);background:var(--hist-hover-bg)}
+.controle-dot{width:10px;height:10px;border-radius:50%;margin-top:4px}
+.controle-main{min-width:0}
+.controle-title{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:4px}
+.controle-title strong{font-size:14px;font-family:var(--mono);color:var(--text)}
+.controle-meta{font-size:11px;color:var(--text3);font-family:var(--mono);line-height:1.5}
+.controle-note{font-size:12px;color:var(--text2);line-height:1.45;margin-top:5px;white-space:pre-wrap}
+.controle-pill{font-size:10px;padding:2px 8px;border-radius:999px;font-family:var(--mono);font-weight:700;text-transform:uppercase;border:0.5px solid var(--border2)}
+.controle-pill.pendente{background:rgba(26,111,173,.12);color:#5aabef;border-color:rgba(26,111,173,.25)}
+.controle-pill.pedir{background:rgba(239,159,39,.12);color:var(--amber);border-color:rgba(239,159,39,.25)}
+.controle-pill.certidao{background:rgba(176,110,245,.12);color:#c79bff;border-color:rgba(176,110,245,.25)}
+.controle-pill.nada{background:rgba(226,75,74,.12);color:#ff8b8b;border-color:rgba(226,75,74,.25)}
+.controle-pill.encontrado{background:rgba(26,158,110,.12);color:#4ecb9e;border-color:rgba(26,158,110,.25)}
+.controle-pill.concluido{background:rgba(238,242,247,.1);color:var(--text2);border-color:var(--border2)}
+.controle-item-actions{display:flex;gap:4px}
+.controle-icon-btn{width:30px;height:30px;border-radius:8px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.controle-icon-btn:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.controle-empty{padding:34px 12px;text-align:center;color:var(--text3);font-size:13px;border:0.5px dashed var(--border2);border-radius:var(--radius-card)}
+.controle-green{background:var(--green)}.controle-blue{background:var(--blue)}.controle-amber{background:var(--amber)}.controle-red{background:var(--red)}.controle-purple{background:#b06ef5}.controle-gray{background:#8890a8}
+@media(max-width:900px){.controle-board{grid-template-columns:1fr}.controle-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.controle-kpis,.controle-row-2{grid-template-columns:1fr}.controle-item{grid-template-columns:9px minmax(0,1fr)}.controle-item-actions{grid-column:2;justify-content:flex-start}}
+
+body.controle-light{
+  --bg:#edf2f4;
+  --bg2:#16343b;
+  --bg3:#f5f8f9;
+  --surface:#ffffff;
+  --input-bg:#fbfcfd;
+  --border:#d9e0e5;
+  --border2:#cbd6dc;
+  --text:#172026;
+  --text2:#4e6271;
+  --text3:#7b8b96;
+  --accent:#1d6f7a;
+  --green:#179b55;
+  --red:#c53c3c;
+  --amber:#d4a612;
+  --blue:#287bd1;
+  --content-grad:#edf2f4;
+}
+body.controle-light .topbar{background:#edf2f4;border-bottom:0.5px solid #d9e0e5}
+body.controle-light .topbar-logo,
+body.controle-light .topbar-logo span{color:#172026!important}
+body.controle-light .sidebar{background:#16343b;border-right:0}
+body.controle-light .dock-logo{background:#f3c04c;color:#15272c}
+body.controle-light .dock-logo svg{stroke:#15272c}
+body.controle-light .dock-item{color:rgba(255,255,255,.58)}
+body.controle-light .dock-item:hover,
+body.controle-light .dock-item.active{background:rgba(255,255,255,.12);color:#fff}
+body.controle-light .content-inner{max-width:1180px;width:100%;margin:0 auto;padding:24px}
+body.controle-light #page-controle{width:100%}
+body.controle-light #page-controle .controle-board{grid-template-columns:320px minmax(0,1fr)}
+body.controle-light #page-controle .controle-wrap{width:min(100%,1500px);margin:0 auto}
+body.controle-light .upload-zone{padding:34px 18px}
+body.controle-light #page-controle .page-header{margin-bottom:14px}
+body.controle-light #page-controle .page-header h1{font-size:26px;color:#061524}
+body.controle-light #page-controle .page-header p{font-size:13px;color:#4e6271}
+body.controle-light .controle-kpi,
+body.controle-light .controle-panel,
+body.controle-light .controle-item{box-shadow:none}
+body.controle-light .controle-kpi strong{font-family:var(--sans);font-size:26px}
+body.controle-light .controle-panel-title{color:#506579}
+body.controle-light .controle-chip{background:#fff;color:#172026}
+body.controle-light .controle-chip.active{background:#16343b;border-color:#16343b;color:#fff}
+body.controle-light .controle-pill{background:#eef5f6}
+body.controle-light .controle-pill.pendente,
+body.controle-light .controle-pill.encontrado{color:#0e6b45}
+body.controle-light .controle-pill.pedir,
+body.controle-light .controle-pill.certidao{color:#8a6400}
+body.controle-light .controle-pill.nada{color:#9e2e2e}
+body.controle-light .form-input{background:#fbfcfd;border:1px solid #cfd9df;color:#172026;font-weight:600}
+body.controle-light .form-label{color:#506579}
+body.controle-light .btn-primary{background:#1d6f7a;border-color:#1d6f7a;color:#fff}
+
 /* ── PRINT ── */
 @media print{
   body{background:#fff;color:#000}
@@ -1021,6 +1113,93 @@ canvas#pdfCanvas{width:100%;display:block}
         <div class="card">
           <div id="histListPage"><div class="empty-note">Carregando...</div></div>
         </div>
+      </div>
+
+      <!-- PAGE CONTROLE -->
+      <div id="page-controle" style="display:none">
+        <div class="page-header">
+          <h1>Mesa de controle</h1>
+          <p>Acompanhamento rápido das buscas depois de salvar no histórico</p>
+        </div>
+        <div class="controle-wrap">
+          <div class="controle-kpis">
+            <div class="controle-kpi"><span>Em aberto</span><strong id="ctrl-kpi-abertos">0</strong></div>
+            <div class="controle-kpi"><span>Pedir</span><strong id="ctrl-kpi-pedir">0</strong></div>
+            <div class="controle-kpi"><span>Certidão</span><strong id="ctrl-kpi-certidao">0</strong></div>
+            <div class="controle-kpi"><span>Concluídos</span><strong id="ctrl-kpi-concluidos">0</strong></div>
+          </div>
+
+          <div class="controle-board">
+            <div class="controle-panel">
+              <div class="controle-panel-title">Entrada rápida</div>
+              <div class="controle-form">
+                <select class="form-input" id="ctrl-historico-select">
+                  <option value="">Carregar busca do histórico...</option>
+                </select>
+                <div class="controle-actions">
+                  <button class="btn btn-sm" onclick="controleCarregarHistorico()">Atualizar histórico</button>
+                  <button class="btn btn-sm btn-primary" onclick="controleAdicionarDoHistorico()">Adicionar selecionada</button>
+                </div>
+                <input type="hidden" id="ctrl-edit-id">
+                <label class="form-label">Processo / protocolo</label>
+                <input class="form-input" id="ctrl-protocolo" placeholder="Ex: 14698/26">
+                <div class="controle-row-2">
+                  <div>
+                    <label class="form-label">Matrícula</label>
+                    <input class="form-input" id="ctrl-matricula" placeholder="233/07">
+                  </div>
+                  <div>
+                    <label class="form-label">Inscrição</label>
+                    <input class="form-input" id="ctrl-inscricao" placeholder="01.08...">
+                  </div>
+                </div>
+                <div class="controle-row-2">
+                  <div>
+                    <label class="form-label">Status</label>
+                    <select class="form-input" id="ctrl-status">
+                      <option value="pendente">Pendente</option>
+                      <option value="pedir">Pedir</option>
+                      <option value="certidao">Certidão</option>
+                      <option value="nada">Nada encontrado</option>
+                      <option value="encontrado">Encontrado</option>
+                      <option value="concluido">Concluído</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label class="form-label">Cor</label>
+                    <select class="form-input" id="ctrl-cor">
+                      <option value="green">Verde</option>
+                      <option value="blue">Azul</option>
+                      <option value="amber">Amarelo</option>
+                      <option value="red">Vermelho</option>
+                      <option value="purple">Roxo</option>
+                      <option value="gray">Cinza</option>
+                    </select>
+                  </div>
+                </div>
+                <label class="form-label">Anotação rápida</label>
+                <textarea class="form-input" id="ctrl-nota" rows="4" placeholder="Pedir, certidão, nada encontrado, conferir inscrição..."></textarea>
+                <div class="controle-actions">
+                  <button class="btn btn-primary" onclick="controleSalvar()">Salvar na mesa</button>
+                  <button class="btn" onclick="controleLimparForm()">Limpar</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="controle-panel">
+              <div class="controle-panel-title">Fila de acompanhamento</div>
+              <div class="controle-filters" id="ctrl-filtros">
+                <button class="controle-chip active" onclick="controleSetFiltro('abertos')" data-filtro="abertos">Abertos</button>
+                <button class="controle-chip" onclick="controleSetFiltro('pedir')" data-filtro="pedir">Pedir</button>
+                <button class="controle-chip" onclick="controleSetFiltro('certidao')" data-filtro="certidao">Certidão</button>
+                <button class="controle-chip" onclick="controleSetFiltro('concluido')" data-filtro="concluido">Concluídos</button>
+                <button class="controle-chip" onclick="controleSetFiltro('todos')" data-filtro="todos">Todos</button>
+              </div>
+              <div id="ctrl-lista" class="controle-list"></div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <!-- PAGE AGENDA -->
       <div id="page-agenda" style="display:none">
@@ -1345,6 +1524,10 @@ canvas#pdfCanvas{width:100%;display:block}
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
       <div class="dock-tip">Histórico</div>
     </button>
+    <button class="dock-item" id="nav-controle" onclick="navTo('controle')">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h7"/><path stroke-linecap="round" stroke-linejoin="round" d="m17 16 2 2 4-5"/></svg>
+      <div class="dock-tip">Mesa de controle</div>
+    </button>
     <button class="dock-item" id="nav-agenda" onclick="navTo('agenda')">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path stroke-linecap="round" d="M16 2v4M8 2v4M3 10h18"/></svg>
       <div class="dock-tip">Agenda</div>
@@ -1413,6 +1596,7 @@ async function checkLogin(){
 }
 
 function showApp(){
+  document.body.classList.add('controle-light');
   document.getElementById('loginScreen').style.display='none';
   document.getElementById('app').style.display='block';
   const dockEl = document.getElementById('dock');
@@ -1522,13 +1706,15 @@ if(sessionStorage.getItem('seplan_token')){
 
 // NAV
 function navTo(page){
-  ['home','busca','historico','agenda'].forEach(p=>{
+  document.body.classList.add('controle-light');
+  ['home','busca','historico','controle','agenda'].forEach(p=>{
     const el=document.getElementById('page-'+p);
     if(el) el.style.display=p===page?'block':'none';
     const btn=document.getElementById('nav-'+p);
     if(btn) btn.classList.toggle('active', p===page);
   });
   if(page==='historico') loadHistoricoPage();
+  if(page==='controle') loadControlePage();
   if(page==='home'){
     homeTick();
     initHomeCanvas();
@@ -1872,11 +2058,239 @@ async function salvarBusca(){
     headers:{'Content-Type':'application/json',...getAuthHeaders(),'Prefer':'return=representation'},
     body:JSON.stringify(payload)
   });
-  if(resp.ok){closeModal('modalCadastro');diShow('salvo');loadHomeStats();}
+  if(resp.ok){
+    const saved = await resp.json();
+    const savedBusca = Array.isArray(saved) ? saved[0] : null;
+    if(savedBusca) controleCriarDeBusca(savedBusca, { silent:true });
+    closeModal('modalCadastro');diShow('salvo');loadHomeStats();
+  }
   else{const err=await resp.json();alert('Erro ao salvar: '+JSON.stringify(err));}
 }
 
 // HISTÓRICO
+// MESA DE CONTROLE
+const CONTROLE_KEY = 'seplan_controle_buscas_v1';
+let controleFiltro = 'abertos';
+let controleHistoricoCache = {};
+
+const controleStatusLabel = {
+  pendente:'Pendente',
+  pedir:'Pedir',
+  certidao:'Certidão',
+  nada:'Nada encontrado',
+  encontrado:'Encontrado',
+  concluido:'Concluído'
+};
+
+function controleId(){
+  if(typeof crypto !== 'undefined' && crypto.randomUUID) return crypto.randomUUID();
+  return Date.now() + '-' + Math.random().toString(16).slice(2);
+}
+
+function controleLoad(){
+  try { return JSON.parse(localStorage.getItem(CONTROLE_KEY)) || []; }
+  catch { return []; }
+}
+
+function controleSaveList(list){
+  localStorage.setItem(CONTROLE_KEY, JSON.stringify(list));
+}
+
+function controleEscape(value){
+  return String(value || '')
+    .replaceAll('&','&amp;')
+    .replaceAll('<','&lt;')
+    .replaceAll('>','&gt;')
+    .replaceAll('"','&quot;')
+    .replaceAll("'",'&#039;');
+}
+
+function controleDias(item){
+  const base = item.criado_em || item.createdAt;
+  if(!base) return 0;
+  const d = new Date(base);
+  if(Number.isNaN(d.getTime())) return 0;
+  const hoje = new Date(); hoje.setHours(0,0,0,0);
+  d.setHours(0,0,0,0);
+  return Math.max(0, Math.round((hoje - d) / 86400000));
+}
+
+function loadControlePage(){
+  controleRender();
+  controleCarregarHistorico(false);
+}
+
+function controleSetFiltro(filtro){
+  controleFiltro = filtro;
+  document.querySelectorAll('#ctrl-filtros .controle-chip').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.filtro === filtro);
+  });
+  controleRender();
+}
+
+function controleCriarDeBusca(busca, opts={}){
+  if(!busca) return;
+  const list = controleLoad();
+  if(busca.id && list.some(item => item.buscaId === busca.id)) {
+    if(!opts.silent) { navTo('controle'); diShow('salvo'); }
+    return;
+  }
+  const temResultado = busca.tem_resultado ?? busca.resultado?.tem_resultado;
+  const item = {
+    id: controleId(),
+    buscaId: busca.id || '',
+    protocolo: busca.protocolo || '',
+    matricula: busca.matricula || '',
+    inscricao: busca.inscricao || '',
+    status: temResultado ? 'encontrado' : 'nada',
+    cor: temResultado ? 'green' : 'red',
+    nota: temResultado ? 'Resultado encontrado na busca salva.' : 'Nada encontrado. Avaliar emissão de certidão.',
+    criado_em: busca.criado_em || new Date().toISOString(),
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString()
+  };
+  list.unshift(item);
+  controleSaveList(list);
+  if(!opts.silent) { controleRender(); diShow('salvo'); }
+}
+
+async function controleCarregarHistorico(showToast=true){
+  const select = document.getElementById('ctrl-historico-select');
+  if(!select || !sessionStorage.getItem('seplan_token')) return;
+  select.innerHTML = '<option value="">Carregando histórico...</option>';
+  try{
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/buscas?order=criado_em.desc&limit=80`,{
+      headers:{...getAuthHeaders()}
+    });
+    const data = await resp.json();
+    if(!Array.isArray(data) || !data.length){
+      select.innerHTML = '<option value="">Nenhuma busca salva encontrada</option>';
+      return;
+    }
+    controleHistoricoCache = {};
+    data.forEach(b => { controleHistoricoCache[b.id] = b; });
+    select.innerHTML = '<option value="">Carregar busca do histórico...</option>' + data.map(b => {
+      const dt = b.criado_em ? new Date(b.criado_em).toLocaleDateString('pt-BR') : '';
+      return `<option value="${controleEscape(b.id)}">${controleEscape(b.protocolo || 'Sem protocolo')} ${dt ? '· '+controleEscape(dt) : ''}</option>`;
+    }).join('');
+    if(showToast) diShow('salvo');
+  } catch(err){
+    select.innerHTML = '<option value="">Não foi possível carregar o histórico</option>';
+  }
+}
+
+function controleAdicionarDoHistorico(){
+  const id = document.getElementById('ctrl-historico-select')?.value;
+  if(!id){ alert('Selecione uma busca do histórico.'); return; }
+  controleCriarDeBusca(controleHistoricoCache[id]);
+  controleRender();
+}
+
+function controleSalvar(){
+  const protocolo = document.getElementById('ctrl-protocolo')?.value.trim();
+  if(!protocolo){ alert('Informe o processo ou protocolo.'); return; }
+  const editId = document.getElementById('ctrl-edit-id')?.value;
+  const list = controleLoad();
+  const payload = {
+    protocolo,
+    matricula: document.getElementById('ctrl-matricula')?.value.trim() || '',
+    inscricao: document.getElementById('ctrl-inscricao')?.value.trim() || '',
+    status: document.getElementById('ctrl-status')?.value || 'pendente',
+    cor: document.getElementById('ctrl-cor')?.value || 'green',
+    nota: document.getElementById('ctrl-nota')?.value.trim() || '',
+    updatedAt: new Date().toISOString()
+  };
+  if(editId){
+    const idx = list.findIndex(item => item.id === editId);
+    if(idx >= 0) list[idx] = { ...list[idx], ...payload };
+  } else {
+    list.unshift({ id:controleId(), buscaId:'', createdAt:new Date().toISOString(), criado_em:new Date().toISOString(), ...payload });
+  }
+  controleSaveList(list);
+  controleLimparForm();
+  controleRender();
+  diShow('salvo');
+}
+
+function controleEditar(id){
+  const item = controleLoad().find(i => i.id === id);
+  if(!item) return;
+  document.getElementById('ctrl-edit-id').value = item.id;
+  document.getElementById('ctrl-protocolo').value = item.protocolo || '';
+  document.getElementById('ctrl-matricula').value = item.matricula || '';
+  document.getElementById('ctrl-inscricao').value = item.inscricao || '';
+  document.getElementById('ctrl-status').value = item.status || 'pendente';
+  document.getElementById('ctrl-cor').value = item.cor || 'green';
+  document.getElementById('ctrl-nota').value = item.nota || '';
+  document.getElementById('ctrl-protocolo').focus();
+}
+
+function controleMarcar(id, status){
+  const list = controleLoad().map(item => item.id === id ? { ...item, status, updatedAt:new Date().toISOString() } : item);
+  controleSaveList(list);
+  controleRender();
+}
+
+function controleExcluir(id){
+  const item = controleLoad().find(i => i.id === id);
+  if(!confirm(`Remover ${item?.protocolo || 'este item'} da mesa de controle?`)) return;
+  controleSaveList(controleLoad().filter(i => i.id !== id));
+  controleRender();
+}
+
+function controleLimparForm(){
+  ['ctrl-edit-id','ctrl-protocolo','ctrl-matricula','ctrl-inscricao','ctrl-nota'].forEach(id => {
+    const el = document.getElementById(id);
+    if(el) el.value = '';
+  });
+  const st = document.getElementById('ctrl-status'); if(st) st.value = 'pendente';
+  const cor = document.getElementById('ctrl-cor'); if(cor) cor.value = 'green';
+}
+
+function controleRender(){
+  const list = controleLoad();
+  const abertos = list.filter(item => item.status !== 'concluido');
+  document.getElementById('ctrl-kpi-abertos').textContent = abertos.length;
+  document.getElementById('ctrl-kpi-pedir').textContent = list.filter(item => item.status === 'pedir').length;
+  document.getElementById('ctrl-kpi-certidao').textContent = list.filter(item => item.status === 'certidao').length;
+  document.getElementById('ctrl-kpi-concluidos').textContent = list.filter(item => item.status === 'concluido').length;
+
+  const filtered = list.filter(item => {
+    if(controleFiltro === 'todos') return true;
+    if(controleFiltro === 'abertos') return item.status !== 'concluido';
+    return item.status === controleFiltro;
+  }).sort((a,b) => controleDias(b) - controleDias(a));
+
+  const el = document.getElementById('ctrl-lista');
+  if(!filtered.length){
+    el.innerHTML = '<div class="controle-empty">Nada na mesa ainda. Adicione uma busca do histórico ou cadastre uma anotação rápida.</div>';
+    return;
+  }
+
+  el.innerHTML = filtered.map(item => {
+    const status = item.status || 'pendente';
+    const dias = controleDias(item);
+    return `<div class="controle-item">
+      <span class="controle-dot controle-${controleEscape(item.cor || 'green')}"></span>
+      <div class="controle-main">
+        <div class="controle-title">
+          <strong>${controleEscape(item.protocolo || 'Sem protocolo')}</strong>
+          <span class="controle-pill ${controleEscape(status)}">${controleEscape(controleStatusLabel[status] || status)}</span>
+        </div>
+        <div class="controle-meta">${item.matricula ? 'Mat. '+controleEscape(item.matricula)+' · ' : ''}${controleEscape(item.inscricao || '')}${item.inscricao || item.matricula ? ' · ' : ''}${dias} dia${dias===1?'':'s'} na mesa</div>
+        ${item.nota ? `<div class="controle-note">${controleEscape(item.nota)}</div>` : ''}
+      </div>
+      <div class="controle-item-actions">
+        <button class="controle-icon-btn" title="Editar" onclick="controleEditar('${item.id}')">✎</button>
+        <button class="controle-icon-btn" title="Pedir" onclick="controleMarcar('${item.id}','pedir')">P</button>
+        <button class="controle-icon-btn" title="Certidão" onclick="controleMarcar('${item.id}','certidao')">C</button>
+        <button class="controle-icon-btn" title="Concluir" onclick="controleMarcar('${item.id}','concluido')">✓</button>
+        <button class="controle-icon-btn" title="Remover" onclick="controleExcluir('${item.id}')">×</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 async function loadHistoricoPage(){
   const el=document.getElementById('histListPage');
   el.innerHTML='<div class="empty-note">Carregando...</div>';
@@ -1971,7 +2385,7 @@ function closeModal(id){
   el.classList.remove('open');
   el.style.display='none';
   if(id==='modalDigitalizacao'){
-    const anyVisible = ['home','busca','historico'].some(p=>{
+    const anyVisible = ['home','busca','historico','controle'].some(p=>{
       const pg=document.getElementById('page-'+p);
       return pg && pg.style.display!=='none';
     });
