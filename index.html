@@ -47,6 +47,20 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .login-card input:focus{border-color:var(--accent)}
 .login-error{font-size:12px;color:var(--red);margin-bottom:.75rem;display:none}
 
+/* Login no modelo claro */
+#loginScreen{background:#edf2f4}
+#login-canvas{opacity:.08}
+.login-card{background:#ffffff;border:1px solid #d9e0e5;border-radius:14px;box-shadow:0 18px 45px rgba(22,52,59,.10);max-width:380px;padding:2.2rem}
+.login-card::before{content:'';position:absolute;inset:0 0 auto 0;height:5px;background:#1d6f7a;border-radius:14px 14px 0 0}
+.login-card input{background:#fbfcfd;border:1px solid #cfd9df;color:#172026;border-radius:8px;font-family:var(--sans);font-weight:600}
+.login-card input::placeholder{color:#7b8b96}
+.login-card input:focus{border-color:#1d6f7a;box-shadow:0 0 0 3px rgba(29,111,122,.10)}
+.login-card .btn-primary{background:#1d6f7a;border-color:#1d6f7a;color:#fff;border-radius:8px;min-height:44px}
+.login-card .btn-primary:hover{background:#124f58;border-color:#124f58}
+.login-card > div:first-child > div:first-child{color:#172026!important;font-size:46px!important;line-height:.9!important}
+.login-card > div:first-child > div:first-child span{color:#1d6f7a!important}
+.login-card > div:first-child > div:nth-child(2){color:#7b8b96!important;letter-spacing:.12em!important}
+
 /* ── DOCK (sidebar minimalista com ícones) ── */
 #app{display:none;min-height:100vh;position:relative}
 .sidebar{position:fixed;top:0;left:0;width:var(--dock);height:100vh;background:var(--bg2);border-right:0.5px solid var(--border);display:flex;flex-direction:column;align-items:center;z-index:50;padding:12px 0;transition:background .3s}
