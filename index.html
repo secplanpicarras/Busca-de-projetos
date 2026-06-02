@@ -1157,6 +1157,8 @@ body.controle-light .btn-primary{background:#1d6f7a;border-color:#1d6f7a;color:#
                 <input type="hidden" id="ctrl-edit-id">
                 <label class="form-label">Processo / protocolo</label>
                 <input class="form-input" id="ctrl-protocolo" placeholder="Ex: 14698/26">
+                <label class="form-label">Requerente</label>
+                <input class="form-input" id="ctrl-requerente" placeholder="Nome ou razão social">
                 <div class="controle-row-2">
                   <div>
                     <label class="form-label">Matrícula</label>
@@ -1197,6 +1199,10 @@ body.controle-light .btn-primary{background:#1d6f7a;border-color:#1d6f7a;color:#
                   <button class="btn btn-primary" onclick="controleSalvar()">Salvar na mesa</button>
                   <button class="btn" onclick="controleLimparForm()">Limpar</button>
                 </div>
+                <div style="height:1px;background:var(--border);margin:2px 0"></div>
+                <label class="form-label">Relatório IPM</label>
+                <input type="file" id="ctrl-ipm-file" accept=".pdf,application/pdf" style="display:none" onchange="controleImportarRelatorioIPM(this.files[0])">
+                <button class="btn" onclick="document.getElementById('ctrl-ipm-file').click()">Importar relatório IPM</button>
               </div>
             </div>
 
@@ -2154,6 +2160,7 @@ function controleCriarDeBusca(busca, opts={}){
     id: controleId(),
     buscaId: busca.id || '',
     protocolo: busca.protocolo || '',
+    requerente: busca.requerente || '',
     matricula: busca.matricula || '',
     inscricao: busca.inscricao || '',
     status: temResultado ? 'encontrado' : 'nada',
@@ -2207,6 +2214,7 @@ function controleSalvar(){
   const list = controleLoad();
   const payload = {
     protocolo,
+    requerente: document.getElementById('ctrl-requerente')?.value.trim() || '',
     matricula: document.getElementById('ctrl-matricula')?.value.trim() || '',
     inscricao: document.getElementById('ctrl-inscricao')?.value.trim() || '',
     status: document.getElementById('ctrl-status')?.value || 'pendente',
@@ -2231,6 +2239,7 @@ function controleEditar(id){
   if(!item) return;
   document.getElementById('ctrl-edit-id').value = item.id;
   document.getElementById('ctrl-protocolo').value = item.protocolo || '';
+  document.getElementById('ctrl-requerente').value = item.requerente || '';
   document.getElementById('ctrl-matricula').value = item.matricula || '';
   document.getElementById('ctrl-inscricao').value = item.inscricao || '';
   document.getElementById('ctrl-status').value = item.status || 'pendente';
@@ -2253,12 +2262,118 @@ function controleExcluir(id){
 }
 
 function controleLimparForm(){
-  ['ctrl-edit-id','ctrl-protocolo','ctrl-matricula','ctrl-inscricao','ctrl-nota'].forEach(id => {
+  ['ctrl-edit-id','ctrl-protocolo','ctrl-requerente','ctrl-matricula','ctrl-inscricao','ctrl-nota'].forEach(id => {
     const el = document.getElementById(id);
     if(el) el.value = '';
   });
   const st = document.getElementById('ctrl-status'); if(st) st.value = 'pendente';
   const cor = document.getElementById('ctrl-cor'); if(cor) cor.value = 'green';
+}
+
+async function controleImportarRelatorioIPM(file){
+  if(!file) return;
+  if(!pdfjsLib){ alert('Leitor de PDF não carregou. Recarregue a página e tente novamente.'); return; }
+  try{
+    const buffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+    let text = '';
+    for(let i=1;i<=pdf.numPages;i++){
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      text += '\n' + content.items.map(item => item.str || '').join('\n');
+    }
+    const itens = controleParseRelatorioIPM(text);
+    if(!itens.length){ alert('Não encontrei processos no relatório IPM.'); return; }
+    const atuais = controleLoad();
+    const existentes = new Set(atuais.map(item => item.protocolo));
+    const novos = itens.filter(item => !existentes.has(item.protocolo));
+    controleSaveList([...novos, ...atuais]);
+    controleRender();
+    file = null;
+    const input = document.getElementById('ctrl-ipm-file');
+    if(input) input.value = '';
+    alert(`${novos.length} processo(s) importado(s). ${itens.length - novos.length} já existiam na mesa.`);
+  } catch(err){
+    alert('Erro ao importar relatório IPM: ' + err.message);
+  }
+}
+
+function controleParseRelatorioIPM(text){
+  const lines = text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+  const start = lines.findIndex(line => /Número\s+Ano|Numero\s+Ano/i.test(line));
+  const end = lines.findIndex(line => /Total de Registros/i.test(line));
+  const body = lines.slice(start >= 0 ? start + 1 : 0, end > start ? end : lines.length);
+  const items = [];
+
+  for(let i=0;i<body.length;i++){
+    const inline = body[i].match(/^(\d{4,7})\s+(20\d{2})\s+(.+)?$/);
+    const split = /^\d{4,7}$/.test(body[i]) && /^20\d{2}$/.test(body[i + 1] || '');
+    if(!inline && !split) continue;
+    const numero = inline ? inline[1] : body[i];
+    const ano = inline ? inline[2] : body[i + 1];
+    const nameParts = [];
+    let situacao = 'Tramitando';
+    let dias = 0;
+    if(inline && inline[3]){
+      const compact = inline[3].match(/^(.*?)\s+(Tramitando|Em Análise|Em Analise)\s*(\d+)?\s*Dias?$/i);
+      if(compact){
+        nameParts.push(compact[1]);
+        situacao = compact[2];
+        dias = Number(compact[3] || 0);
+        items.push({
+          id: controleId(),
+          buscaId: '',
+          protocolo: `${numero}/${ano}`,
+          requerente: nameParts.join(' ').replace(/\s+/g,' ').trim(),
+          matricula: '',
+          inscricao: '',
+          status: 'pendente',
+          cor: 'blue',
+          nota: `Importado do relatório IPM. Situação: ${situacao}. Atualizar inscrição/matrícula após consulta.`,
+          criado_em: (() => { const d = new Date(); d.setDate(d.getDate() - dias); return d.toISOString(); })(),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        });
+        continue;
+      }
+      nameParts.push(inline[3]);
+    }
+    let j = inline ? i + 1 : i + 2;
+    for(; j<body.length; j++){
+      const line = body[j];
+      const match = line.match(/^(Tramitando|Em Análise|Em Analise)\s*(\d+)?\s*Dias?/i);
+      if(match){
+        situacao = match[1];
+        dias = Number(match[2] || 0);
+        if(!dias && /^(\d+)\s*Dias?/i.test(body[j + 1] || '')){
+          dias = Number((body[j + 1].match(/^(\d+)/) || [0,0])[1]);
+          j += 1;
+        }
+        break;
+      }
+      if(/^\d{4,7}$/.test(line) && /^20\d{2}$/.test(body[j + 1] || '')) break;
+      nameParts.push(line);
+    }
+    const created = new Date();
+    created.setDate(created.getDate() - dias);
+    items.push({
+      id: controleId(),
+      buscaId: '',
+      protocolo: `${numero}/${ano}`,
+      requerente: nameParts.join(' ').replace(/\s+/g,' ').trim(),
+      matricula: '',
+      inscricao: '',
+      status: 'pendente',
+      cor: 'blue',
+      nota: `Importado do relatório IPM. Situação: ${situacao}. Atualizar inscrição/matrícula após consulta.`,
+      criado_em: created.toISOString(),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    });
+    i = Math.max(i, j);
+  }
+
+  return items;
 }
 
 function controleRender(){
@@ -2291,7 +2406,7 @@ function controleRender(){
           <strong>${controleEscape(item.protocolo || 'Sem protocolo')}</strong>
           <span class="controle-pill ${controleEscape(status)}">${controleEscape(controleStatusLabel[status] || status)}</span>
         </div>
-        <div class="controle-meta">${item.matricula ? 'Mat. '+controleEscape(item.matricula)+' · ' : ''}${controleEscape(item.inscricao || '')}${item.inscricao || item.matricula ? ' · ' : ''}${dias} dia${dias===1?'':'s'} na mesa</div>
+        <div class="controle-meta">${item.requerente ? controleEscape(item.requerente)+' · ' : ''}${item.matricula ? 'Mat. '+controleEscape(item.matricula)+' · ' : ''}${controleEscape(item.inscricao || '')}${item.inscricao || item.matricula ? ' · ' : ''}${dias} dia${dias===1?'':'s'} na mesa</div>
         ${item.nota ? `<div class="controle-note">${controleEscape(item.nota)}</div>` : ''}
       </div>
       <div class="controle-item-actions">
