@@ -870,6 +870,7 @@ canvas#pdfCanvas{width:100%;display:block}
 .controle-title strong{font-size:14px;font-family:var(--mono);color:var(--text)}
 .controle-meta{font-size:11px;color:var(--text3);font-family:var(--mono);line-height:1.5}
 .controle-note{font-size:12px;color:var(--text2);line-height:1.45;margin-top:5px;white-space:pre-wrap}
+.controle-alerta-ipm{font-size:12px;color:#9e2e2e;background:#fff1f1;border:1px solid #f0c8c8;border-radius:8px;padding:7px 9px;margin-top:7px;font-weight:700}
 .controle-pill{font-size:10px;padding:2px 8px;border-radius:999px;font-family:var(--mono);font-weight:700;text-transform:uppercase;border:0.5px solid var(--border2)}
 .controle-pill.pendente{background:rgba(26,111,173,.12);color:#5aabef;border-color:rgba(26,111,173,.25)}
 .controle-pill.pedir{background:rgba(239,159,39,.12);color:var(--amber);border-color:rgba(239,159,39,.25)}
@@ -937,6 +938,14 @@ body.controle-light .form-input{background:#fbfcfd;border:1px solid #cfd9df;colo
 body.controle-light .form-label{color:#506579}
 body.controle-light .btn-primary{background:#1d6f7a;border-color:#1d6f7a;color:#fff}
 
+/* Agenda nova embutida */
+#page-agenda > :not(.agenda-embed){display:none!important}
+.agenda-embed{height:calc(100vh - 52px);min-height:720px;border:0;border-radius:0;overflow:hidden;background:#edf2f4;margin:-24px}
+.agenda-embed iframe{width:100%;height:100%;border:0;display:block;background:#edf2f4}
+body.controle-light #page-agenda{width:100%}
+body.controle-light #page-agenda .agenda-embed{box-shadow:none}
+body.controle-light:has(#page-agenda[style*="block"]) .content-inner{max-width:none;padding:24px}
+
 /* Digitalização no modelo claro */
 body.controle-light #modalDigitalizacao .modal{
   background:#ffffff;
@@ -996,6 +1005,142 @@ body.controle-light #dg-lista,
 body.controle-light #dg-analista-lista{color:#172026}
 body.controle-light #dg-count,
 body.controle-light #dg-status{color:#506579!important}
+
+/* Busca, histórico e modais no padrão claro */
+body.controle-light #page-busca,
+body.controle-light #page-historico{max-width:1180px;margin:0 auto}
+body.controle-light .page-header h1{color:#061524;font-size:28px;line-height:1.1;margin:0}
+body.controle-light .page-header p{color:#4e6271;margin-top:4px}
+body.controle-light .steps{gap:8px;margin-bottom:18px}
+body.controle-light .step-pill{
+  background:#ffffff;
+  border:1px solid #cfd9df;
+  color:#506579;
+  min-height:34px;
+  padding:0 14px;
+  font-family:var(--sans);
+  font-weight:800;
+}
+body.controle-light .step-pill span{font-family:var(--mono);font-size:11px;color:inherit}
+body.controle-light .step-pill.active{background:#1d6f7a;border-color:#1d6f7a;color:#fff}
+body.controle-light .step-pill.done{background:#e7f3f4;border-color:#9fc8ce;color:#124f58}
+body.controle-light .card{
+  background:#ffffff!important;
+  border:1px solid #d9e0e5!important;
+  border-radius:10px;
+  box-shadow:none;
+}
+body.controle-light .card:hover{border-color:#c7d4db!important}
+body.controle-light .card-label{
+  color:#506579;
+  font-family:var(--mono);
+  letter-spacing:.08em;
+}
+body.controle-light .upload-zone{
+  background:#fbfcfd;
+  border:1px dashed #9fc8ce;
+  min-height:150px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+}
+body.controle-light .upload-zone:hover{background:#f2f8f9;border-color:#1d6f7a;transform:none}
+body.controle-light .upload-zone svg{color:#607d8b}
+body.controle-light .upload-zone p{color:#172026}
+body.controle-light .upload-zone span{color:#607080}
+body.controle-light .btn,
+body.controle-light .tab{
+  border:1px solid #cfd9df;
+  background:#ffffff;
+  color:#172026;
+  border-radius:8px;
+  font-weight:700;
+}
+body.controle-light .btn:hover,
+body.controle-light .tab:hover{background:#f5f8f9;color:#172026}
+body.controle-light .btn-primary,
+body.controle-light .btn-green{
+  background:#1d6f7a!important;
+  border-color:#1d6f7a!important;
+  color:#ffffff!important;
+}
+body.controle-light .btn-primary:hover,
+body.controle-light .btn-green:hover{background:#124f58!important;border-color:#124f58!important}
+body.controle-light .tabs{border-bottom:1px solid #d9e0e5}
+body.controle-light .tab.active{background:#1d6f7a;border-color:#1d6f7a;color:#fff}
+body.controle-light .name-row input,
+body.controle-light .add-row input,
+body.controle-light #inscricaoInput{
+  background:#fbfcfd!important;
+  border:1px solid #cfd9df!important;
+  color:#172026!important;
+  border-radius:8px!important;
+  font-family:var(--sans)!important;
+  font-weight:600;
+}
+body.controle-light .progress-bar{background:#d9e0e5}
+body.controle-light .progress-fill{background:#1d6f7a}
+body.controle-light .progress-msg{color:#506579}
+body.controle-light .hist-item{
+  background:#ffffff;
+  border:1px solid #d9e0e5;
+  border-radius:10px;
+  margin-bottom:8px;
+}
+body.controle-light .hist-item:hover{background:#f5f8f9;border-color:#c7d4db}
+body.controle-light .hist-title,
+body.controle-light .hist-item span{color:#172026}
+body.controle-light .hist-meta{color:#607080}
+body.controle-light .empty-note,
+body.controle-light .empty-state{color:#607080}
+body.controle-light #resultsContainer .card{border-radius:10px}
+body.controle-light .resultado-title{color:#172026}
+body.controle-light .resultado-sub{color:#607080}
+body.controle-light .highlight-label{background:#f5f8f9;color:#506579;border-color:#d9e0e5}
+body.controle-light .modal-overlay{background:rgba(15,25,32,.42);backdrop-filter:blur(5px)}
+body.controle-light .modal{
+  background:#ffffff;
+  border:1px solid #d9e0e5;
+  color:#172026;
+  border-radius:12px;
+  box-shadow:0 22px 60px rgba(22,52,59,.18);
+}
+body.controle-light .modal-title{color:#172026;font-family:var(--sans);font-size:18px;letter-spacing:0;text-transform:none}
+body.controle-light .modal-close{
+  color:#506579;
+  border:1px solid #cfd9df;
+  background:#fbfcfd;
+  width:34px;
+  height:34px;
+  display:grid;
+  place-items:center;
+}
+body.controle-light .modal-close:hover{background:#eef5f6;color:#172026}
+body.controle-light .form-label{color:#506579}
+body.controle-light .form-input,
+body.controle-light .form-select,
+body.controle-light textarea.form-input{
+  background:#fbfcfd;
+  border:1px solid #cfd9df;
+  color:#172026;
+  border-radius:8px;
+  font-weight:600;
+}
+body.controle-light .form-input:focus,
+body.controle-light .form-select:focus,
+body.controle-light textarea.form-input:focus{
+  border-color:#1d6f7a;
+  box-shadow:0 0 0 3px rgba(29,111,122,.10);
+}
+body.controle-light #fProcessosPreview,
+body.controle-light #fResultadoPreview,
+body.controle-light .fProcessosPreview,
+body.controle-light .fResultadoPreview{
+  background:#f5f8f9!important;
+  border:1px solid #d9e0e5!important;
+  color:#172026!important;
+}
 
 /* ── PRINT ── */
 @media print{
@@ -1283,6 +1428,9 @@ body.controle-light #dg-status{color:#506579!important}
 
       <!-- PAGE AGENDA -->
       <div id="page-agenda" style="display:none">
+        <div class="agenda-embed">
+          <iframe id="agendaFrame" src="agenda.html" title="Agenda SEPLAN"></iframe>
+        </div>
 
 
 <!-- HEADER -->
@@ -1803,7 +1951,8 @@ function navTo(page){
   if(page==='agenda'){
     const pageAg = document.getElementById('page-agenda');
     if(pageAg) pageAg.style.display = 'block';
-    agendaInit();
+    const frame = document.getElementById('agendaFrame');
+    if(frame && !frame.src) frame.src = 'agenda.html';
   }
   if(page==='digitalizacao'){ abrirDigitalizacao(); }
 }
@@ -2255,6 +2404,7 @@ async function controleCarregarHistorico(showToast=true){
       return `<option value="${controleEscape(b.id)}">${controleEscape(b.protocolo || 'Sem protocolo')} ${dt ? '· '+controleEscape(dt) : ''}</option>`;
     }).join('');
     if(showToast) diShow('salvo');
+    if(alertas.length) alert(`Atencao: ${alertas.length} concluido(s) ainda aparecem no relatorio IPM: ${alertas.slice(0,8).join(', ')}${alertas.length>8?'...':''}`);
   } catch(err){
     select.innerHTML = '<option value="">Não foi possível carregar o histórico</option>';
   }
@@ -2309,7 +2459,7 @@ function controleEditar(id){
 }
 
 function controleMarcar(id, status){
-  const list = controleLoad().map(item => item.id === id ? { ...item, status, updatedAt:new Date().toISOString() } : item);
+  const list = controleLoad().map(item => item.id === id ? { ...item, status, ipmAlerta: status === 'concluido' ? item.ipmAlerta : false, updatedAt:new Date().toISOString() } : item);
   controleSaveList(list);
   controleRender();
 }
@@ -2345,8 +2495,26 @@ async function controleImportarRelatorioIPM(file){
     const itens = controleParseRelatorioIPM(text);
     if(!itens.length){ alert('Não encontrei processos no relatório IPM.'); return; }
     const atuais = controleLoad();
-    const existentes = new Set(atuais.map(item => item.protocolo));
-    const novos = itens.filter(item => !existentes.has(item.protocolo));
+    const porProtocolo = new Map(atuais.map(item => [item.protocolo, item]));
+    const novos = [];
+    const alertas = [];
+    itens.forEach(item => {
+      const atual = porProtocolo.get(item.protocolo);
+      if(!atual){
+        novos.push(item);
+        return;
+      }
+      atual.requerente = atual.requerente || item.requerente;
+      atual.ipmUltimaSituacao = item.ipmSituacao || '';
+      atual.ipmUltimaImportacao = new Date().toISOString();
+      if(atual.status === 'concluido'){
+        atual.ipmAlerta = true;
+        atual.cor = 'red';
+        alertas.push(atual.protocolo);
+      } else {
+        atual.ipmAlerta = false;
+      }
+    });
     controleSaveList([...novos, ...atuais]);
     controleRender();
     file = null;
@@ -2389,6 +2557,7 @@ function controleParseRelatorioIPM(text){
           inscricao: '',
           status: 'pendente',
           cor: 'blue',
+          ipmSituacao: situacao,
           nota: `Importado do relatório IPM. Situação: ${situacao}. Atualizar inscrição/matrícula após consulta.`,
           criado_em: (() => { const d = new Date(); d.setDate(d.getDate() - dias); return d.toISOString(); })(),
           createdAt: new Date().toISOString(),
@@ -2425,6 +2594,7 @@ function controleParseRelatorioIPM(text){
       inscricao: '',
       status: 'pendente',
       cor: 'blue',
+      ipmSituacao: situacao,
       nota: `Importado do relatório IPM. Situação: ${situacao}. Atualizar inscrição/matrícula após consulta.`,
       criado_em: created.toISOString(),
       createdAt: new Date().toISOString(),
@@ -2468,6 +2638,7 @@ function controleRender(){
         </div>
         <div class="controle-meta">${item.requerente ? controleEscape(item.requerente)+' · ' : ''}${item.matricula ? 'Mat. '+controleEscape(item.matricula)+' · ' : ''}${controleEscape(item.inscricao || '')}${item.inscricao || item.matricula ? ' · ' : ''}${dias} dia${dias===1?'':'s'} na mesa</div>
         ${item.nota ? `<div class="controle-note">${controleEscape(item.nota)}</div>` : ''}
+        ${item.ipmAlerta ? `<div class="controle-alerta-ipm">Ainda aparece no relatório IPM mesmo marcado como concluído.</div>` : ''}
       </div>
       <div class="controle-item-actions">
         <button class="controle-icon-btn" title="Editar" onclick="controleEditar('${item.id}')">✎</button>
