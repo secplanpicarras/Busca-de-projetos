@@ -1098,7 +1098,7 @@ body.controle-light #resultsContainer .card{border-radius:10px}
 body.controle-light .resultado-title{color:#172026}
 body.controle-light .resultado-sub{color:#607080}
 body.controle-light .highlight-label{background:#f5f8f9;color:#506579;border-color:#d9e0e5}
-body.controle-light .modal-overlay{background:rgba(15,25,32,.42);backdrop-filter:blur(5px)}
+body.controle-light .modal-overlay{background:rgba(15,25,32,.20);backdrop-filter:none}
 body.controle-light .modal{
   background:#ffffff;
   border:1px solid #d9e0e5;
@@ -2752,6 +2752,35 @@ function closeModal(id){
     if(!anyVisible) navTo('home');
   }
 }
+
+function closeTopModal(){
+  const openModal = Array.from(document.querySelectorAll('.modal-overlay'))
+    .reverse()
+    .find(el => el.style.display && el.style.display !== 'none');
+  if(openModal){
+    closeModal(openModal.id);
+    return true;
+  }
+  const openOverlay = Array.from(document.querySelectorAll('.overlay.open')).reverse()[0];
+  if(openOverlay){
+    closeModal(openOverlay.id);
+    return true;
+  }
+  return false;
+}
+
+document.addEventListener('keydown', (event) => {
+  if(event.key === 'Escape' && closeTopModal()){
+    event.preventDefault();
+  }
+});
+
+document.addEventListener('click', (event) => {
+  const overlay = event.target;
+  if(overlay && overlay.classList && overlay.classList.contains('modal-overlay')){
+    closeModal(overlay.id);
+  }
+});
 
 async function excluirBusca(){
   if(!buscaSelecionada) return;
