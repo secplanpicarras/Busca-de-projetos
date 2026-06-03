@@ -1222,6 +1222,38 @@ body.controle-light .fResultadoPreview{
   .sidebar,.topbar,.btn-row,.steps,.modal-overlay{display:none!important}
   .content{margin:0;padding:0}
 }
+
+.admin-grid{display:grid;grid-template-columns:360px minmax(0,1fr);gap:16px;align-items:start}
+.admin-form-card,.admin-list-card{border-radius:12px!important;padding:16px!important}
+.admin-form-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.admin-form-title{font-size:17px;font-weight:900;color:var(--text);line-height:1.1}
+.admin-form-sub{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.35}
+.admin-field-row{display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:12px}
+.admin-section{border:1px solid var(--border);border-radius:10px;background:#fbfcfd;padding:12px;margin-top:12px}
+.admin-section-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;margin-bottom:10px}
+.admin-section-title{font-size:11px;font-family:var(--mono);font-weight:900;color:#40586a;text-transform:uppercase;letter-spacing:.06em}
+.admin-section-note{font-size:11px;color:#6a7f8e;line-height:1.35;margin-top:2px}
+.admin-checks{display:grid;grid-template-columns:1fr;gap:7px}
+.admin-check{display:flex;align-items:center;gap:8px;border:1px solid #d9e0e5;background:#fff;border-radius:8px;padding:9px 10px;font-size:12px;font-weight:800;color:#172026;cursor:pointer;transition:all .15s}
+.admin-check:hover{border-color:#1d6f7a;background:#f4fbfb}
+.admin-check input{accent-color:var(--accent);width:14px;height:14px;flex-shrink:0}
+.admin-list-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.admin-list{display:grid;gap:10px}
+.admin-user{border:1px solid #d9e0e5;border-radius:12px;background:#fff;padding:14px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start}
+.admin-user:hover{border-color:#b8cbd4;background:#fbfdfd}
+.admin-user strong{font-size:15px;color:#061524;display:block;line-height:1.1}
+.admin-user small{font-size:12px;color:#617586;font-family:var(--mono);display:block;margin-top:3px}
+.admin-chiprow{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+.admin-chip{font-size:10px;font-weight:900;font-family:var(--mono);padding:4px 8px;border-radius:999px;background:#eef5f6;color:#315465;border:1px solid #d6e1e5;line-height:1}
+.admin-chip.role{background:#e8f6f3;color:#12766c;border-color:#bfe4dd}
+.admin-chip.block{background:#fff1f1;color:#b33636;border-color:#ffd5d5}
+.admin-actions{display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.admin-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.admin-stat{border:1px solid #d9e0e5;background:#fff;border-radius:12px;padding:12px}
+.admin-stat span{font-size:10px;font-family:var(--mono);font-weight:900;color:#607080;text-transform:uppercase;letter-spacing:.06em}
+.admin-stat strong{display:block;font-size:24px;color:#061524;margin-top:4px;line-height:1}
+@media (max-width:980px){.admin-grid{grid-template-columns:1fr}.admin-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 </style>
 </head>
 <body>
@@ -1647,30 +1679,60 @@ body.controle-light .fResultadoPreview{
           <h1>Equipe e permissoes</h1>
           <p>Controle quais modulos cada usuario pode ver na Central SEPLAN.</p>
         </div>
+        <div class="admin-summary">
+          <div class="admin-stat"><span>Total</span><strong id="admin-stat-total">0</strong></div>
+          <div class="admin-stat"><span>Admins</span><strong id="admin-stat-admin">0</strong></div>
+          <div class="admin-stat"><span>Analistas</span><strong id="admin-stat-analista">0</strong></div>
+          <div class="admin-stat"><span>Inativos</span><strong id="admin-stat-inativo">0</strong></div>
+        </div>
         <div class="admin-grid">
-          <div class="card">
-            <div class="card-label">Cadastro de usuario</div>
-            <input class="form-input" id="admin-email" placeholder="email@dominio.com" style="margin-bottom:8px">
-            <input class="form-input" id="admin-nome" placeholder="Nome do usuario" style="margin-bottom:8px">
-            <select class="form-select" id="admin-papel" style="width:100%;margin-bottom:12px">
-              <option value="analista">Analista</option>
-              <option value="admin">Admin</option>
-              <option value="digitalizacao">Digitalizacao</option>
-              <option value="usuario">Usuario basico</option>
-            </select>
-            <div class="card-label" style="margin-top:6px;margin-bottom:8px">Liberar modulos extras</div>
-            <div class="admin-checks" id="admin-permitidos"></div>
-            <div class="card-label" style="margin-top:14px;margin-bottom:8px">Bloquear modulos</div>
-            <div class="admin-checks" id="admin-bloqueados"></div>
+          <div class="card admin-form-card">
+            <div class="admin-form-head">
+              <div>
+                <div class="admin-form-title">Perfil do usuario</div>
+                <div class="admin-form-sub">O papel define a base. As listas abaixo criam excecoes.</div>
+              </div>
+            </div>
+            <div class="admin-field-row">
+              <input class="form-input" id="admin-email" placeholder="email@dominio.com">
+              <input class="form-input" id="admin-nome" placeholder="Nome do usuario">
+              <select class="form-select" id="admin-papel" style="width:100%">
+                <option value="analista">Analista</option>
+                <option value="admin">Admin</option>
+                <option value="digitalizacao">Digitalizacao</option>
+                <option value="usuario">Usuario basico</option>
+              </select>
+            </div>
+            <div class="admin-section">
+              <div class="admin-section-head">
+                <div>
+                  <div class="admin-section-title">Liberar extras</div>
+                  <div class="admin-section-note">Use quando uma pessoa precisa ver algo alem do papel dela.</div>
+                </div>
+              </div>
+              <div class="admin-checks" id="admin-permitidos"></div>
+            </div>
+            <div class="admin-section">
+              <div class="admin-section-head">
+                <div>
+                  <div class="admin-section-title">Bloquear modulos</div>
+                  <div class="admin-section-note">Remove acesso mesmo que o papel normalmente permita.</div>
+                </div>
+              </div>
+              <div class="admin-checks" id="admin-bloqueados"></div>
+            </div>
             <div class="btn-row" style="margin-top:14px">
               <button class="btn btn-primary" onclick="adminSalvarPerfil()">Salvar perfil</button>
               <button class="btn" onclick="adminLimparForm()">Limpar</button>
             </div>
             <div class="empty-note" style="text-align:left;padding:10px 0 0">O login do usuario ainda precisa existir em Authentication > Users no Supabase.</div>
           </div>
-          <div class="card">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px">
-              <div class="card-label" style="margin:0">Usuarios cadastrados</div>
+          <div class="card admin-list-card">
+            <div class="admin-list-head">
+              <div>
+                <div class="admin-form-title">Usuarios cadastrados</div>
+                <div class="admin-form-sub">Edite permissoes ou inative acesso sem usar SQL.</div>
+              </div>
               <button class="btn btn-sm" onclick="adminCarregarPerfis()">Atualizar</button>
             </div>
             <div id="admin-lista" class="admin-list"><div class="empty-note">Carregando...</div></div>
@@ -2437,6 +2499,15 @@ async function adminCarregarPerfis(){
     const resp = await authFetch(`${SUPABASE_URL}/rest/v1/perfis?select=*&order=nome.asc`,{headers:{...getAuthHeaders()}});
     const rows = await resp.json();
     adminPerfisCache = Array.isArray(rows) ? rows : [];
+    const total = adminPerfisCache.length;
+    const admins = adminPerfisCache.filter(p => (p.papel||'').toLowerCase()==='admin').length;
+    const analistas = adminPerfisCache.filter(p => (p.papel||'').toLowerCase()==='analista').length;
+    const inativos = adminPerfisCache.filter(p => p.ativo===false).length;
+    const setStat = (id, val) => { const el=document.getElementById(id); if(el) el.textContent=val; };
+    setStat('admin-stat-total', total);
+    setStat('admin-stat-admin', admins);
+    setStat('admin-stat-analista', analistas);
+    setStat('admin-stat-inativo', inativos);
     if(!adminPerfisCache.length){
       box.innerHTML = '<div class="empty-note">Nenhum perfil cadastrado.</div>';
       return;
@@ -2445,7 +2516,8 @@ async function adminCarregarPerfis(){
       const permitidos = listaModulos(p.modulos_permitidos);
       const bloqueados = listaModulos(p.modulos_bloqueados);
       const base = MODULOS_POR_PERFIL[(p.papel||'analista').toLowerCase()] || MODULOS_POR_PERFIL.analista;
-      const baseLabel = base.includes('*') ? 'todos os modulos' : base.map(m => MODULOS_LABELS[m] || m).join(', ');
+      const baseMods = base.includes('*') ? ['todos'] : base.filter(m => m !== 'home');
+      const baseHtml = baseMods.map(m => `<span class="admin-chip">${m==='todos'?'todos os modulos':MODULOS_LABELS[m]||m}</span>`).join('');
       const extraHtml = permitidos.map(m => `<span class="admin-chip">+ ${MODULOS_LABELS[m]||m}</span>`).join('');
       const blockHtml = bloqueados.map(m => `<span class="admin-chip block">- ${MODULOS_LABELS[m]||m}</span>`).join('');
       return `<div class="admin-user">
@@ -2454,12 +2526,13 @@ async function adminCarregarPerfis(){
           <small>${controleEscape(p.email||'')}</small>
           <div class="admin-chiprow">
             <span class="admin-chip role">${controleEscape(p.papel||'analista')}</span>
-            <span class="admin-chip">base: ${controleEscape(baseLabel)}</span>
-            ${extraHtml}${blockHtml}
+            ${baseHtml}
+            ${extraHtml || ''}
+            ${blockHtml || ''}
             ${p.ativo===false?'<span class="admin-chip block">inativo</span>':''}
           </div>
         </div>
-        <div style="display:flex;gap:6px;align-items:center">
+        <div class="admin-actions">
           <button class="btn btn-sm" onclick="adminEditarPerfil('${controleEscape(p.email||'')}')">Editar</button>
           <button class="btn btn-sm" onclick="adminAlternarAtivo('${controleEscape(p.email||'')}',${p.ativo===false?'true':'false'})">${p.ativo===false?'Ativar':'Inativar'}</button>
         </div>
