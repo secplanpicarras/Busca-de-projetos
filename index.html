@@ -1252,7 +1252,19 @@ body.controle-light .fResultadoPreview{
 .admin-stat{border:1px solid #d9e0e5;background:#fff;border-radius:12px;padding:12px}
 .admin-stat span{font-size:10px;font-family:var(--mono);font-weight:900;color:#607080;text-transform:uppercase;letter-spacing:.06em}
 .admin-stat strong{display:block;font-size:24px;color:#061524;margin-top:4px;line-height:1}
+.admin-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:8px;margin-bottom:12px}
+.admin-preview{border:1px dashed #b8cbd4;background:#f8fbfb;border-radius:10px;padding:10px;margin-top:12px}
+.admin-preview-title{font-size:11px;font-family:var(--mono);font-weight:900;text-transform:uppercase;color:#40586a;margin-bottom:8px;letter-spacing:.06em}
+.admin-preview-list{display:flex;gap:6px;flex-wrap:wrap}
+.admin-editing{display:none;border:1px solid #bfe4dd;background:#e8f6f3;color:#12766c;border-radius:10px;padding:9px 10px;margin-bottom:10px;font-size:12px;font-weight:800}
+.admin-status{display:none;border-radius:10px;padding:9px 10px;margin-top:10px;font-size:12px;font-weight:800}
+.admin-status.ok{display:block;background:#e8f6f3;color:#12766c;border:1px solid #bfe4dd}
+.admin-status.err{display:block;background:#fff1f1;color:#b33636;border:1px solid #ffd5d5}
+.admin-quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0 12px}
+.admin-quick button{border:1px solid #d9e0e5;background:#fff;border-radius:9px;padding:9px 10px;text-align:left;cursor:pointer;color:#172026;font-weight:900;font-size:12px}
+.admin-quick button:hover{border-color:#1d6f7a;background:#f4fbfb}
 @media (max-width:980px){.admin-grid{grid-template-columns:1fr}.admin-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.admin-toolbar{grid-template-columns:1fr}}
 
 </style>
 </head>
@@ -1693,15 +1705,23 @@ body.controle-light .fResultadoPreview{
                 <div class="admin-form-sub">O papel define a base. As listas abaixo criam excecoes.</div>
               </div>
             </div>
+            <div class="admin-editing" id="admin-editing"></div>
             <div class="admin-field-row">
               <input class="form-input" id="admin-email" placeholder="email@dominio.com">
               <input class="form-input" id="admin-nome" placeholder="Nome do usuario">
-              <select class="form-select" id="admin-papel" style="width:100%">
+              <select class="form-select" id="admin-papel" style="width:100%" onchange="adminAtualizarPreview()">
                 <option value="analista">Analista</option>
                 <option value="admin">Admin</option>
                 <option value="digitalizacao">Digitalizacao</option>
                 <option value="usuario">Usuario basico</option>
               </select>
+            </div>
+            <div class="admin-section-title" style="margin-top:4px">Atalhos de perfil</div>
+            <div class="admin-quick">
+              <button onclick="adminAplicarPreset('analista')">Analista padrao</button>
+              <button onclick="adminAplicarPreset('admin')">Admin completo</button>
+              <button onclick="adminAplicarPreset('digitalizacao')">Somente digitalizacao</button>
+              <button onclick="adminAplicarPreset('usuario')">Consulta simples</button>
             </div>
             <div class="admin-section">
               <div class="admin-section-head">
@@ -1721,10 +1741,15 @@ body.controle-light .fResultadoPreview{
               </div>
               <div class="admin-checks" id="admin-bloqueados"></div>
             </div>
+            <div class="admin-preview">
+              <div class="admin-preview-title">Acesso final deste usuario</div>
+              <div class="admin-preview-list" id="admin-preview-modulos"></div>
+            </div>
             <div class="btn-row" style="margin-top:14px">
               <button class="btn btn-primary" onclick="adminSalvarPerfil()">Salvar perfil</button>
               <button class="btn" onclick="adminLimparForm()">Limpar</button>
             </div>
+            <div class="admin-status" id="admin-status"></div>
             <div class="empty-note" style="text-align:left;padding:10px 0 0">O login do usuario ainda precisa existir em Authentication > Users no Supabase.</div>
           </div>
           <div class="card admin-list-card">
@@ -1734,6 +1759,17 @@ body.controle-light .fResultadoPreview{
                 <div class="admin-form-sub">Edite permissoes ou inative acesso sem usar SQL.</div>
               </div>
               <button class="btn btn-sm" onclick="adminCarregarPerfis()">Atualizar</button>
+            </div>
+            <div class="admin-toolbar">
+              <input class="form-input" id="admin-filtro" placeholder="Buscar por nome ou email..." oninput="adminRenderLista()">
+              <select class="form-select" id="admin-filtro-papel" onchange="adminRenderLista()">
+                <option value="">Todos</option>
+                <option value="admin">Admins</option>
+                <option value="analista">Analistas</option>
+                <option value="digitalizacao">Digitalizacao</option>
+                <option value="usuario">Usuario basico</option>
+                <option value="inativo">Inativos</option>
+              </select>
             </div>
             <div id="admin-lista" class="admin-list"><div class="empty-note">Carregando...</div></div>
           </div>
@@ -2398,9 +2434,33 @@ async function navTo(page){
 
 // ADMIN / PERFIS
 let adminPerfisCache = [];
+let adminEditandoEmail = '';
 function adminInit(){
   adminRenderChecks();
   adminCarregarPerfis();
+}
+
+function adminStatus(msg, tipo='ok'){
+  const el = document.getElementById('admin-status');
+  if(!el) return;
+  el.textContent = msg;
+  el.style.display = '';
+  el.className = 'admin-status ' + (tipo === 'err' ? 'err' : 'ok');
+  clearTimeout(window._adminStatusTimer);
+  window._adminStatusTimer = setTimeout(()=>{ el.style.display='none'; el.className='admin-status'; }, 3500);
+}
+
+function adminSetEditando(email=''){
+  adminEditandoEmail = email;
+  const el = document.getElementById('admin-editing');
+  if(!el) return;
+  if(email){
+    el.textContent = 'Editando: ' + email;
+    el.style.display = 'block';
+  } else {
+    el.textContent = '';
+    el.style.display = 'none';
+  }
 }
 
 function adminRenderChecks(){
@@ -2410,13 +2470,14 @@ function adminRenderChecks(){
     if(!box) return;
     box.innerHTML = mods.map(m => `
       <label class="admin-check">
-        <input type="checkbox" value="${m}" id="${prefix}-${m}">
+        <input type="checkbox" value="${m}" id="${prefix}-${m}" onchange="adminAtualizarPreview()">
         <span>${MODULOS_LABELS[m] || m}</span>
       </label>
     `).join('');
   };
   render('admin-permitidos','perm');
   render('admin-bloqueados','bloq');
+  adminAtualizarPreview();
 }
 
 function adminSelecionados(prefix){
@@ -2437,6 +2498,8 @@ function adminLimparForm(){
   document.getElementById('admin-papel').value = 'analista';
   adminSetChecks('perm', []);
   adminSetChecks('bloq', []);
+  adminSetEditando('');
+  adminAtualizarPreview();
 }
 
 function adminEditarPerfil(email){
@@ -2447,14 +2510,42 @@ function adminEditarPerfil(email){
   document.getElementById('admin-papel').value = p.papel || 'analista';
   adminSetChecks('perm', p.modulos_permitidos);
   adminSetChecks('bloq', p.modulos_bloqueados);
+  adminSetEditando(p.email || '');
+  adminAtualizarPreview();
   window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function adminAplicarPreset(papel){
+  document.getElementById('admin-papel').value = papel;
+  adminSetChecks('perm', []);
+  adminSetChecks('bloq', []);
+  adminAtualizarPreview();
+}
+
+function adminModulosEfetivos(papel, extras=[], bloqueados=[]){
+  const base = MODULOS_POR_PERFIL[(papel||'analista').toLowerCase()] || MODULOS_POR_PERFIL.analista;
+  const set = new Set(base.includes('*') ? MODULOS_CENTRAL : base);
+  listaModulos(extras).forEach(m => set.add(m));
+  listaModulos(bloqueados).forEach(m => set.delete(m));
+  set.add('home');
+  return [...set].filter(m => m !== 'home');
+}
+
+function adminAtualizarPreview(){
+  const box = document.getElementById('admin-preview-modulos');
+  if(!box) return;
+  const papel = document.getElementById('admin-papel')?.value || 'analista';
+  const mods = adminModulosEfetivos(papel, adminSelecionados('perm'), adminSelecionados('bloq'));
+  box.innerHTML = mods.length
+    ? mods.map(m => `<span class="admin-chip">${MODULOS_LABELS[m] || m}</span>`).join('')
+    : '<span class="admin-chip block">sem modulos operacionais</span>';
 }
 
 async function adminSalvarPerfil(){
   const email = document.getElementById('admin-email').value.trim().toLowerCase();
   const nome = document.getElementById('admin-nome').value.trim();
   const papel = document.getElementById('admin-papel').value;
-  if(!email || !nome){ alert('Informe email e nome.'); return; }
+  if(!email || !nome){ adminStatus('Informe email e nome antes de salvar.', 'err'); return; }
   const payload = {
     email,
     nome,
@@ -2473,10 +2564,11 @@ async function adminSalvarPerfil(){
     if(email === usuarioEmail()) _usuarioPerfilCache = null;
     await aplicarPermissoesModulos();
     await adminCarregarPerfis();
-    alert('Perfil salvo.');
+    adminSetEditando(email);
+    adminStatus('Perfil salvo com sucesso.');
   }catch(e){
     console.error(e);
-    alert('Nao foi possivel salvar o perfil.');
+    adminStatus('Nao foi possivel salvar o perfil.', 'err');
   }
 }
 
@@ -2488,7 +2580,8 @@ async function adminAlternarAtivo(email, ativo){
       body:JSON.stringify({ativo})
     });
     await adminCarregarPerfis();
-  }catch(e){ alert('Nao foi possivel atualizar o usuario.'); }
+    adminStatus(ativo ? 'Usuario ativado.' : 'Usuario inativado.');
+  }catch(e){ adminStatus('Nao foi possivel atualizar o usuario.', 'err'); }
 }
 
 async function adminCarregarPerfis(){
@@ -2512,7 +2605,31 @@ async function adminCarregarPerfis(){
       box.innerHTML = '<div class="empty-note">Nenhum perfil cadastrado.</div>';
       return;
     }
-    box.innerHTML = adminPerfisCache.map(p => {
+    adminRenderLista();
+  }catch(e){
+    box.innerHTML = '<div class="empty-note">Nao foi possivel carregar os perfis.</div>';
+  }
+}
+
+function adminRenderLista(){
+  const box = document.getElementById('admin-lista');
+  if(!box) return;
+  const termo = (document.getElementById('admin-filtro')?.value || '').toLowerCase().trim();
+  const filtroPapel = document.getElementById('admin-filtro-papel')?.value || '';
+  let rows = adminPerfisCache.slice();
+  if(termo){
+    rows = rows.filter(p => `${p.nome||''} ${p.email||''}`.toLowerCase().includes(termo));
+  }
+  if(filtroPapel === 'inativo'){
+    rows = rows.filter(p => p.ativo === false);
+  } else if(filtroPapel){
+    rows = rows.filter(p => (p.papel||'').toLowerCase() === filtroPapel);
+  }
+  if(!rows.length){
+    box.innerHTML = '<div class="empty-note">Nenhum usuario encontrado neste filtro.</div>';
+    return;
+  }
+  box.innerHTML = rows.map(p => {
       const permitidos = listaModulos(p.modulos_permitidos);
       const bloqueados = listaModulos(p.modulos_bloqueados);
       const base = MODULOS_POR_PERFIL[(p.papel||'analista').toLowerCase()] || MODULOS_POR_PERFIL.analista;
@@ -2538,9 +2655,6 @@ async function adminCarregarPerfis(){
         </div>
       </div>`;
     }).join('');
-  }catch(e){
-    box.innerHTML = '<div class="empty-note">Nao foi possivel carregar os perfis.</div>';
-  }
 }
 
 // STEPS
