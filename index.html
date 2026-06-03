@@ -874,6 +874,9 @@ canvas#pdfCanvas{width:100%;display:block}
 .controle-filters{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
 .controle-chip{border:0.5px solid var(--border2);background:transparent;color:var(--text2);border-radius:999px;padding:5px 11px;font-size:11px;font-weight:600;cursor:pointer}
 .controle-chip.active{background:rgba(26,158,110,.14);border-color:rgba(26,158,110,.35);color:var(--accent)}
+.controle-help{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:0 0 10px}
+.controle-help-item{background:var(--bg3);border:0.5px solid var(--border);border-radius:8px;padding:8px 10px;font-size:11px;color:var(--text2);line-height:1.35}
+.controle-help-item strong{display:block;color:var(--text);font-size:11px;margin-bottom:2px}
 .controle-list{display:grid;gap:7px}
 .controle-item{display:grid;grid-template-columns:11px minmax(0,1fr) auto;gap:10px;align-items:start;background:var(--surface);border:0.5px solid var(--border);border-radius:var(--radius-card);padding:12px;transition:border-color .15s,background .15s}
 .controle-item:hover{border-color:var(--border2);background:var(--hist-hover-bg)}
@@ -882,6 +885,9 @@ canvas#pdfCanvas{width:100%;display:block}
 .controle-title{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-bottom:4px}
 .controle-title strong{font-size:14px;font-family:var(--mono);color:var(--text)}
 .controle-meta{font-size:11px;color:var(--text3);font-family:var(--mono);line-height:1.5}
+.controle-source{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 0}
+.controle-source-chip{font-size:10px;font-weight:800;color:#124f58;background:#e7f3f4;border:1px solid #c3dde1;border-radius:999px;padding:3px 8px;text-transform:uppercase;letter-spacing:.02em}
+.controle-source-text{font-size:11px;color:var(--text2);line-height:1.4}
 .controle-note{font-size:12px;color:var(--text2);line-height:1.45;margin-top:5px;white-space:pre-wrap}
 .controle-alerta-ipm{font-size:12px;color:#9e2e2e;background:#fff1f1;border:1px solid #f0c8c8;border-radius:8px;padding:7px 9px;margin-top:7px;font-weight:700}
 .controle-pill{font-size:10px;padding:2px 8px;border-radius:999px;font-family:var(--mono);font-weight:700;text-transform:uppercase;border:0.5px solid var(--border2)}
@@ -891,13 +897,15 @@ canvas#pdfCanvas{width:100%;display:block}
 .controle-pill.nada{background:rgba(226,75,74,.12);color:#ff8b8b;border-color:rgba(226,75,74,.25)}
 .controle-pill.encontrado{background:rgba(26,158,110,.12);color:#4ecb9e;border-color:rgba(26,158,110,.25)}
 .controle-pill.concluido{background:rgba(238,242,247,.1);color:var(--text2);border-color:var(--border2)}
-.controle-item-actions{display:flex;gap:4px}
-.controle-icon-btn{width:30px;height:30px;border-radius:8px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.controle-item-actions{display:flex;gap:5px;align-items:center;flex-wrap:wrap;justify-content:flex-end;max-width:260px}
+.controle-icon-btn{min-width:34px;height:32px;border-radius:8px;border:0.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 9px;font-size:11px;font-weight:800;font-family:var(--sans);white-space:nowrap}
+.controle-icon-btn.wide{min-width:74px}
 .controle-icon-btn:hover{color:var(--text);background:rgba(255,255,255,.04)}
 .controle-empty{padding:34px 12px;text-align:center;color:var(--text3);font-size:13px;border:0.5px dashed var(--border2);border-radius:var(--radius-card)}
 .controle-green{background:var(--green)}.controle-blue{background:var(--blue)}.controle-amber{background:var(--amber)}.controle-red{background:var(--red)}.controle-purple{background:#b06ef5}.controle-gray{background:#8890a8}
 @media(max-width:900px){.controle-board{grid-template-columns:1fr}.controle-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:560px){.controle-kpis,.controle-row-2{grid-template-columns:1fr}.controle-item{grid-template-columns:9px minmax(0,1fr)}.controle-item-actions{grid-column:2;justify-content:flex-start}}
+@media(max-width:700px){.controle-help{grid-template-columns:1fr}}
+@media(max-width:560px){.controle-kpis,.controle-row-2{grid-template-columns:1fr}.controle-item{grid-template-columns:9px minmax(0,1fr)}.controle-item-actions{grid-column:2;justify-content:flex-start;max-width:none}}
 
 body.controle-light{
   --bg:#edf2f4;
@@ -941,12 +949,16 @@ body.controle-light .controle-kpi strong{font-family:var(--sans);font-size:26px}
 body.controle-light .controle-panel-title{color:#506579}
 body.controle-light .controle-chip{background:#fff;color:#172026}
 body.controle-light .controle-chip.active{background:#16343b;border-color:#16343b;color:#fff}
+body.controle-light .controle-help-item{background:#f8fafb;border-color:#d9e0e5}
 body.controle-light .controle-pill{background:#eef5f6}
 body.controle-light .controle-pill.pendente,
 body.controle-light .controle-pill.encontrado{color:#0e6b45}
 body.controle-light .controle-pill.pedir,
 body.controle-light .controle-pill.certidao{color:#8a6400}
 body.controle-light .controle-pill.nada{color:#9e2e2e}
+body.controle-light .controle-source-chip{background:#e7f3f4;color:#124f58;border-color:#c3dde1}
+body.controle-light .controle-icon-btn{background:#fbfcfd;border-color:#cfd9df;color:#172026}
+body.controle-light .controle-icon-btn:hover{background:#eef5f6;border-color:#1d6f7a;color:#124f58}
 body.controle-light .form-input{background:#fbfcfd;border:1px solid #cfd9df;color:#172026;font-weight:600}
 body.controle-light .form-label{color:#506579}
 body.controle-light .btn-primary{background:#1d6f7a;border-color:#1d6f7a;color:#fff}
@@ -1500,6 +1512,11 @@ body.controle-light .fResultadoPreview{
                 <button class="controle-chip" onclick="controleSetFiltro('certidao')" data-filtro="certidao">Certidão</button>
                 <button class="controle-chip" onclick="controleSetFiltro('concluido')" data-filtro="concluido">Concluídos</button>
                 <button class="controle-chip" onclick="controleSetFiltro('todos')" data-filtro="todos">Todos</button>
+              </div>
+              <div class="controle-help">
+                <div class="controle-help-item"><strong>Para que serve</strong>Guardar processos que precisam de retorno, certidão, conferência ou acompanhamento.</div>
+                <div class="controle-help-item"><strong>Vindo do Monitor</strong>O IPM pode enviar processos para cá e avisar quando algo concluído ainda aparece no relatório.</div>
+                <div class="controle-help-item"><strong>Ações</strong>Use Pedir, Certidão ou Concluir para mover o item dentro da fila.</div>
               </div>
               <div id="ctrl-lista" class="controle-list"></div>
             </div>
@@ -2732,6 +2749,10 @@ function controleRender(){
   el.innerHTML = filtered.map(item => {
     const status = item.status || 'pendente';
     const dias = controleDias(item);
+    const origemMonitor = item.ipmUltimoRelatorio || item.ipmUltimaImportacao || /Monitor IPM/i.test(item.nota || '');
+    const sourceHtml = origemMonitor
+      ? `<div class="controle-source"><span class="controle-source-chip">Monitor IPM</span><span class="controle-source-text">Incluido a partir do relatorio. Use esta Mesa para decidir o retorno e acompanhar o prazo.</span></div>`
+      : `<div class="controle-source"><span class="controle-source-chip">Manual</span><span class="controle-source-text">Item criado pela Central para acompanhamento interno.</span></div>`;
     return `<div class="controle-item">
       <span class="controle-dot controle-${controleEscape(item.cor || 'green')}"></span>
       <div class="controle-main">
@@ -2740,15 +2761,16 @@ function controleRender(){
           <span class="controle-pill ${controleEscape(status)}">${controleEscape(controleStatusLabel[status] || status)}</span>
         </div>
         <div class="controle-meta">${item.requerente ? controleEscape(item.requerente)+' · ' : ''}${item.matricula ? 'Mat. '+controleEscape(item.matricula)+' · ' : ''}${controleEscape(item.inscricao || '')}${item.inscricao || item.matricula ? ' · ' : ''}${dias} dia${dias===1?'':'s'} na mesa</div>
+        ${sourceHtml}
         ${item.nota ? `<div class="controle-note">${controleEscape(item.nota)}</div>` : ''}
         ${item.ipmAlerta ? `<div class="controle-alerta-ipm">Ainda aparece no relatório IPM mesmo marcado como concluído.</div>` : ''}
       </div>
       <div class="controle-item-actions">
-        <button class="controle-icon-btn" title="Editar" onclick="controleEditar('${item.id}')">✎</button>
-        <button class="controle-icon-btn" title="Pedir" onclick="controleMarcar('${item.id}','pedir')">P</button>
-        <button class="controle-icon-btn" title="Certidão" onclick="controleMarcar('${item.id}','certidao')">C</button>
-        <button class="controle-icon-btn" title="Concluir" onclick="controleMarcar('${item.id}','concluido')">✓</button>
-        <button class="controle-icon-btn" title="Remover" onclick="controleExcluir('${item.id}')">×</button>
+        <button class="controle-icon-btn" title="Editar dados deste item" onclick="controleEditar('${item.id}')">Editar</button>
+        <button class="controle-icon-btn wide" title="Marcar como precisa pedir retorno ou documento" onclick="controleMarcar('${item.id}','pedir')">Pedir</button>
+        <button class="controle-icon-btn wide" title="Marcar para emitir ou conferir certidão" onclick="controleMarcar('${item.id}','certidao')">Certidão</button>
+        <button class="controle-icon-btn wide" title="Marcar como resolvido" onclick="controleMarcar('${item.id}','concluido')">Concluir</button>
+        <button class="controle-icon-btn" title="Remover da Mesa" onclick="controleExcluir('${item.id}')">Remover</button>
       </div>
     </div>`;
   }).join('');
