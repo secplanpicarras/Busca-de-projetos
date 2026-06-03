@@ -126,6 +126,19 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .hchip-b{background:rgba(26,111,173,.15);color:#5aabef}
 .hchip-a{background:rgba(239,159,39,.13);color:#f0ac3a}
 
+.dash-panel{position:relative;z-index:1;margin:18px 0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.dash-tile{background:var(--surface);border:0.5px solid var(--border);border-radius:12px;padding:14px;cursor:pointer;transition:border-color .15s,transform .15s}
+.dash-tile:hover{border-color:var(--border2);transform:translateY(-1px)}
+.dash-tile span{display:block;font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.dash-tile strong{display:block;font-family:var(--barlow);font-size:28px;line-height:1;color:var(--text)}
+.dash-tile small{display:block;font-size:11px;color:var(--text2);margin-top:8px;line-height:1.35}
+.dash-tile.ok strong{color:var(--green)}
+.dash-tile.warn strong{color:var(--amber)}
+.dash-tile.info strong{color:var(--blue)}
+.dash-tile.accent strong{color:var(--accent)}
+@media(max-width:980px){.dash-panel{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.dash-panel{grid-template-columns:1fr}.home-grid{grid-template-columns:1fr}.hmod-main{grid-row:auto}}
+
 .home-feed{margin-bottom:1.5rem}
 .feed-label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px;font-family:var(--mono)}
 .feed-items{display:flex;flex-direction:column;gap:6px}
@@ -946,46 +959,92 @@ body.controle-light #page-agenda{width:100%}
 body.controle-light #page-agenda .agenda-embed{box-shadow:none}
 body.controle-light:has(#page-agenda[style*="block"]) .content-inner{max-width:none;padding:24px}
 
+/* Monitor IPM incorporado */
+#page-monitor > :not(.monitor-embed){display:none!important}
+.monitor-embed{height:calc(100vh - 52px);min-height:720px;border:0;border-radius:0;overflow:hidden;background:#f3f6f7;margin:-24px}
+.monitor-embed iframe{width:100%;height:100%;border:0;display:block;background:#f3f6f7}
+body.controle-light #page-monitor{width:100%}
+body.controle-light #page-monitor .monitor-embed{box-shadow:none}
+body.controle-light:has(#page-monitor[style*="block"]) .content-inner{max-width:none;padding:24px}
+
 /* Digitalização no modelo claro */
-body.controle-light #modalDigitalizacao .modal{
+/* Monitor IPM em modal */
+body.controle-light #page-digitalizacao{width:100%}
+body.controle-light #page-digitalizacao .digitalizacao-page{width:min(100%,1180px);margin:0 auto}
+body.controle-light #page-digitalizacao .digitalizacao-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:14px;
+}
+body.controle-light #page-digitalizacao .digitalizacao-shell{
   background:#ffffff;
   border:1px solid #d9e0e5;
+  border-radius:12px;
   color:#172026;
-  box-shadow:0 22px 60px rgba(22,52,59,.18);
+  padding:18px;
+  box-shadow:none;
 }
-body.controle-light #modalDigitalizacao .modal-title{color:#172026}
-body.controle-light #modalDigitalizacao .modal-close{
-  color:#506579;
-  border:1px solid #cfd9df;
-  background:#fbfcfd;
-  width:34px;
-  height:34px;
-}
-body.controle-light #modalDigitalizacao .modal-close:hover{background:#eef5f6;color:#172026}
-body.controle-light #modalDigitalizacao .tabs{border-bottom:1px solid #d9e0e5}
-body.controle-light #modalDigitalizacao .tab{
+body.controle-light #page-digitalizacao .tabs{border-bottom:1px solid #d9e0e5}
+body.controle-light #page-digitalizacao .tab{
   color:#506579;
   border:1px solid transparent;
   background:transparent;
 }
-body.controle-light #modalDigitalizacao .tab:hover{background:#f5f8f9;color:#172026}
-body.controle-light #modalDigitalizacao .tab.active{
+body.controle-light #page-digitalizacao .tab:hover{background:#f5f8f9;color:#172026}
+body.controle-light #page-digitalizacao .tab.active{
   background:#1d6f7a;
   border-color:#1d6f7a;
   color:#fff;
 }
-body.controle-light #modalDigitalizacao .form-label{color:#506579}
-body.controle-light #modalDigitalizacao .form-input{
+body.controle-light #page-digitalizacao .form-label{color:#506579}
+body.controle-light #page-digitalizacao .form-input{
   background:#fbfcfd;
   border:1px solid #cfd9df;
   color:#172026;
   font-weight:600;
 }
-body.controle-light #modalDigitalizacao .form-input::placeholder{color:#7b8b96}
-body.controle-light #modalDigitalizacao .form-input:focus{
+body.controle-light #page-digitalizacao .form-input::placeholder{color:#7b8b96}
+body.controle-light #page-digitalizacao .form-input:focus{
   border-color:#1d6f7a;
   box-shadow:0 0 0 3px rgba(29,111,122,.10);
 }
+@media(max-width:760px){
+  body.controle-light #page-digitalizacao .digitalizacao-header{display:block}
+  body.controle-light #page-digitalizacao .digitalizacao-header .btn{margin-top:10px;width:100%;justify-content:center}
+  body.controle-light #dg-pane-novo > div:first-child{grid-template-columns:1fr!important}
+}
+#modalMonitor .modal{
+  width:min(1560px,calc(100vw - 72px));
+  max-width:none;
+  height:min(900px,calc(100vh - 64px));
+  padding:0;
+  overflow:hidden;
+}
+#modalMonitor .monitor-head{
+  height:52px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:0 16px 0 18px;
+  border-bottom:1px solid #d9e0e5;
+  background:#ffffff;
+}
+#modalMonitor .monitor-title{font-family:var(--sans);font-size:15px;font-weight:900;color:#172026}
+#modalMonitor .monitor-sub{font-size:12px;color:#607080;margin-top:1px}
+#modalMonitor iframe{
+  width:100%;
+  height:calc(100% - 52px);
+  border:0;
+  display:block;
+  background:#f0f2f7;
+}
+@media (max-width:800px){
+  #modalMonitor .modal{width:calc(100vw - 16px);height:calc(100vh - 16px)}
+}
+
 body.controle-light #dg-btn-analista{
   background:#1d6f7a!important;
   border-color:#1d6f7a!important;
@@ -1210,6 +1269,28 @@ body.controle-light .fResultadoPreview{
             <div class="hstat"><div class="hstat-num" id="home-clock">—</div><div class="hstat-lbl">Horário</div></div>
           </div>
         </div>
+        <div class="dash-panel">
+          <div class="dash-tile accent" onclick="navTo('controle')">
+            <span>Mesa em aberto</span>
+            <strong id="dash-controle-abertos">0</strong>
+            <small id="dash-controle-sub">Itens para acompanhar</small>
+          </div>
+          <div class="dash-tile warn" onclick="navTo('digitalizacao')">
+            <span>Digitaliza&ccedil;&atilde;o</span>
+            <strong id="dash-dig-pendentes">0</strong>
+            <small>Pedidos ainda nao entregues</small>
+          </div>
+          <div class="dash-tile info" onclick="navTo('agenda')">
+            <span>Agenda</span>
+            <strong id="dash-agenda-hoje">0</strong>
+            <small id="dash-agenda-sub">Atendimentos de hoje</small>
+          </div>
+          <div class="dash-tile ok" onclick="navTo('monitor')">
+            <span>Monitor IPM</span>
+            <strong id="dash-monitor-status">OK</strong>
+            <small>Importacao de relatorio e alertas</small>
+          </div>
+        </div>
         <div class="home-grid" style="position:relative;z-index:1">
           <div class="hmod hmod-main" onclick="navTo('busca')">
             <div class="hmod-badge warn" id="hbadge-busca">carregando</div>
@@ -1237,10 +1318,10 @@ body.controle-light .fResultadoPreview{
             <div class="hmod-name">Pedidos</div>
             <span class="hchip hchip-a" id="hchip-dig">carregando</span>
           </div>
-          <div class="hmod hmod-sm">
-            <div class="hmod-lbl">Viabilidade</div>
-            <div class="hmod-name">REGIN</div>
-            <span class="hchip hchip-b">1.331 CNAEs</span>
+          <div class="hmod hmod-sm" onclick="navTo('monitor')" style="cursor:pointer">
+            <div class="hmod-lbl">Relatorio IPM</div>
+            <div class="hmod-name">Monitor</div>
+            <span class="hchip hchip-b">Painel de prazos</span>
           </div>
         </div>
         <div class="home-feed" style="position:relative;z-index:1" id="home-feed-wrap">
@@ -1423,6 +1504,116 @@ body.controle-light .fResultadoPreview{
               <div id="ctrl-lista" class="controle-list"></div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- PAGE DIGITALIZACAO -->
+      <div id="page-digitalizacao" style="display:none">
+        <div class="digitalizacao-page">
+          <div class="page-header digitalizacao-header">
+            <div>
+              <h1>Controle de Digitaliza&ccedil;&atilde;o</h1>
+              <p>Pedidos de documentos, buscas e acompanhamento por analista</p>
+            </div>
+            <button class="btn" onclick="dgShowTab('lista')">Ver registros</button>
+          </div>
+          <div class="digitalizacao-shell">
+      <!-- ABAS -->
+      <div class="tabs" style="margin-bottom:1.25rem">
+        <button class="tab active" id="dg-tab-novo" onclick="dgShowTab('novo')">+ Novo registro</button>
+        <button class="tab" id="dg-tab-lista" onclick="dgShowTab('lista')">Registros</button>
+        <button class="tab" id="dg-tab-analistas" onclick="dgShowTab('analistas')">Por analista</button>
+      </div>
+
+      <!-- ABA NOVO -->
+      <div id="dg-pane-novo">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem">
+          <div>
+            <label class="form-label">Nº do processo *</label>
+            <input class="form-input" id="dg-processo" placeholder="Ex: 2024.001234-0">
+          </div>
+          <div>
+            <label class="form-label">Data da solicitação *</label>
+            <input class="form-input" id="dg-data" type="date">
+          </div>
+          <div style="grid-column:1/-1">
+            <label class="form-label">Motivo</label>
+            <div style="display:flex;gap:6px">
+              <button id="dg-btn-analista" onclick="dgSetMotivo('analista')" style="flex:1;padding:9px 6px;border-radius:var(--radius);border:1px solid var(--accent);background:var(--accent);color:var(--accent-text);font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',var(--sans);transition:all .15s">👤 Analista pediu</button>
+              <button id="dg-btn-busca" onclick="dgSetMotivo('busca')" style="flex:1;padding:9px 6px;border-radius:var(--radius);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Nunito',var(--sans);transition:all .15s">🔍 Busca de projeto</button>
+            </div>
+          </div>
+          <div id="dg-field-analista" style="grid-column:1/-1">
+            <label class="form-label">Analista</label>
+            <select class="form-input" id="dg-analista">
+              <option value="">Selecione o analista</option>
+              <option>Gabriela</option><option>Ruy</option><option>Sabrina</option>
+              <option>Vera</option><option>Marco</option><option>Julia</option>
+              <option>Anderson</option><option>Chris</option><option>Maurício</option><option>Bruna</option>
+            </select>
+          </div>
+          <div id="dg-field-busca" style="grid-column:1/-1;display:none">
+            <label class="form-label">Vincular busca do histórico</label>
+            <div style="position:relative">
+              <div id="dg-busca-trigger" onclick="dgToggleDropdown()" class="form-input" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none">
+                <span id="dg-busca-label" style="color:var(--text3)">Selecione uma busca...</span>
+                <span id="dg-busca-arrow" style="font-size:12px;color:var(--text3);transition:transform .2s">▼</span>
+              </div>
+              <div id="dg-busca-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;z-index:999;max-height:220px;overflow-y:auto;animation:fadeIn .15s ease">
+                <div id="dg-busca-list"></div>
+                <div onclick="dgSelecionarBusca('__manual__','✏️ Digitar manualmente')" style="padding:10px 14px;cursor:pointer;border-top:1px solid var(--border);font-size:12px;color:var(--text2);font-family:var(--mono);transition:background .15s" onmouseover="this.style.background='var(--nav-hover-bg)'" onmouseout="this.style.background='transparent'">✏️ Digitar manualmente</div>
+              </div>
+            </div>
+            <input type="hidden" id="dg-busca-select">
+            <div id="dg-field-busca-manual" style="display:none;margin-top:8px">
+              <input class="form-input" id="dg-busca" placeholder="Descreva a busca...">
+            </div>
+          </div>
+          <div style="grid-column:1/-1">
+            <label class="form-label">Observação <span style="text-transform:none;font-weight:400;letter-spacing:0;opacity:.6">(opcional)</span></label>
+            <textarea class="form-input" id="dg-obs" rows="2" placeholder="Informações adicionais..." style="resize:vertical;line-height:1.5"></textarea>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end">
+          <div id="dg-status" style="flex:1;font-size:12px;color:var(--green);align-self:center;font-family:var(--mono)"></div>
+          <button class="btn btn-primary" onclick="dgAdicionar()">+ Registrar</button>
+        </div>
+      </div>
+
+      <!-- ABA REGISTROS -->
+      <div id="dg-pane-lista" style="display:none">
+        <div style="display:flex;gap:8px;margin-bottom:1rem">
+          <input class="form-input" id="dg-pesquisa" placeholder="🔍  Pesquisar por processo..." oninput="dgFiltrar()" style="flex:1">
+        </div>
+        <div id="dg-lista" style="max-height:380px;overflow-y:auto"></div>
+        <div id="dg-count" style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:.5rem;text-align:right"></div>
+      </div>
+
+      <!-- ABA ANALISTAS -->
+      <div id="dg-pane-analistas" style="display:none">
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:1rem" id="dg-analistas-grid"></div>
+        <div id="dg-analista-detalhe" style="display:none">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+            <button onclick="dgVoltarAnalistas()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:13px;padding:4px 0">← Voltar</button>
+            <span id="dg-analista-nome" style="font-size:14px;font-weight:700;font-family:var(--mono);color:var(--text)"></span>
+          </div>
+          <div id="dg-analista-lista" style="max-height:320px;overflow-y:auto"></div>
+        </div>
+      </div>
+
+    </div>
+
+
+
+
+</div>
+
+      </div>
+
+      <!-- PAGE MONITOR -->
+      <div id="page-monitor" style="display:none">
+        <div class="monitor-embed">
+          <iframe id="monitorFramePage" src="monitor.html" title="Monitor IPM"></iframe>
         </div>
       </div>
 
@@ -1638,104 +1829,6 @@ body.controle-light .fResultadoPreview{
     </div>
   </div>
 
-<!-- MODAL DIGITALIZAÇÃO -->
-  <div id="modalDigitalizacao" class="modal-overlay" style="display:none">
-    <div class="modal" style="max-width:680px">
-      <div class="modal-header">
-        <span class="modal-title">📄 Controle de Digitalização</span>
-        <button class="modal-close" onclick="closeModal('modalDigitalizacao')">×</button>
-      </div>
-
-      <!-- ABAS -->
-      <div class="tabs" style="margin-bottom:1.25rem">
-        <button class="tab active" id="dg-tab-novo" onclick="dgShowTab('novo')">+ Novo registro</button>
-        <button class="tab" id="dg-tab-lista" onclick="dgShowTab('lista')">Registros</button>
-        <button class="tab" id="dg-tab-analistas" onclick="dgShowTab('analistas')">Por analista</button>
-      </div>
-
-      <!-- ABA NOVO -->
-      <div id="dg-pane-novo">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem">
-          <div>
-            <label class="form-label">Nº do processo *</label>
-            <input class="form-input" id="dg-processo" placeholder="Ex: 2024.001234-0">
-          </div>
-          <div>
-            <label class="form-label">Data da solicitação *</label>
-            <input class="form-input" id="dg-data" type="date">
-          </div>
-          <div style="grid-column:1/-1">
-            <label class="form-label">Motivo</label>
-            <div style="display:flex;gap:6px">
-              <button id="dg-btn-analista" onclick="dgSetMotivo('analista')" style="flex:1;padding:9px 6px;border-radius:var(--radius);border:1px solid var(--accent);background:var(--accent);color:var(--accent-text);font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',var(--sans);transition:all .15s">👤 Analista pediu</button>
-              <button id="dg-btn-busca" onclick="dgSetMotivo('busca')" style="flex:1;padding:9px 6px;border-radius:var(--radius);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Nunito',var(--sans);transition:all .15s">🔍 Busca de projeto</button>
-            </div>
-          </div>
-          <div id="dg-field-analista" style="grid-column:1/-1">
-            <label class="form-label">Analista</label>
-            <select class="form-input" id="dg-analista">
-              <option value="">Selecione o analista</option>
-              <option>Gabriela</option><option>Ruy</option><option>Sabrina</option>
-              <option>Vera</option><option>Marco</option><option>Julia</option>
-              <option>Anderson</option><option>Chris</option><option>Maurício</option><option>Bruna</option>
-            </select>
-          </div>
-          <div id="dg-field-busca" style="grid-column:1/-1;display:none">
-            <label class="form-label">Vincular busca do histórico</label>
-            <div style="position:relative">
-              <div id="dg-busca-trigger" onclick="dgToggleDropdown()" class="form-input" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none">
-                <span id="dg-busca-label" style="color:var(--text3)">Selecione uma busca...</span>
-                <span id="dg-busca-arrow" style="font-size:12px;color:var(--text3);transition:transform .2s">▼</span>
-              </div>
-              <div id="dg-busca-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;z-index:999;max-height:220px;overflow-y:auto;animation:fadeIn .15s ease">
-                <div id="dg-busca-list"></div>
-                <div onclick="dgSelecionarBusca('__manual__','✏️ Digitar manualmente')" style="padding:10px 14px;cursor:pointer;border-top:1px solid var(--border);font-size:12px;color:var(--text2);font-family:var(--mono);transition:background .15s" onmouseover="this.style.background='var(--nav-hover-bg)'" onmouseout="this.style.background='transparent'">✏️ Digitar manualmente</div>
-              </div>
-            </div>
-            <input type="hidden" id="dg-busca-select">
-            <div id="dg-field-busca-manual" style="display:none;margin-top:8px">
-              <input class="form-input" id="dg-busca" placeholder="Descreva a busca...">
-            </div>
-          </div>
-          <div style="grid-column:1/-1">
-            <label class="form-label">Observação <span style="text-transform:none;font-weight:400;letter-spacing:0;opacity:.6">(opcional)</span></label>
-            <textarea class="form-input" id="dg-obs" rows="2" placeholder="Informações adicionais..." style="resize:vertical;line-height:1.5"></textarea>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;justify-content:flex-end">
-          <div id="dg-status" style="flex:1;font-size:12px;color:var(--green);align-self:center;font-family:var(--mono)"></div>
-          <button class="btn btn-primary" onclick="dgAdicionar()">+ Registrar</button>
-        </div>
-      </div>
-
-      <!-- ABA REGISTROS -->
-      <div id="dg-pane-lista" style="display:none">
-        <div style="display:flex;gap:8px;margin-bottom:1rem">
-          <input class="form-input" id="dg-pesquisa" placeholder="🔍  Pesquisar por processo..." oninput="dgFiltrar()" style="flex:1">
-        </div>
-        <div id="dg-lista" style="max-height:380px;overflow-y:auto"></div>
-        <div id="dg-count" style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:.5rem;text-align:right"></div>
-      </div>
-
-      <!-- ABA ANALISTAS -->
-      <div id="dg-pane-analistas" style="display:none">
-        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:1rem" id="dg-analistas-grid"></div>
-        <div id="dg-analista-detalhe" style="display:none">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
-            <button onclick="dgVoltarAnalistas()" style="background:none;border:none;cursor:pointer;color:var(--text2);font-size:13px;padding:4px 0">← Voltar</button>
-            <span id="dg-analista-nome" style="font-size:14px;font-weight:700;font-family:var(--mono);color:var(--text)"></span>
-          </div>
-          <div id="dg-analista-lista" style="max-height:320px;overflow-y:auto"></div>
-        </div>
-      </div>
-
-    </div>
-
-
-
-
-</div>
-
 <div class="sidebar" id="dock" style="display:none">
     <div class="dock-logo">
       <svg viewBox="0 0 16 16"><path d="M2 8h12M8 2v12"/></svg>
@@ -1755,6 +1848,10 @@ body.controle-light .fResultadoPreview{
     <button class="dock-item" id="nav-controle" onclick="navTo('controle')">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h7"/><path stroke-linecap="round" stroke-linejoin="round" d="m17 16 2 2 4-5"/></svg>
       <div class="dock-tip">Mesa de controle</div>
+    </button>
+    <button class="dock-item" id="nav-monitor" onclick="navTo('monitor')">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19V5m0 14h18M8 16v-5m5 5V8m5 8v-9"/></svg>
+      <div class="dock-tip">Monitor IPM</div>
     </button>
     <button class="dock-item" id="nav-agenda" onclick="navTo('agenda')">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><path stroke-linecap="round" d="M16 2v4M8 2v4M3 10h18"/></svg>
@@ -1935,7 +2032,7 @@ if(sessionStorage.getItem('seplan_token')){
 // NAV
 function navTo(page){
   document.body.classList.add('controle-light');
-  ['home','busca','historico','controle','agenda'].forEach(p=>{
+  ['home','busca','historico','controle','digitalizacao','monitor','agenda'].forEach(p=>{
     const el=document.getElementById('page-'+p);
     if(el) el.style.display=p===page?'block':'none';
     const btn=document.getElementById('nav-'+p);
@@ -1953,6 +2050,12 @@ function navTo(page){
     if(pageAg) pageAg.style.display = 'block';
     const frame = document.getElementById('agendaFrame');
     if(frame && !frame.src) frame.src = 'agenda.html';
+  }
+  if(page==='monitor'){
+    const pageMon = document.getElementById('page-monitor');
+    if(pageMon) pageMon.style.display = 'block';
+    const frame = document.getElementById('monitorFramePage');
+    if(frame && !frame.src) frame.src = 'monitor.html';
   }
   if(page==='digitalizacao'){ abrirDigitalizacao(); }
 }
@@ -2744,13 +2847,10 @@ function closeModal(id){
   if(!el) return;
   el.classList.remove('open');
   el.style.display='none';
-  if(id==='modalDigitalizacao'){
-    const anyVisible = ['home','busca','historico','controle'].some(p=>{
-      const pg=document.getElementById('page-'+p);
-      return pg && pg.style.display!=='none';
-    });
-    if(!anyVisible) navTo('home');
-  }
+}
+
+function abrirMonitor(){
+  navTo('monitor');
 }
 
 function closeTopModal(){
@@ -2828,9 +2928,9 @@ function gerarCertidao(){
 // ── DIGITALIZAÇÃO ─────────────────────────────────────────────────────────
 
 function abrirDigitalizacao() {
-  document.getElementById('dg-data').value = new Date().toISOString().slice(0,10);
+  const data = document.getElementById('dg-data');
+  if(data && !data.value) data.value = new Date().toISOString().slice(0,10);
   dgShowTab('novo');
-  document.getElementById('modalDigitalizacao').style.display = 'flex';
 }
 
 function dgShowTab(t) {
@@ -3124,6 +3224,17 @@ async function loadHomeStats(){
     <div class="feed-item" style="opacity:.3"><div class="fdot" style="background:var(--border2)"></div><div class="ftext" style="background:var(--border2);border-radius:4px;height:12px;width:45%"></div></div>`;
 
   try{
+    const mesa = controleLoad();
+    const abertos = mesa.filter(i => i.status !== 'concluido').length;
+    const pedir = mesa.filter(i => i.status === 'pedir').length;
+    const certidao = mesa.filter(i => i.status === 'certidao').length;
+    const abertosEl = document.getElementById('dash-controle-abertos');
+    const subEl = document.getElementById('dash-controle-sub');
+    if(abertosEl) abertosEl.textContent = abertos;
+    if(subEl) subEl.textContent = `${pedir} pedir | ${certidao} certidao`;
+  }catch(e){}
+
+  try{
     const resp = await authFetch(`${SUPABASE_URL}/rest/v1/buscas?select=id&limit=1000`);
     const data = await resp.json();
     if(Array.isArray(data)){
@@ -3141,6 +3252,8 @@ async function loadHomeStats(){
     if(Array.isArray(data)){
       const pend = data.filter(r=>r.status==='pedido').length;
       countTo(document.getElementById('home-ndig'), data.length, 800);
+      const dashDig = document.getElementById('dash-dig-pendentes');
+      if(dashDig) dashDig.textContent = pend;
       const chip = document.getElementById('hchip-dig');
       const badge = document.getElementById('hbadge-dig');
       if(chip){chip.textContent = pend + ' pendentes'; chip.className = pend>0?'hchip hchip-a':'hchip hchip-g';}
@@ -3154,6 +3267,11 @@ async function loadHomeStats(){
     const data = await resp.json();
     if(Array.isArray(data)){
       const futuros = data.filter(r=>r.data>=hoje&&r.nome);
+      const deHoje = data.filter(r=>r.data===hoje&&r.nome).length;
+      const dashHoje = document.getElementById('dash-agenda-hoje');
+      const dashAgendaSub = document.getElementById('dash-agenda-sub');
+      if(dashHoje) dashHoje.textContent = deHoje;
+      if(dashAgendaSub) dashAgendaSub.textContent = futuros.length + ' proximos na agenda';
       const chip = document.getElementById('hchip-agenda');
       const badge = document.getElementById('hbadge-agenda');
       if(chip){chip.textContent = futuros.length + ' agendado(s)'; chip.className='hchip hchip-b';}
