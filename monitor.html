@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SEPLAN — Monitor de Processos</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Cabinet+Grotesk:wght@400;500;700;800&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#08090c;--s1:#0f1117;--s2:#161a24;--s3:#1e2230;
+  --border:#222636;--border2:#2d3347;
+  --text:#eef0f8;--sub:#8892a8;--muted:#4d566b;
+  --accent:#4f7cff;--teal:#00cba9;--danger:#f04c5a;--warn:#f5a623;--ok:#27c47a;--purple:#9b6dff;
+  --r:10px;
+}
+:root.light{
+  --bg:#f0f2f7;--s1:#ffffff;--s2:#f5f7fc;--s3:#eaecf3;
+  --border:#dde1ed;--border2:#c8cedd;
+  --text:#111827;--sub:#4b5675;--muted:#9099b0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+header,thead th,.card,.kpi,.table-card,.hist-chart-card,.hcard,.ritem,.upload-compact,.hpill,.table-bar,.twrap{transition:background .25s,border-color .25s,color .25s}
+
+/* ─── HEADER ─── */
+header{display:flex;align-items:center;gap:12px;padding:0 24px;height:54px;background:var(--s1);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:200}
+.logo{display:flex;align-items:center;gap:9px;margin-right:2px}
+.logo-mark{width:28px;height:28px;border-radius:6px;flex-shrink:0;background:linear-gradient(135deg,var(--accent),var(--teal));display:flex;align-items:center;justify-content:center;font-family:'Space Mono',monospace;font-size:10px;font-weight:700;color:#fff}
+.logo-name{font-family:'Cabinet Grotesk',sans-serif;font-size:14px;font-weight:800;letter-spacing:-.2px;white-space:nowrap}
+.logo-dot{color:var(--accent)}
+.hdiv{width:1px;height:18px;background:var(--border);flex-shrink:0}
+.hnav{display:flex;gap:1px}
+.hnav-btn{padding:5px 12px;border-radius:6px;border:none;background:none;color:var(--sub);font-size:12px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap;font-family:'Inter',sans-serif}
+.hnav-btn:hover{color:var(--text);background:var(--s2)}
+.hnav-btn.active{color:var(--accent);background:rgba(79,124,255,.1)}
+.hspace{flex:1}
+.htime{font-family:'Space Mono',monospace;font-size:10px;color:var(--muted);white-space:nowrap}
+
+/* compact upload */
+.upload-compact{position:relative;display:flex;align-items:center;gap:8px;padding:4px 4px 4px 10px;border-radius:7px;border:1px dashed var(--border2);background:var(--s2);cursor:pointer;transition:all .18s}
+.upload-compact:hover,.upload-compact.drag-over{border-color:var(--accent);background:rgba(79,124,255,.07)}
+.upload-compact input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-label{font-size:11px;color:var(--sub);white-space:nowrap}
+.upload-label strong{color:var(--text);font-weight:500}
+.upload-cta{position:relative;z-index:1;background:var(--accent);color:#fff;border:none;padding:5px 11px;border-radius:5px;font-size:11px;font-weight:600;cursor:pointer;transition:opacity .15s;white-space:nowrap;font-family:'Inter',sans-serif}
+.upload-cta:hover{opacity:.85}
+
+.hpill{display:flex;align-items:center;gap:5px;padding:4px 10px;border-radius:6px;border:1px solid var(--border);background:var(--s2);font-family:'Space Mono',monospace;font-size:10px;color:var(--sub);white-space:nowrap}
+.hpill.ok{color:var(--ok);border-color:rgba(39,196,122,.2);background:rgba(39,196,122,.06)}
+.hpill.err{color:var(--danger);border-color:rgba(240,76,90,.2);background:rgba(240,76,90,.06)}
+.dot{width:5px;height:5px;border-radius:50%;background:currentColor}
+
+/* ─── LOADING ─── */
+#loading{display:none;position:fixed;inset:0;background:rgba(8,9,12,.82);z-index:999;align-items:center;justify-content:center;flex-direction:column;gap:14px;backdrop-filter:blur(4px)}
+.spin{width:34px;height:34px;border:2.5px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loadingMsg{font-family:'Space Mono',monospace;font-size:11px;color:var(--sub)}
+
+/* ─── TOAST ─── */
+#toast{position:fixed;bottom:22px;right:22px;z-index:9999;padding:10px 16px;border-radius:8px;font-size:12px;display:none;align-items:center;gap:8px;box-shadow:0 8px 28px rgba(0,0,0,.45);animation:slideUp .2s ease}
+#toast.ok{background:rgba(39,196,122,.12);border:1px solid rgba(39,196,122,.3);color:var(--ok)}
+#toast.err{background:rgba(240,76,90,.12);border:1px solid rgba(240,76,90,.3);color:var(--danger)}
+@keyframes slideUp{from{transform:translateY(14px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* ─── PANELS ─── */
+.panel{display:none;padding:22px 24px 60px}
+.panel.active{display:block}
+
+/* empty */
+#empty{padding:80px 24px;text-align:center}
+.empty-icon{font-size:44px;opacity:.22;margin-bottom:14px}
+.empty-title{font-family:'Cabinet Grotesk',sans-serif;font-size:20px;font-weight:800;margin-bottom:8px}
+.empty-sub{font-size:13px;color:var(--sub);max-width:360px;margin:0 auto;line-height:1.65}
+
+/* ─── KPI STRIP ─── */
+.kpi-strip{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:18px}
+.kpi{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:15px 17px;position:relative;overflow:hidden;transition:transform .15s,border-color .15s}
+.kpi:hover{transform:translateY(-2px);border-color:var(--border2)}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.kpi.kt::after{background:var(--accent)}.kpi.ka::after{background:var(--danger)}.kpi.kd::after{background:var(--ok)}.kpi.kp::after{background:var(--purple)}.kpi.ke::after{background:var(--warn)}
+.kpi-label{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px}
+.kpi-val{font-family:'Cabinet Grotesk',sans-serif;font-size:36px;font-weight:800;line-height:1;margin-bottom:4px}
+.kpi.kt .kpi-val{color:var(--accent)}.kpi.ka .kpi-val{color:var(--danger)}.kpi.kd .kpi-val{color:var(--ok)}.kpi.kp .kpi-val{color:var(--purple)}.kpi.ke .kpi-val{color:var(--warn)}
+.kpi-sub{font-size:10.5px;color:var(--muted)}
+
+.ops-summary{display:grid;grid-template-columns:1.45fr repeat(3,minmax(0,1fr));gap:10px;margin:-4px 0 14px}
+.ops-main,.ops-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px}
+.ops-eyebrow{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:7px}
+.ops-text{font-size:13px;line-height:1.55;color:var(--text)}
+.ops-card strong{display:block;font-family:'Cabinet Grotesk',sans-serif;font-size:24px;line-height:1;color:var(--text);margin-bottom:5px}
+.ops-card span{display:block;font-size:11px;color:var(--sub);line-height:1.35}
+.ops-card.danger strong{color:var(--danger)}
+.ops-card.warn strong{color:var(--warn)}
+.ops-card.ok strong{color:var(--ok)}
+
+/* ─── MID ROW ─── */
+.mid-row{display:grid;grid-template-columns:300px 1fr;gap:8px;margin-bottom:18px}
+.card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:16px 18px}
+.card-title{font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card-title::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* donut */
+.donut-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.leg{display:grid;grid-template-columns:1fr 1fr;gap:6px 10px;width:100%}
+.leg-row{display:flex;align-items:center;gap:7px;font-size:12px}
+.leg-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.leg-name{color:var(--sub);flex:1}
+.leg-n{font-family:'Space Mono',monospace;font-size:10px}
+
+/* bars */
+.bars{display:flex;flex-direction:column;gap:6px}
+.bar-top{display:flex;justify-content:space-between;margin-bottom:3px;font-size:10.5px}
+.bar-name{color:var(--text)}
+.bar-nums{font-family:'Space Mono',monospace;color:var(--muted);font-size:9.5px}
+.bar-track{height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--danger));transition:width .7s cubic-bezier(.4,0,.2,1)}
+
+/* ─── TABLE ─── */
+.table-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.table-bar{display:flex;align-items:center;gap:8px;padding:11px 14px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.srch{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:12px;outline:none;width:200px;font-family:'Inter',sans-serif;transition:border-color .15s}
+.srch:focus{border-color:var(--accent)}
+.srch::placeholder{color:var(--muted)}
+.fsel{background:var(--s2);border:1px solid var(--border);border-radius:7px;padding:6px 10px;color:var(--text);font-size:12px;outline:none;cursor:pointer}
+.ftog{padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:var(--s2);color:var(--muted);font-size:10px;font-family:'Space Mono',monospace;cursor:pointer;transition:all .15s}
+.multi-select{position:relative;flex-shrink:0}
+.ms-trigger{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:7px;border:1px solid var(--border);background:var(--s2);color:var(--text);font-size:12px;cursor:pointer;white-space:nowrap;transition:border-color .15s;user-select:none;min-width:150px}
+.ms-trigger:hover{border-color:var(--accent)}
+.ms-trigger.open{border-color:var(--accent)}
+.ms-arrow{font-size:10px;color:var(--muted);margin-left:auto;transition:transform .2s}
+.ms-trigger.open .ms-arrow{transform:rotate(180deg)}
+.ms-dropdown{display:none;position:absolute;top:calc(100% + 4px);left:0;background:var(--s1);border:1px solid var(--border2);border-radius:8px;padding:6px;z-index:500;min-width:170px;box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.ms-dropdown.open{display:block}
+.ms-item{display:flex;align-items:center;gap:9px;padding:7px 9px;border-radius:6px;cursor:pointer;font-size:12px;transition:background .12s}
+.ms-item:hover{background:var(--s2)}
+.ms-item input[type=checkbox]{width:14px;height:14px;accent-color:var(--accent);cursor:pointer;flex-shrink:0}
+.ms-item span{color:var(--text)}
+:root.light .ms-dropdown{box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.ftog.on{background:rgba(240,76,90,.1);border-color:rgba(240,76,90,.35);color:var(--danger)}
+.tcnt{margin-left:auto;font-family:'Space Mono',monospace;font-size:10px;color:var(--muted)}
+.twrap{overflow-x:auto;max-height:490px;overflow-y:auto}
+table{width:100%;border-collapse:collapse;font-size:12px}
+thead th{padding:8px 13px;text-align:left;font-family:'Space Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);background:var(--s2);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:1;white-space:nowrap;cursor:pointer;transition:color .12s}
+thead th:hover{color:var(--text)}
+thead th.srt{color:var(--accent)}
+tbody tr{border-bottom:1px solid rgba(30,34,48,.8);transition:background .1s}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+tbody tr.late{background:rgba(240,76,90,.03)}
+tbody tr.late:hover{background:rgba(240,76,90,.07)}
+tbody tr.critical{background:rgba(240,76,90,.08)}
+tbody tr.critical:hover{background:rgba(240,76,90,.12)}
+td{padding:8px 13px;vertical-align:middle;white-space:nowrap}
+.tn{font-family:'Space Mono',monospace;font-size:11px;color:var(--accent)}
+.tdate{font-family:'Space Mono',monospace;font-size:10.5px;color:var(--muted)}
+.tsub{max-width:220px;overflow:hidden;text-overflow:ellipsis;font-size:11.5px}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:10px;font-family:'Space Mono',monospace}
+.b-tram{background:rgba(79,124,255,.12);color:#7ea6ff}
+.b-abert{background:rgba(245,166,35,.12);color:#f5c35a}
+.b-anal{background:rgba(245,166,35,.08);color:var(--warn)}
+.b-par{background:rgba(155,109,255,.12);color:#c4a0ff}
+.b-read{background:rgba(0,203,169,.12);color:#00cba9}
+.db{display:inline-flex;align-items:center;gap:3px;font-family:'Space Mono',monospace;font-size:10px;padding:2px 8px;border-radius:5px;font-weight:700}
+.db-ok{background:rgba(39,196,122,.1);color:#52e09a}
+.db-warn{background:rgba(245,166,35,.1);color:#f5c35a}
+.db-bad{background:rgba(240,76,90,.12);color:#f87181}
+.db-crit{background:rgba(240,76,90,.22);color:#fca5a5}
+.row-actions{display:flex;align-items:center;gap:6px}
+.row-btn{border:1px solid var(--border);background:var(--s2);color:var(--text);border-radius:6px;padding:5px 9px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Space Mono',monospace;transition:border-color .15s,background .15s}
+.row-btn:hover{border-color:var(--accent);background:rgba(79,124,255,.08)}
+.row-btn.added{color:var(--ok);border-color:rgba(39,196,122,.35);background:rgba(39,196,122,.08)}
+
+/* ─── HISTÓRICO ─── */
+.hist-chart-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r);padding:18px 20px;margin-bottom:14px}
+.hgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:8px;margin-top:10px}
+.hcard{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:12px 13px;transition:border-color .15s}
+.hcard:hover{border-color:var(--accent)}
+.hdate{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted);margin-bottom:7px}
+.htot{font-family:'Cabinet Grotesk',sans-serif;font-size:24px;font-weight:800}
+.hbad{font-size:11px;color:var(--danger);margin-top:2px}
+.hpct{font-family:'Space Mono',monospace;font-size:9px;color:var(--muted)}
+.htrend{font-size:11px;margin-top:4px}
+.tup{color:var(--danger)}.tdn{color:var(--ok)}.teq{color:var(--muted)}
+
+/* ─── RELATÓRIOS ─── */
+.rlist{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.ritem{background:var(--s2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:12px}
+.rdate{font-family:'Space Mono',monospace;font-size:10px;color:var(--accent);min-width:126px}
+.rfile{font-size:12px;color:var(--sub);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rstats{display:flex;gap:12px;font-family:'Space Mono',monospace;font-size:10px}
+.rtot{color:var(--text)}.rbad{color:var(--danger)}
+
+.theme-toggle{background:var(--s2);border:1px solid var(--border);border-radius:7px;width:32px;height:32px;cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.theme-toggle:hover{border-color:var(--accent);background:rgba(79,124,255,.1)}
+/* Light mode specific */
+:root.light .kpi{box-shadow:0 1px 4px rgba(0,0,0,.07)}
+:root.light .card{box-shadow:0 1px 4px rgba(0,0,0,.07)}
+:root.light .table-card{box-shadow:0 1px 4px rgba(0,0,0,.07)}
+:root.light .srch,:root.light .fsel{color:var(--text)}
+:root.light tbody tr:hover{background:rgba(79,124,255,.05)}
+:root.light tbody tr.late{background:rgba(240,76,90,.05)}
+:root.light tbody tr.late:hover{background:rgba(240,76,90,.1)}
+:root.light tbody tr.critical{background:rgba(240,76,90,.08)}
+:root.light .bar-track{background:#e2e6f0}
+:root.light .hcard{box-shadow:0 1px 3px rgba(0,0,0,.06)}
+:root.light .upload-compact:hover{border-color:var(--accent);background:rgba(79,124,255,.06)}
+:root.light #loading{background:rgba(240,242,247,.88)}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* Integração visual com a Central SEPLAN */
+body{background:#f3f6f7;color:#172026}
+header{
+  height:44px;
+  padding:0 24px;
+  background:#ffffff;
+  border-bottom:1px solid #d9e0e5;
+  box-shadow:none;
+}
+.logo,.theme-toggle{display:none}
+.hdiv{display:none}
+.hnav{gap:8px}
+.hnav-btn{
+  color:#506579;
+  border:1px solid transparent;
+  border-radius:999px;
+  padding:6px 13px;
+  font-weight:700;
+}
+.hnav-btn:hover{background:#f5f8f9;color:#172026}
+.hnav-btn.active{background:#16343b;color:#ffffff;border-color:#16343b}
+.htime{color:#607080}
+.upload-compact{
+  background:#fbfcfd;
+  border:1px dashed #b8c6d0;
+  border-radius:8px;
+  padding:5px 5px 5px 12px;
+}
+.upload-label{color:#506579}
+.upload-label strong{color:#172026}
+.upload-cta{background:#1d6f7a;border-radius:7px}
+.hpill{
+  background:#eef8f3;
+  border-color:#bfe4d0;
+  color:#0e6b45;
+  border-radius:999px;
+  padding:5px 12px;
+}
+.panel{padding:18px 24px 44px}
+#empty{padding:110px 24px;text-align:center}
+.empty-icon{opacity:.18}
+.empty-title{font-family:'Inter',sans-serif;font-size:20px}
+.empty-sub{color:#506579}
+.kpi,.card,.table-card,.hist-chart-card,.hcard,.ritem{
+  background:#ffffff;
+  border-color:#d9e0e5;
+  box-shadow:none!important;
+}
+.ops-main,.ops-card{
+  background:#ffffff;
+  border-color:#d9e0e5;
+  box-shadow:none!important;
+  border-radius:8px;
+}
+.ops-eyebrow{color:#506579}
+.ops-text{color:#172026}
+.ops-card span{color:#506579}
+.table-bar,thead th{background:#ffffff;border-color:#d9e0e5}
+.srch,.fsel,.ftog,.ms-trigger{
+  background:#fbfcfd;
+  border-color:#cfd9df;
+  color:#172026;
+}
+.twrap{max-height:calc(100vh - 300px)}
+.monitor-titlebar{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  margin-bottom:16px;
+}
+.monitor-eyebrow{
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#1d6f7a;
+  margin-bottom:4px;
+}
+.monitor-heading{
+  font-family:'Inter',sans-serif;
+  font-size:26px;
+  line-height:1.05;
+  font-weight:900;
+  color:#061524;
+}
+.monitor-copy{
+  color:#506579;
+  font-size:13px;
+  margin-top:5px;
+}
+.monitor-last{
+  min-width:190px;
+  text-align:right;
+  color:#607080;
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+}
+.kpi-strip{grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.kpi{
+  border-radius:8px;
+  padding:14px 16px;
+  min-height:104px;
+}
+.kpi:hover{transform:none;border-color:#c7d4db}
+.kpi-label{
+  color:#506579;
+  font-size:10px;
+  letter-spacing:.07em;
+  margin-bottom:9px;
+}
+.kpi-val{
+  font-family:'Inter',sans-serif;
+  font-size:30px;
+  color:#061524!important;
+}
+.kpi.kt::after{background:#1d6f7a}.kpi.ka::after{background:#d58b17}.kpi.kd::after{background:#0e8f63}.kpi.kp::after{background:#7b5fc9}.kpi.ke::after{background:#c98d22}
+.mid-row{grid-template-columns:320px minmax(0,1fr);gap:12px;margin-bottom:12px}
+.card,.table-card,.hist-chart-card{
+  border-radius:8px;
+}
+.card-title{
+  color:#506579;
+  font-size:10px;
+  letter-spacing:.08em;
+  margin-bottom:12px;
+}
+.table-card{border-radius:8px}
+.table-bar{
+  padding:12px;
+  gap:8px;
+}
+.srch{width:min(320px,100%);height:38px;border-radius:8px}
+.fsel,.ftog,.ms-trigger{height:38px;border-radius:8px}
+.ftog.on{background:#fff1f1;border-color:#f0c8c8;color:#9e2e2e}
+.tcnt{
+  color:#506579;
+  background:#eef5f6;
+  border-radius:999px;
+  padding:6px 10px;
+}
+thead th{
+  color:#506579;
+  background:#f8fafb;
+  height:38px;
+}
+td{padding:10px 13px}
+tbody tr{border-bottom:1px solid #edf1f3}
+tbody tr:hover{background:#f7fbfc}
+.tn{color:#124f58;font-weight:800}
+.tsub{max-width:420px;color:#172026;font-weight:650}
+.badge,.db{border-radius:999px;font-weight:800}
+.b-tram{background:#e7f3f4;color:#124f58}.b-abert{background:#fff4d8;color:#8a6400}.b-anal{background:#fff4d8;color:#8a6400}.b-par{background:#f0eafb;color:#6547a8}.b-read{background:#edf8f4;color:#0e6b45}
+.row-btn{background:#fbfcfd;border-color:#cfd9df;color:#172026}
+.row-btn:hover{background:#eef5f6;border-color:#1d6f7a}
+.row-btn.added{background:#edf8f4;border-color:#a8d9c7;color:#0e6b45}
+.db-ok{background:#edf8f4;color:#0e6b45}.db-warn{background:#fff4d8;color:#8a6400}.db-bad,.db-crit{background:#fff1f1;color:#9e2e2e}
+#empty{
+  max-width:720px;
+  margin:72px auto 0;
+  padding:54px 34px;
+  background:#ffffff;
+  border:1px dashed #cfd9df;
+  border-radius:10px;
+}
+.empty-icon{font-size:36px;margin-bottom:12px}
+.empty-title{font-size:22px;color:#061524}
+.empty-sub{max-width:440px}
+@media(max-width:1000px){
+  .kpi-strip{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ops-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ops-main{grid-column:1/-1}
+  .mid-row{grid-template-columns:1fr}
+  .monitor-titlebar{align-items:flex-start;flex-direction:column}
+  .monitor-last{text-align:left}
+}
+@media(max-width:640px){
+  .ops-summary{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="loading"><div class="spin"></div><div id="loadingMsg">Processando…</div></div>
+<div id="toast"></div>
+
+<header>
+  <div class="logo">
+    <div class="logo-mark">SP</div>
+    <div class="logo-name">SEPLAN<span class="logo-dot">.</span>Monitor</div>
+  </div>
+  <div class="hdiv"></div>
+  <nav class="hnav">
+    <button class="hnav-btn active" onclick="showTab('painel',this)">Painel</button>
+    <button class="hnav-btn" onclick="showTab('historico',this)">Histórico</button>
+    <button class="hnav-btn" onclick="showTab('relatorios',this)">Relatórios</button>
+  </nav>
+  <div class="hspace"></div>
+  <div class="htime" id="htime">—</div>
+  <div class="hdiv"></div>
+  <div class="upload-compact" id="uploadZone">
+    <input type="file" id="fileInput" accept=".pdf">
+    <span class="upload-label"><strong>Importar</strong> PDF do IPM</span>
+    <button class="upload-cta" onclick="document.getElementById('fileInput').click();event.stopPropagation()">Selecionar</button>
+  </div>
+  <div class="hdiv"></div>
+  <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Alternar tema">
+    <span id="themeIcon">☀️</span>
+  </button>
+  <div class="hdiv"></div>
+  <div class="hpill" id="dbStatus"><div class="dot"></div>Conectando</div>
+</header>
+
+<!-- PAINEL -->
+<div class="panel active" id="tab-painel">
+  <div class="monitor-titlebar">
+    <div>
+      <div class="monitor-eyebrow">Relatorio IPM</div>
+      <div class="monitor-heading">Monitor de Processos</div>
+      <div class="monitor-copy">Acompanhamento de tramitacao, atrasos e situacoes da SEPLAN.</div>
+    </div>
+    <div class="monitor-last">Ultima importacao<br><span id="monitor-last-label">aguardando PDF</span></div>
+  </div>
+  <div id="empty">
+    <div class="empty-icon">📋</div>
+    <div class="empty-title">Nenhum dado carregado</div>
+    <div class="empty-sub">Selecione o PDF diário do IPM no campo acima. Os dados são salvos automaticamente e ficam acessíveis para toda a equipe.</div>
+  </div>
+  <div id="dashboard" style="display:none">
+    <div class="kpi-strip">
+      <div class="kpi kt"><div class="kpi-label">Total de Processos</div><div class="kpi-val" id="sTotal">0</div><div class="kpi-sub">registros ativos</div></div>
+      <div class="kpi ka"><div class="kpi-label">⚠ Atrasados +30 dias</div><div class="kpi-val" id="sAtrasados">0</div><div class="kpi-sub" id="sAtrasadosPct">—</div></div>
+      <div class="kpi kd"><div class="kpi-label">✓ Em Dia ≤30 dias</div><div class="kpi-val" id="sEmDia">0</div><div class="kpi-sub" id="sEmDiaPct">—</div></div>
+      <div class="kpi kp"><div class="kpi-label">◎ Paralisados</div><div class="kpi-val" id="sParalisados">0</div><div class="kpi-sub">situação paralisado</div></div>
+      <div class="kpi ke"><div class="kpi-label">◑ Em Análise</div><div class="kpi-val" id="sAnalise">0</div><div class="kpi-sub">aguardando análise</div></div>
+    </div>
+    <div class="ops-summary">
+      <div class="ops-main">
+        <div class="ops-eyebrow">Leitura operacional</div>
+        <div class="ops-text" id="opsText">Importe um relatorio para montar a leitura do dia.</div>
+      </div>
+      <div class="ops-card danger">
+        <strong id="opsCriticos">0</strong>
+        <span>processos acima de 180 dias</span>
+      </div>
+      <div class="ops-card warn">
+        <strong id="opsBuscas">0</strong>
+        <span>buscas de projeto no relatorio</span>
+      </div>
+      <div class="ops-card ok">
+        <strong id="opsMesa">0</strong>
+        <span>processos ja localizados na Mesa</span>
+      </div>
+    </div>
+    <div class="mid-row">
+      <div class="card">
+        <div class="card-title">Situação</div>
+        <div class="donut-wrap">
+          <svg id="donutSvg" width="120" height="120" viewBox="0 0 100 100" style="flex-shrink:0"></svg>
+          <div class="leg" id="donutLeg"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Top subassuntos com atraso</div>
+        <div class="bars" id="barList"></div>
+      </div>
+    </div>
+    <div class="table-card">
+      <div class="table-bar">
+        <input class="srch" id="srch" placeholder="Buscar número, subassunto…" oninput="renderTable()">
+        <div class="multi-select" id="multiSit">
+          <div class="ms-trigger" onclick="toggleMultiSelect()">
+            <span id="msLabel">Todas situações</span>
+            <span class="ms-arrow">▾</span>
+          </div>
+          <div class="ms-dropdown" id="msDropdown">
+            <label class="ms-item"><input type="checkbox" value="Tramitando" onchange="onSitChange()"><span>Tramitando</span></label>
+            <label class="ms-item"><input type="checkbox" value="Aberto" onchange="onSitChange()"><span>Aberto</span></label>
+            <label class="ms-item"><input type="checkbox" value="Em Análise" onchange="onSitChange()"><span>Em Análise</span></label>
+            <label class="ms-item"><input type="checkbox" value="Paralisado" onchange="onSitChange()"><span>Paralisado</span></label>
+            <label class="ms-item"><input type="checkbox" value="Em Readequação" onchange="onSitChange()"><span>Em Readequação</span></label>
+          </div>
+        </div>
+        <select class="fsel" id="fSub" onchange="renderTable()"><option value="">Todos subassuntos</option></select>
+        <button class="ftog" id="btnLate" onclick="toggleLate()">Só atrasados</button>
+        <div class="tcnt" id="tcnt">0 processos</div>
+      </div>
+      <div class="twrap">
+        <table>
+          <thead><tr>
+            <th onclick="sortBy('numero')">Nº / Ano</th>
+            <th onclick="sortBy('data_tramite')">Último Trâmite</th>
+            <th onclick="sortBy('situacao')">Situação</th>
+            <th onclick="sortBy('subassunto')">Subassunto</th>
+            <th onclick="sortBy('dias_parado')">Dias parado</th>
+            <th>Ações</th>
+          </tr></thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HISTÓRICO -->
+<div class="panel" id="tab-historico">
+  <div class="hist-chart-card">
+    <div class="card-title">Evolução — atrasados vs total</div>
+    <canvas id="histChart" height="70"></canvas>
+  </div>
+  <div class="card">
+    <div class="card-title">Snapshots diários</div>
+    <div class="hgrid" id="hgrid"></div>
+  </div>
+</div>
+
+<!-- RELATÓRIOS -->
+<div class="panel" id="tab-relatorios">
+  <div class="card">
+    <div class="card-title">Histórico de importações</div>
+    <div class="rlist" id="rlist"><div style="font-size:13px;color:var(--muted)">Nenhuma importação ainda.</div></div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+pdfjsLib.GlobalWorkerOptions.workerSrc='';
+const SUPA_URL='https://oqmiwgnxltfgmdmhmxmq.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9xbWl3Z254bHRmZ21kbWhteG1xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNDQzMDksImV4cCI6MjA5MzcyMDMwOX0.XClbKEYt-DJezINAydYPn8enQoNT8Ub-J0xVeY3dfQE';
+const MON_REL_KEY='seplan_monitor_relatorios_v1';
+const MON_PROC_KEY='seplan_monitor_processos_v1';
+const MON_SNAP_KEY='seplan_monitor_snapshots_v1';
+const CONTROLE_KEY='seplan_controle_buscas_v1';
+let dbOnline=false;
+const supa={async req(method,path,body){
+  const token=sessionStorage.getItem('seplan_token')||SUPA_KEY;
+  const r=await fetch(`${SUPA_URL}/rest/v1/${path}`,{
+    method,
+    headers:{'apikey':SUPA_KEY,'Authorization':`Bearer ${token}`,'Content-Type':'application/json','Prefer':method==='POST'?'return=representation':''},
+    body:body?JSON.stringify(body):undefined
+  });
+  if(!r.ok)throw new Error(await r.text());
+  return r.status===204?null:r.json();
+},get:p=>supa.req('GET',p),post:(p,b)=>supa.req('POST',p,b)};
+let allData=[],sortCol='dias_parado',sortDir='desc',onlyLate=false,hChart=null,latestRel=null;
+
+async function init(){await checkDB();await loadLatest();await loadHistorico();await loadRelatorios();}
+
+function readStore(key){try{return JSON.parse(localStorage.getItem(key))||[];}catch{return[];}}
+function writeStore(key,value){localStorage.setItem(key,JSON.stringify(value));}
+function monitorId(){return 'mon_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,8);}
+
+async function checkDB(){
+  const e=document.getElementById('dbStatus');
+  try{
+    await supa.get('relatorios?select=id&limit=1');
+    dbOnline=true;
+    e.innerHTML='<div class="dot"></div>Banco conectado';
+    e.className='hpill ok';
+  }catch{
+    dbOnline=false;
+    e.innerHTML='<div class="dot"></div>Modo local';
+    e.className='hpill ok';
+  }
+}
+
+function showTab(name,btn){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.hnav-btn').forEach(b=>b.classList.remove('active'));document.getElementById('tab-'+name).classList.add('active');btn.classList.add('active');if(name==='historico')loadHistorico();if(name==='relatorios')loadRelatorios();}
+
+function toast(msg,type='ok'){const el=document.getElementById('toast');el.textContent=(type==='ok'?'✓  ':'✕  ')+msg;el.className=type;el.style.display='flex';setTimeout(()=>el.style.display='none',3800);}
+function showLoading(msg){document.getElementById('loadingMsg').textContent=msg;document.getElementById('loading').style.display='flex';}
+function hideLoading(){document.getElementById('loading').style.display='none';}
+
+const zone=document.getElementById('uploadZone');
+zone.addEventListener('dragover',e=>{e.preventDefault();zone.classList.add('drag-over');});
+zone.addEventListener('dragleave',()=>zone.classList.remove('drag-over'));
+zone.addEventListener('drop',e=>{e.preventDefault();zone.classList.remove('drag-over');const f=e.dataTransfer.files[0];if(f?.type==='application/pdf')processFile(f);});
+document.getElementById('fileInput').addEventListener('change',e=>{if(e.target.files[0])processFile(e.target.files[0]);});
+
+async function processFile(file){
+  showLoading('Lendo PDF…');
+  try{
+    const records=await parsePDF(file);
+    if(!records.length)throw new Error('Nenhum registro encontrado no PDF.');
+    showLoading(`Salvando ${records.length} processos…`);
+    await saveToSupabase(records,file.name);
+    showLoading('Atualizando painel…');
+    await loadLatest();await loadRelatorios();
+    toast(`${records.length} processos importados!`,'ok');
+  }catch(e){toast('Erro: '+e.message,'err');console.error(e);}
+  finally{hideLoading();document.getElementById('fileInput').value='';}
+}
+
+async function parsePDF(file){
+  const ab=await file.arrayBuffer();
+  const pdf=await pdfjsLib.getDocument({data:new Uint8Array(ab)}).promise;
+  const pageLines=[];let yOffset=0;
+  for(let pn=1;pn<=pdf.numPages;pn++){
+    const page=await pdf.getPage(pn);
+    const content=await page.getTextContent();
+    const vp=page.getViewport({scale:1});
+    const lm=new Map();
+    for(const item of content.items){
+      if(!item.str?.trim())continue;
+      const y=Math.round(vp.height-item.transform[5]);
+      let matched=false;
+      for(const[ky]of lm){if(Math.abs(ky-y)<=3){lm.get(ky).push({x:item.transform[4],str:item.str.trim()});matched=true;break;}}
+      if(!matched)lm.set(y,[{x:item.transform[4],str:item.str.trim()}]);
+    }
+    for(const[y,ws]of[...lm.entries()].sort((a,b)=>a[0]-b[0]))
+      pageLines.push({y:yOffset+y,text:ws.sort((a,b)=>a.x-b.x).map(w=>w.str).join(' ')});
+    yOffset+=10000;
+  }
+  return extractFromLines(pageLines);
+}
+
+function parseDias(s){if(!s)return 0;if(/hoje/i.test(s))return 0;const m=s.match(/(\d+)\s*dia/i);return m?parseInt(m[1]):0;}
+function parseData(s){if(!s)return null;const m=s.match(/(\d{2})\/(\d{2})\/(\d{4})/);return m?`${m[3]}-${m[2]}-${m[1]}`:null;}
+function fmtDate(s){if(!s)return'—';const m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);return m?`${m[3]}/${m[2]}/${m[1]}`:'—';}
+
+function extractFromLines(lines){
+  const records=[];
+  const mainRx=/^(\d{1,6}\/\d{4})\s+(\d{2}\/\d{2}\/\d{4})(?:\s+\d{2}:\d{2}:\d{2})?\s+(Tramitando|Aberto|Em An[aá]lise|Paralisado|Em Readequa[çc][aã]o|Readequando)\s+SEPLAN\s+(.+?)\s+(Hoje|\d+\s*Dias?)$/i;
+  const contRx=/^\d{2}:\d{2}:\d{2}\s+(.+)$/;
+  const caps2Rx=/^[A-ZÁÉÍÓÚÇÃÕ][A-ZÁÉÍÓÚÇÃÕ/ ]{3,}$/;
+  for(let i=0;i<lines.length;i++){
+    const m=lines[i].text.match(mainRx);if(!m)continue;
+    let sub=m[4].trim();
+    for(let k=1;k<=2;k++){
+      if(i+k>=lines.length)break;
+      const nx=lines[i+k].text;
+      const mc=nx.match(contRx);
+      if(mc){sub+=' '+mc[1].trim();continue;}
+      if(caps2Rx.test(nx)&&!nx.match(/^\d{1,6}\/\d{4}/))sub+=' '+nx.trim();
+    }
+    records.push({numero:m[1],ano:parseInt(m[1].split('/')[1]),data_tramite:parseData(m[2]),situacao:m[3],subassunto:sub.replace(/\s+/g,' ').trim(),dias_parado:parseDias(m[5]),dias_str:m[5].trim()});
+  }
+  return records.length ? records : extractProcessosRelacionadosLines(lines);
+}
+
+function extractIPMBuscaLines(lines){
+  const txtLines=lines.map(l=>String(l.text||'').trim()).filter(Boolean);
+  const start=txtLines.findIndex(line=>/N[uú]mero\s+Ano|Numero\s+Ano/i.test(line));
+  const end=txtLines.findIndex(line=>/Total de Registros/i.test(line));
+  const body=txtLines.slice(start>=0?start+1:0,end>start?end:txtLines.length);
+  const records=[];
+  for(let i=0;i<body.length;i++){
+    const inline=body[i].match(/^(\d{4,7})\s+(20\d{2})\s*(.*)$/);
+    const split=/^\d{4,7}$/.test(body[i])&&/^20\d{2}$/.test(body[i+1]||'');
+    if(!inline&&!split)continue;
+    const numero=inline?inline[1]:body[i];
+    const ano=inline?inline[2]:body[i+1];
+    const nameParts=[];
+    const initial=inline?(inline[3]||''):'';
+    let situacao='Tramitando';
+    let dias=0;
+    const compact=initial.match(/^(.*?)\s+(Tramitando|Aberto|Em\s+An\S*lise|Em Analise|Paralisado|Em\s+Readequa\S+o|Readequando)\s*(Hoje|\d+\s*Dias?)?$/i);
+    if(compact){
+      if(compact[1])nameParts.push(compact[1]);
+      situacao=compact[2];
+      dias=parseDias(compact[3]||'Hoje');
+      records.push(recordFromIPM(numero,ano,nameParts.join(' '),situacao,dias));
+      continue;
+    }
+    if(initial)nameParts.push(initial);
+    let j=inline?i+1:i+2;
+    for(;j<body.length;j++){
+      const line=body[j];
+      const match=line.match(/^(Tramitando|Aberto|Em\s+An\S*lise|Em Analise|Paralisado|Em\s+Readequa\S+o|Readequando)\s*(Hoje|\d+\s*Dias?)?$/i);
+      if(match){
+        situacao=match[1];
+        dias=parseDias(match[2]||'Hoje');
+        break;
+      }
+      if(/^\d{4,7}$/.test(line)&&/^20\d{2}$/.test(body[j+1]||''))break;
+      if(/^P[áa]g|^IPM Sistemas|^Atende\.Net|^Identificador/i.test(line))continue;
+      nameParts.push(line);
+    }
+    records.push(recordFromIPM(numero,ano,nameParts.join(' '),situacao,dias));
+    i=Math.max(i,j);
+  }
+  return records;
+}
+
+function recordFromIPM(numero,ano,requerente,situacao,dias){
+  const dt=new Date();
+  dt.setDate(dt.getDate()-dias);
+  return {
+    numero:`${numero}/${ano}`,
+    ano:Number(ano),
+    data_tramite:dt.toISOString().slice(0,10),
+    situacao:situacao.replace(/Analise/i,'Análise'),
+    subassunto:'BUSCA DE PROJETO',
+    requerente:String(requerente||'').replace(/\s+/g,' ').trim(),
+    dias_parado:dias,
+    dias_str:dias===0?'Hoje':`${dias} Dias`
+  };
+}
+
+function extractProcessosRelacionadosLines(lines){
+  const txtLines=lines.map(l=>String(l.text||'').trim()).filter(Boolean);
+  const start=txtLines.findIndex(line=>/N[uú]mero\/Ano|Numero\/Ano/i.test(line));
+  const end=txtLines.findIndex(line=>/Total de Registros/i.test(line));
+  const body=txtLines.slice(start>=0?start+1:0,end>start?end:txtLines.length);
+  const records=[];
+  for(let i=0;i<body.length;i++){
+    if(!/^\d{1,6}\/20\d{2}\b/.test(body[i]))continue;
+    const parts=[body[i]];
+    let j=i+1;
+    for(;j<body.length;j++){
+      if(/^\d{1,6}\/20\d{2}\b/.test(body[j]))break;
+      if(/^P[áa]g\b|^IPM Sistemas|^Atende\.Net|^Identificador/i.test(body[j]))continue;
+      parts.push(body[j]);
+    }
+    const row=parts.join(' ').replace(/\s+/g,' ').trim().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+--- PAGE\b.*$/i,'');
+    const m=row.match(/^(\d{1,6}\/(20\d{2}))\s+(\d{2}\/\d{2}\/\d{4})(?:\s+\d{2}:\d{2}:\d{2})?\s+(Tramitando|Aberto|Em An[aá]lise|Em Analise|Paralisado|Em Readequa[çc][aã]o|Readequando)\s+SEPLAN\s+(.+?)\s+(Hoje|\d+\s*Dias?)$/i);
+    if(m){
+      records.push({
+        numero:m[1],
+        ano:Number(m[2]),
+        data_tramite:parseData(m[3]),
+        situacao:m[4].replace(/Analise/i,'Análise').replace(/^Readequando$/i,'Em Readequação'),
+        subassunto:m[5].replace(/\s+/g,' ').trim(),
+        dias_parado:parseDias(m[6]),
+        dias_str:m[6].trim()
+      });
+    }
+    i=Math.max(i,j-1);
+  }
+  return records;
+}
+
+async function saveToSupabase(records,filename){
+  const total=records.length,atrasados=records.filter(r=>r.dias_parado>30).length;
+  const today=new Date().toISOString().split('T')[0];
+  const snapshot={data_snapshot:today,total_processos:total,total_atrasados:atrasados,total_em_dia:records.filter(r=>r.dias_parado<=30).length,total_paralisados:records.filter(r=>r.situacao==='Paralisado').length,total_analise:records.filter(r=>r.situacao==='Em Análise').length,pct_atrasados:parseFloat((atrasados/total*100).toFixed(2))};
+  try{
+    const[rel]=await supa.post('relatorios',{nome_arquivo:filename,total_registros:total,total_atrasados:atrasados,data_relatorio:today});
+    for(let i=0;i<records.length;i+=200)await supa.post('processos',records.slice(i,i+200).map(r=>({...r,relatorio_id:rel.id})));
+    await supa.post('snapshots_diarios',{...snapshot,relatorio_id:rel.id});
+    dbOnline=true;
+    latestRel=rel;
+  }catch(e){
+    dbOnline=false;
+    const rel={id:monitorId(),nome_arquivo:filename,total_registros:total,total_atrasados:atrasados,data_relatorio:today,importado_em:new Date().toISOString(),local:true};
+    latestRel=rel;
+    const rels=readStore(MON_REL_KEY);
+    const procs=readStore(MON_PROC_KEY).filter(p=>p.relatorio_id!==rel.id);
+    const snaps=readStore(MON_SNAP_KEY);
+    rels.unshift(rel);
+    writeStore(MON_REL_KEY,rels.slice(0,40));
+    writeStore(MON_PROC_KEY,[...records.map(r=>({...r,relatorio_id:rel.id,id:monitorId()})),...procs].slice(0,6000));
+    writeStore(MON_SNAP_KEY,[{...snapshot,relatorio_id:rel.id,id:monitorId()},...snaps.filter(s=>s.data_snapshot!==today)].slice(0,60));
+  }
+  syncMesaControle(records);
+  updateDbBadge();
+}
+
+function updateDbBadge(){
+  const e=document.getElementById('dbStatus');
+  if(!e)return;
+  if(dbOnline){e.innerHTML='<div class="dot"></div>Banco conectado';e.className='hpill ok';}
+  else{e.innerHTML='<div class="dot"></div>Modo local';e.className='hpill ok';}
+}
+
+function protocoloCurto(numero){
+  const m=String(numero||'').match(/^(\d+)\/(\d{4})$/);
+  return m?`${m[1]}/${m[2].slice(-2)}`:String(numero||'');
+}
+function protocoloKey(value){
+  const m=String(value||'').match(/(\d+)\s*\/\s*(\d{2,4})/);
+  if(!m)return String(value||'').replace(/\D/g,'');
+  const ano=m[2].length===2?'20'+m[2]:m[2];
+  return `${m[1]}/${ano}`;
+}
+function mesaControleMap(){
+  return new Map(readStore(CONTROLE_KEY).map((item,i)=>[protocoloKey(item.protocolo),{item,i}]));
+}
+function monitorToMesaItem(r){
+  return {
+    id:'ctrl_'+monitorId(),
+    buscaId:'',
+    createdAt:new Date().toISOString(),
+    criado_em:new Date().toISOString(),
+    protocolo:protocoloCurto(r.numero),
+    requerente:'',
+    matricula:'',
+    inscricao:'',
+    status:r.dias_parado>30?'pedir':'pendente',
+    cor:r.dias_parado>180?'red':r.dias_parado>30?'amber':'blue',
+    nota:`Importado do Monitor IPM. Subassunto: ${r.subassunto}. Ultimo tramite: ${fmtDate(r.data_tramite)}. ${r.dias_str||r.dias_parado+' dias'}.`,
+    ipmUltimoRelatorio:new Date().toISOString(),
+    ipmDias:r.dias_parado
+  };
+}
+function addProcessoMesa(numero){
+  const r=allData.find(item=>protocoloKey(item.numero)===protocoloKey(numero));
+  if(!r){toast('Processo nao encontrado no relatorio.','err');return;}
+  const mesa=readStore(CONTROLE_KEY);
+  const index=new Map(mesa.map((item,i)=>[protocoloKey(item.protocolo),i]));
+  const key=protocoloKey(r.numero);
+  if(index.has(key)){
+    const item=mesa[index.get(key)];
+    item.ipmUltimoRelatorio=new Date().toISOString();
+    item.ipmDias=r.dias_parado;
+    if(item.status==='concluido'){item.ipmAlerta=true;item.cor='red';}
+    writeStore(CONTROLE_KEY,mesa);
+    try{parent?.controleRender?.();parent?.loadHomeStats?.();}catch{}
+    toast('Processo ja estava na Mesa. Dados IPM atualizados.','ok');
+    renderTable();
+    return;
+  }
+  mesa.unshift(monitorToMesaItem(r));
+  writeStore(CONTROLE_KEY,mesa);
+  try{parent?.controleRender?.();parent?.loadHomeStats?.();}catch{}
+  toast('Processo enviado para a Mesa.','ok');
+  renderTable();
+}
+function syncMesaControle(records){
+  const buscas=records.filter(r=>/BUSCA\s+DE\s+PROJETO/i.test(r.subassunto||''));
+  if(!buscas.length)return;
+  const mesa=readStore(CONTROLE_KEY);
+  const index=new Map(mesa.map((item,i)=>[protocoloKey(item.protocolo),i]));
+  let mudou=false, novos=0, alertas=0;
+  for(const r of buscas){
+    const key=protocoloKey(r.numero);
+    if(index.has(key)){
+      const item=mesa[index.get(key)];
+      item.ipmUltimoRelatorio=new Date().toISOString();
+      item.ipmDias=r.dias_parado;
+      if(item.status==='concluido'){
+        item.ipmAlerta=true;
+        item.cor='red';
+        alertas++;
+      }
+      mudou=true;
+      continue;
+    }
+    mesa.unshift({
+      id:'ctrl_'+monitorId(),
+      buscaId:'',
+      createdAt:new Date().toISOString(),
+      criado_em:new Date().toISOString(),
+      protocolo:protocoloCurto(r.numero),
+      requerente:'',
+      matricula:'',
+      inscricao:'',
+      status:'pendente',
+      cor:r.dias_parado>30?'amber':'blue',
+      nota:`Importado do Monitor IPM. Subassunto: ${r.subassunto}. Ultimo tramite: ${fmtDate(r.data_tramite)}. ${r.dias_str||r.dias_parado+' dias'}.`,
+      ipmUltimoRelatorio:new Date().toISOString(),
+      ipmDias:r.dias_parado
+    });
+    novos++;
+    mudou=true;
+  }
+  if(mudou){
+    writeStore(CONTROLE_KEY,mesa);
+    try{parent?.controleRender?.();}catch{}
+    const msg=[novos?`${novos} enviados para a Mesa`:null,alertas?`${alertas} concluido(s) com alerta`:null].filter(Boolean).join(' · ');
+    if(msg) toast(msg,'ok');
+  }
+}
+
+async function loadLatest(){
+  try{
+    const rels=await supa.get('relatorios?select=*&order=importado_em.desc&limit=1');
+    if(!rels?.length)return;
+    const rel=rels[0];
+    // Fetch all records with pagination (Supabase default limit is 1000)
+    let allProcs=[], from=0, pageSize=1000;
+    while(true){
+      const page=await supa.get(`processos?relatorio_id=eq.${rel.id}&select=*&order=dias_parado.desc&limit=${pageSize}&offset=${from}`);
+      if(!page?.length)break;
+      allProcs=[...allProcs,...page];
+      if(page.length<pageSize)break;
+      from+=pageSize;
+    }
+    if(!allProcs.length)return;
+    allData=allProcs;
+    const d=new Date(rel.importado_em);
+    const stamp=`${d.toLocaleDateString('pt-BR')} ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+    document.getElementById('htime').textContent=stamp;
+    document.getElementById('monitor-last-label').textContent=stamp;
+    updateDashboard();
+    document.getElementById('empty').style.display='none';
+    document.getElementById('dashboard').style.display='block';
+    dbOnline=true;updateDbBadge();
+  }catch(e){
+    console.warn(e.message);
+    dbOnline=false;updateDbBadge();
+    loadLatestLocal();
+  }
+}
+
+function loadLatestLocal(){
+  const rel=readStore(MON_REL_KEY)[0];
+  if(!rel)return;
+  latestRel=rel;
+  allData=readStore(MON_PROC_KEY).filter(p=>p.relatorio_id===rel.id).sort((a,b)=>b.dias_parado-a.dias_parado);
+  if(!allData.length)return;
+  const d=new Date(rel.importado_em||Date.now());
+  const stamp=`${d.toLocaleDateString('pt-BR')} ${d.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}`;
+  document.getElementById('htime').textContent=stamp;
+  document.getElementById('monitor-last-label').textContent=stamp;
+  updateDashboard();
+  document.getElementById('empty').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+}
+
+function updateDashboard(){
+  updateKPIs(allData);
+  updateOperationalSummary(allData);
+  drawDonut();drawBars();fillFilters();renderTable();
+}
+
+function updateKPIs(data){
+  const total=data.length;
+  const at=data.filter(r=>r.dias_parado>30).length;
+  const ed=total-at;
+  const par=data.filter(r=>r.situacao==='Paralisado').length;
+  const an=data.filter(r=>r.situacao==='Em Análise').length;
+  document.getElementById('sTotal').textContent=total;
+  document.getElementById('sAtrasados').textContent=at;
+  document.getElementById('sAtrasadosPct').textContent=total?`${Math.round(at/total*100)}% do total`:'—';
+  document.getElementById('sEmDia').textContent=ed;
+  document.getElementById('sEmDiaPct').textContent=total?`${Math.round(ed/total*100)}% do total`:'—';
+  document.getElementById('sParalisados').textContent=par;
+  document.getElementById('sAnalise').textContent=an;
+}
+
+function updateOperationalSummary(data){
+  const total=data.length;
+  const atrasados=data.filter(r=>r.dias_parado>30).length;
+  const criticos=data.filter(r=>r.dias_parado>180).length;
+  const buscas=data.filter(r=>/BUSCA\s+DE\s+PROJETO/i.test(r.subassunto||'')).length;
+  const mesa=mesaControleMap();
+  const naMesa=data.filter(r=>mesa.has(protocoloKey(r.numero))).length;
+  const paralisados=data.filter(r=>r.situacao==='Paralisado').length;
+  document.getElementById('opsCriticos').textContent=criticos;
+  document.getElementById('opsBuscas').textContent=buscas;
+  document.getElementById('opsMesa').textContent=naMesa;
+  const pct=total?Math.round(atrasados/total*100):0;
+  const principal=criticos>0
+    ? `${criticos} processos estao acima de 180 dias. Comece por eles e depois confira os paralisados.`
+    : `${atrasados} processos estao acima de 30 dias (${pct}% do total).`;
+  document.getElementById('opsText').textContent=`${principal} O relatorio tem ${buscas} busca(s) de projeto e ${naMesa} processo(s) ja cruzados com a Mesa. Paralisados: ${paralisados}.`;
+}
+
+function drawDonut(){
+  const C={'Tramitando':'#4f7cff','Aberto':'#f5a623','Em Análise':'#f5c35a','Paralisado':'#9b6dff'};
+  const counts={};for(const r of allData)counts[r.situacao]=(counts[r.situacao]||0)+1;
+  const total=allData.length,svg=document.getElementById('donutSvg');
+  while(svg.firstChild)svg.removeChild(svg.firstChild);
+
+  const NS='http://www.w3.org/2000/svg';
+  const bg=document.createElementNS(NS,'circle');
+  bg.setAttribute('cx','50');bg.setAttribute('cy','50');bg.setAttribute('r','38');
+  bg.setAttribute('fill','none');bg.setAttribute('stroke','#1e2230');bg.setAttribute('stroke-width','12');
+  svg.appendChild(bg);
+
+  const circ=2*Math.PI*38;let off=0;
+  const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  for(const[sit,cnt]of entries){
+    const frac=cnt/total,dash=frac*circ,gap=circ-dash;
+    const c=document.createElementNS(NS,'circle');
+    c.setAttribute('cx','50');c.setAttribute('cy','50');c.setAttribute('r','38');
+    c.setAttribute('fill','none');
+    c.setAttribute('stroke',C[sit]||'#888');
+    c.setAttribute('stroke-width','12');
+    c.setAttribute('stroke-dasharray',`${dash} ${gap}`);
+    c.setAttribute('stroke-dashoffset', String(circ/4 - off));
+    c.setAttribute('transform','rotate(-90 50 50)');
+    svg.appendChild(c);
+    off+=dash;
+  }
+
+  const t=document.createElementNS(NS,'text');
+  t.setAttribute('x','50');t.setAttribute('y','46');t.setAttribute('text-anchor','middle');
+  t.setAttribute('dominant-baseline','middle');
+  t.setAttribute('fill','#eef0f8');t.setAttribute('font-family','Cabinet Grotesk,sans-serif');
+  t.setAttribute('font-size','16');t.setAttribute('font-weight','800');
+  t.textContent=String(total);svg.appendChild(t);
+
+  const t2=document.createElementNS(NS,'text');
+  t2.setAttribute('x','50');t2.setAttribute('y','60');t2.setAttribute('text-anchor','middle');
+  t2.setAttribute('fill','#4d566b');t2.setAttribute('font-family','Space Mono,monospace');
+  t2.setAttribute('font-size','6.5');t2.textContent='processos';svg.appendChild(t2);
+
+  const leg=document.getElementById('donutLeg');leg.innerHTML='';
+  for(const[sit,cnt]of entries){
+    const d=document.createElement('div');d.className='leg-row';
+    d.innerHTML=`<div class="leg-dot" style="background:${C[sit]||'#888'}"></div><span class="leg-name">${sit}</span><span class="leg-n">${cnt}</span>`;
+    leg.appendChild(d);
+  }
+}
+
+function drawBars(){
+  const counts={},totals={};
+  for(const r of allData){totals[r.subassunto]=(totals[r.subassunto]||0)+1;if(r.dias_parado>30)counts[r.subassunto]=(counts[r.subassunto]||0)+1;}
+  const sorted=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8),max=sorted[0]?.[1]||1,bl=document.getElementById('barList');bl.innerHTML='';
+  for(const[sub,cnt]of sorted){const tot=totals[sub]||1,lbl=sub.length>36?sub.slice(0,36)+'…':sub,d=document.createElement('div');
+  d.innerHTML=`<div class="bar-top"><span class="bar-name" title="${sub}">${lbl}</span><span class="bar-nums">${cnt} atrasados / ${tot} total</span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(cnt/max*100)}%"></div></div>`;bl.appendChild(d);}
+}
+
+function fillFilters(){
+  const subs=[...new Set(allData.map(r=>r.subassunto))].sort(),sel=document.getElementById('fSub');
+  sel.innerHTML='<option value="">Todos subassuntos</option>';
+  subs.forEach(s=>{const o=document.createElement('option');o.value=s;o.textContent=s;sel.appendChild(o);});
+}
+
+function sortBy(col){if(sortCol===col)sortDir=sortDir==='asc'?'desc':'asc';else{sortCol=col;sortDir=col==='dias_parado'?'desc':'asc';}renderTable();}
+function toggleLate(){onlyLate=!onlyLate;document.getElementById('btnLate').classList.toggle('on',onlyLate);renderTable();}
+
+// Multi-select dropdown
+function toggleMultiSelect(){
+  const trigger=document.querySelector('.ms-trigger');
+  const dropdown=document.getElementById('msDropdown');
+  trigger.classList.toggle('open');
+  dropdown.classList.toggle('open');
+}
+// Close dropdown when clicking outside
+document.addEventListener('click',function(e){
+  if(!e.target.closest('.multi-select')){
+    document.querySelector('.ms-trigger')?.classList.remove('open');
+    document.getElementById('msDropdown')?.classList.remove('open');
+  }
+});
+function onSitChange(){
+  const checked=[...document.querySelectorAll('#msDropdown input:checked')].map(c=>c.value);
+  const label=document.getElementById('msLabel');
+  if(checked.length===0)label.textContent='Todas situações';
+  else if(checked.length===1)label.textContent=checked[0];
+  else label.textContent=`${checked.length} situações`;
+  renderTable();
+}
+function getSelectedSits(){
+  return[...document.querySelectorAll('#msDropdown input:checked')].map(c=>c.value);
+}
+
+function situacaoClass(s){
+  const n=String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  if(n.includes('tramitando'))return'b-tram';
+  if(n.includes('aberto'))return'b-abert';
+  if(n.includes('analise'))return'b-anal';
+  if(n.includes('paralisado'))return'b-par';
+  if(n.includes('readequa')||n.includes('readequando'))return'b-read';
+  return'';
+}
+
+function renderTable(){
+  const q=document.getElementById('srch').value.toLowerCase();
+  const sits=getSelectedSits();
+  const fSub=document.getElementById('fSub').value;
+  let f=allData.filter(r=>{if(sits.length>0&&!sits.includes(r.situacao))return false;if(fSub&&r.subassunto!==fSub)return false;if(onlyLate&&r.dias_parado<=30)return false;if(q)return r.numero.toLowerCase().includes(q)||r.subassunto.toLowerCase().includes(q)||r.situacao.toLowerCase().includes(q);return true;});
+  f.sort((a,b)=>{let va=a[sortCol]??'',vb=b[sortCol]??'';if(typeof va==='string'){va=va.toLowerCase();vb=String(vb).toLowerCase();}return va<vb?(sortDir==='asc'?-1:1):va>vb?(sortDir==='asc'?1:-1):0;});
+  document.getElementById('tcnt').textContent=`${f.length} processos`;
+  // Update KPIs based on filtered data
+  const fSub2=document.getElementById('fSub').value;
+  const activeSits=getSelectedSits();
+  if(activeSits.length>0||fSub2||onlyLate){
+    updateKPIs(f);
+    updateOperationalSummary(f);
+  } else {
+    updateKPIs(allData);
+    updateOperationalSummary(allData);
+  }
+  const body=document.getElementById('tbody');body.innerHTML='';
+  const mesa=mesaControleMap();
+  for(const r of f){
+    const at=r.dias_parado>30,tr=document.createElement('tr');
+    if(r.dias_parado>180)tr.className='critical';
+    else if(at)tr.className='late';
+    let dc='db-ok';if(r.dias_parado>90)dc='db-crit';else if(r.dias_parado>30)dc='db-bad';else if(r.dias_parado>10)dc='db-warn';
+    const df=fmtDate(r.data_tramite);
+    const inMesa=mesa.has(protocoloKey(r.numero));
+    tr.innerHTML=`<td class="tn">${r.numero}</td><td class="tdate">${df}</td><td><span class="badge ${situacaoClass(r.situacao)}">${r.situacao}</span></td><td class="tsub" title="${r.subassunto}">${r.subassunto}</td><td><span class="db ${dc}">${at?'! ':''}${r.dias_str||r.dias_parado+' Dias'}</span></td><td><div class="row-actions"><button class="row-btn ${inMesa?'added':''}" onclick="addProcessoMesa('${r.numero}')">${inMesa?'Na Mesa':'Mesa'}</button></div></td>`;
+    body.appendChild(tr);
+  }
+}
+
+async function loadHistorico(){
+  try{
+    const snaps=await supa.get('snapshots_diarios?select=*&order=data_snapshot.asc&limit=30');
+    if(!snaps?.length)return;
+    renderHistorico(snaps);
+  }catch(e){console.warn(e.message);renderHistorico(readStore(MON_SNAP_KEY).reverse().slice(-30));}
+}
+
+function renderHistorico(snaps){
+  if(!snaps?.length)return;
+  if(hChart)hChart.destroy();
+  const ctx=document.getElementById('histChart').getContext('2d');
+  hChart=new Chart(ctx,{type:'line',data:{labels:snaps.map(s=>new Date(s.data_snapshot+'T12:00:00').toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'})),datasets:[{label:'Atrasados (+30d)',data:snaps.map(s=>s.total_atrasados),borderColor:'#f04c5a',backgroundColor:'rgba(240,76,90,0.07)',tension:.35,fill:true,pointRadius:3,pointBackgroundColor:'#f04c5a'},{label:'Total',data:snaps.map(s=>s.total_processos),borderColor:'#4f7cff',backgroundColor:'rgba(79,124,255,0.05)',tension:.35,fill:true,pointRadius:2,pointBackgroundColor:'#4f7cff'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#8892a8',font:{family:'Space Mono',size:10}}}},scales:{x:{ticks:{color:'#4d566b',font:{family:'Space Mono',size:9}},grid:{color:'#1e2230'}},y:{ticks:{color:'#4d566b',font:{family:'Space Mono',size:9}},grid:{color:'#1e2230'}}}}});
+  const grid=document.getElementById('hgrid');grid.innerHTML='';
+  const rev=[...snaps].reverse().slice(0,14);
+  for(let i=0;i<rev.length;i++){
+    const s=rev[i],prev=rev[i+1];
+    let trend='<span class="teq">— igual</span>';
+    if(prev){const d=s.total_atrasados-prev.total_atrasados;if(d>0)trend=`<span class="tup">▲ +${d}</span>`;else if(d<0)trend=`<span class="tdn">▼ ${d}</span>`;}
+    const c=document.createElement('div');c.className='hcard';
+    c.innerHTML=`<div class="hdate">${new Date(s.data_snapshot+'T12:00:00').toLocaleDateString('pt-BR',{weekday:'short',day:'2-digit',month:'2-digit'})}</div><div class="htot">${s.total_processos}</div><div class="hbad">⚠ ${s.total_atrasados} atrasados</div><div class="hpct">${s.pct_atrasados}% do total</div><div class="htrend">${trend}</div>`;
+    grid.appendChild(c);
+  }
+}
+
+async function loadRelatorios(){
+  try{
+    const rels=await supa.get('relatorios?select=*&order=importado_em.desc&limit=30');
+    renderRelatorios(rels);
+  }catch(e){console.warn(e.message);renderRelatorios(readStore(MON_REL_KEY));}
+}
+
+function renderRelatorios(rels){
+  const list=document.getElementById('rlist');
+  if(!rels?.length){list.innerHTML='<div style="font-size:13px;color:var(--muted)">Nenhuma importação ainda.</div>';return;}
+  list.innerHTML='';
+  for(const r of rels){
+    const d=document.createElement('div');d.className='ritem';
+    d.innerHTML=`<div class="rdate">${new Date(r.importado_em||r.data_relatorio).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})}</div><div class="rfile">📄 ${r.nome_arquivo||'—'}${r.local?' · local':''}</div><div class="rstats"><span class="rtot">${r.total_registros} processos</span><span class="rbad">⚠ ${r.total_atrasados} atrasados</span></div>`;
+    list.appendChild(d);
+  }
+}
+
+function toggleTheme(){
+  const isLight=document.documentElement.classList.toggle('light');
+  document.getElementById('themeIcon').textContent=isLight?'🌙':'☀️';
+  localStorage.setItem('seplan-theme',isLight?'light':'dark');
+}
+// Restore saved theme
+(function(){
+  const saved=localStorage.getItem('seplan-theme');
+  if(saved!=='dark'){document.documentElement.classList.add('light');document.getElementById('themeIcon').textContent='🌙';}
+})();
+
+init();
+</script>
+</body>
+</html>
