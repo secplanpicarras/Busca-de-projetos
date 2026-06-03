@@ -1970,6 +1970,7 @@ function showApp(){
   if(pageHome) pageHome.style.display='block';
   const navHome = document.getElementById('nav-home');
   if(navHome) navHome.classList.add('active');
+  aplicarPermissoesModulos();
   homeTick();
   initHomeCanvas();
   loadHomeStats();
@@ -2039,7 +2040,7 @@ let _usuarioPerfilCache = null;
 async function usuarioPerfil(){
   if(_usuarioPerfilCache) return _usuarioPerfilCache;
   const email = usuarioEmail();
-  if(!email) return {email:'',nome:'Usuario',papel:'usuario',ativo:true};
+  if(!email) return {email:'',nome:'Usuario',papel:'analista',ativo:true};
   try{
     const resp = await authFetch(`${SUPABASE_URL}/rest/v1/perfis?email=eq.${encodeURIComponent(email)}&limit=1`,{headers:{...getAuthHeaders()}});
     const rows = await resp.json();
@@ -2048,12 +2049,75 @@ async function usuarioPerfil(){
       return _usuarioPerfilCache;
     }
   }catch(e){ console.warn('usuarioPerfil', e.message); }
-  _usuarioPerfilCache = {email,nome:usuarioNome(),papel:'usuario',ativo:true};
+  _usuarioPerfilCache = {email,nome:usuarioNome(),papel:'analista',ativo:true};
   return _usuarioPerfilCache;
 }
 
 function usuarioPodeGerenciarDigitalizacao(perfil){
   return ['admin','digitalizacao'].includes((perfil?.papel||'').toLowerCase());
+}
+
+const MODULOS_CENTRAL = ['home','busca','historico','controle','digitalizacao','monitor','agenda'];
+const MODULOS_POR_PERFIL = {
+  admin:['*'],
+  analista:['home','busca','digitalizacao','agenda','monitor'],
+  digitalizacao:['home','digitalizacao'],
+  usuario:['home','busca','digitalizacao']
+};
+
+function listaModulos(valor){
+  if(!valor) return [];
+  if(Array.isArray(valor)) return valor;
+  if(typeof valor === 'string'){
+    try{
+      const parsed = JSON.parse(valor);
+      if(Array.isArray(parsed)) return parsed;
+    }catch{}
+    return valor.split(',').map(x=>x.trim()).filter(Boolean);
+  }
+  return [];
+}
+
+async function usuarioModulosPermitidos(){
+  const perfil = await usuarioPerfil();
+  const papel = (perfil.papel || 'analista').toLowerCase();
+  const base = MODULOS_POR_PERFIL[papel] || MODULOS_POR_PERFIL.analista;
+  const set = new Set(base.includes('*') ? MODULOS_CENTRAL : base);
+  listaModulos(perfil.modulos_permitidos).forEach(m => set.add(m));
+  listaModulos(perfil.modulos_bloqueados).forEach(m => set.delete(m));
+  set.add('home');
+  return set;
+}
+
+async function usuarioPodeAcessarModulo(modulo){
+  const permitidos = await usuarioModulosPermitidos();
+  return permitidos.has(modulo);
+}
+
+async function usuarioPodeSalvarBusca(){
+  const perfil = await usuarioPerfil();
+  if((perfil.papel || '').toLowerCase() === 'admin') return true;
+  const permitidos = await usuarioModulosPermitidos();
+  return permitidos.has('historico') || permitidos.has('controle');
+}
+
+async function aplicarPermissoesModulos(){
+  const permitidos = await usuarioModulosPermitidos();
+  window._modulosPermitidos = permitidos;
+  window._podeSalvarBusca = await usuarioPodeSalvarBusca();
+  MODULOS_CENTRAL.forEach(modulo => {
+    const pode = permitidos.has(modulo);
+    const nav = document.getElementById('nav-'+modulo);
+    if(nav) nav.style.display = pode ? '' : 'none';
+    document.querySelectorAll(`[onclick*="navTo('${modulo}')"]`).forEach(el => {
+      if(el.id === 'nav-'+modulo) return;
+      el.style.display = pode ? '' : 'none';
+    });
+    const page = document.getElementById('page-'+modulo);
+    if(page && !pode) page.style.display = 'none';
+  });
+  const salvar = document.getElementById('btnSalvarBusca');
+  if(salvar && !window._podeSalvarBusca) salvar.style.display = 'none';
 }
 
 async function notificacaoCriar(destinatario_email, tipo, titulo, mensagem, referencia_tipo='', referencia_id=''){
@@ -2182,8 +2246,13 @@ if(sessionStorage.getItem('seplan_token')){
 }
 
 // NAV
-function navTo(page){
+async function navTo(page){
   document.body.classList.add('controle-light');
+  if(!(await usuarioPodeAcessarModulo(page))){
+    alert('Seu perfil nao tem acesso a este modulo.');
+    page = 'home';
+  }
+  await aplicarPermissoesModulos();
   ['home','busca','historico','controle','digitalizacao','monitor','agenda'].forEach(p=>{
     const el=document.getElementById('page-'+p);
     if(el) el.style.display=p===page?'block':'none';
@@ -2393,7 +2462,9 @@ async function startSearch(){
     setTimeout(()=>{document.getElementById('searchStatusCard').style.display='none';},700);
     currentSearch={inscricao,inscricao_resultados:inscricaoResults,nome_resultados:nameResults,proprietarios:cleaned,tem_resultado:inscricaoResults.length>0||nameResults.some(r=>r.matches.length>0)};
     renderResults(inscricaoResults,nameResults);
-    document.getElementById('btnSalvarBusca').style.display='inline-flex';
+    const podeSalvar = await usuarioPodeSalvarBusca();
+    window._podeSalvarBusca = podeSalvar;
+    document.getElementById('btnSalvarBusca').style.display=podeSalvar?'inline-flex':'none';
   }catch(err){setSearchProgress(0,'Erro ao carregar planilha.');console.error(err);}
 }
 
@@ -2483,8 +2554,12 @@ function marcarLive(pid,valor){
 }
 
 // SALVAR — apenas processos confirmados ✓
-function openSalvar(){
+async function openSalvar(){
   if(!currentSearch) return;
+  if(!(await usuarioPodeSalvarBusca())){
+    alert('Seu perfil permite consultar a busca, mas nao salvar no historico.');
+    return;
+  }
   const confirmados=[];
 
   // Inscrição = match exato, entra automaticamente
