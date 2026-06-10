@@ -1623,7 +1623,7 @@ body.controle-light .fResultadoPreview{
           <div class="page-header digitalizacao-header">
             <div>
               <h1>Controle de Digitaliza&ccedil;&atilde;o</h1>
-              <p>Pedidos de documentos, buscas e acompanhamento por analista</p>
+              <p>Pedidos de digitalizacao vinculados ao usuario solicitante</p>
             </div>
             <button class="btn" onclick="dgShowTab('lista')">Ver registros</button>
           </div>
@@ -1632,46 +1632,47 @@ body.controle-light .fResultadoPreview{
       <div class="tabs" style="margin-bottom:1.25rem">
         <button class="tab active" id="dg-tab-novo" onclick="dgShowTab('novo')">+ Novo registro</button>
         <button class="tab" id="dg-tab-lista" onclick="dgShowTab('lista')">Registros</button>
-        <button class="tab" id="dg-tab-analistas" onclick="dgShowTab('analistas')">Por analista</button>
+        <button class="tab" id="dg-tab-analistas" onclick="dgShowTab('analistas')">Por solicitante</button>
       </div>
 
       <!-- ABA NOVO -->
       <div id="dg-pane-novo">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem">
+        <div style="display:grid;grid-template-columns:1fr 180px;gap:12px;margin-bottom:1rem">
           <div>
-            <label class="form-label">Nº do processo *</label>
-            <input class="form-input" id="dg-processo" placeholder="Ex: 2024.001234-0">
+            <label class="form-label">N? do processo *</label>
+            <input class="form-input" id="dg-processo" placeholder="Ex: 15000">
           </div>
           <div>
-            <label class="form-label">Data da solicitação *</label>
-            <input class="form-input" id="dg-data" type="date">
+            <label class="form-label">Ano *</label>
+            <input class="form-input" id="dg-ano" inputmode="numeric" maxlength="4" placeholder="2026">
+            <input class="form-input" id="dg-data" type="date" style="display:none">
           </div>
-          <div style="grid-column:1/-1">
+          <div id="dg-motivo-wrap" style="grid-column:1/-1;display:none">
             <label class="form-label">Motivo</label>
             <div style="display:flex;gap:6px">
-              <button id="dg-btn-analista" onclick="dgSetMotivo('analista')" style="flex:1;padding:9px 6px;border-radius:var(--radius);border:1px solid var(--accent);background:var(--accent);color:var(--accent-text);font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',var(--sans);transition:all .15s">👤 Analista pediu</button>
-              <button id="dg-btn-busca" onclick="dgSetMotivo('busca')" style="flex:1;padding:9px 6px;border-radius:var(--radius);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Nunito',var(--sans);transition:all .15s">🔍 Busca de projeto</button>
+              <button id="dg-btn-analista" onclick="dgSetMotivo('analista')" style="flex:1;padding:9px 6px;border-radius:var(--radius);border:1px solid var(--accent);background:var(--accent);color:var(--accent-text);font-size:12px;font-weight:700;cursor:pointer;font-family:'Nunito',var(--sans);transition:all .15s">Analista pediu</button>
+              <button id="dg-btn-busca" onclick="dgSetMotivo('busca')" style="flex:1;padding:9px 6px;border-radius:var(--radius);border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;font-family:'Nunito',var(--sans);transition:all .15s">Busca de projeto</button>
             </div>
           </div>
-          <div id="dg-field-analista" style="grid-column:1/-1">
+          <div id="dg-field-analista" style="grid-column:1/-1;display:none">
             <label class="form-label">Analista</label>
             <select class="form-input" id="dg-analista">
               <option value="">Selecione o analista</option>
               <option>Gabriela</option><option>Ruy</option><option>Sabrina</option>
               <option>Vera</option><option>Marco</option><option>Julia</option>
-              <option>Anderson</option><option>Chris</option><option>Maurício</option><option>Bruna</option>
+              <option>Anderson</option><option>Chris</option><option>Mauricio</option><option>Bruna</option>
             </select>
           </div>
           <div id="dg-field-busca" style="grid-column:1/-1;display:none">
-            <label class="form-label">Vincular busca do histórico</label>
+            <label class="form-label">Vincular busca do historico</label>
             <div style="position:relative">
               <div id="dg-busca-trigger" onclick="dgToggleDropdown()" class="form-input" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;user-select:none">
                 <span id="dg-busca-label" style="color:var(--text3)">Selecione uma busca...</span>
-                <span id="dg-busca-arrow" style="font-size:12px;color:var(--text3);transition:transform .2s">▼</span>
+                <span id="dg-busca-arrow" style="font-size:12px;color:var(--text3);transition:transform .2s">v</span>
               </div>
               <div id="dg-busca-dropdown" style="display:none;position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--radius);overflow:hidden;z-index:999;max-height:220px;overflow-y:auto;animation:fadeIn .15s ease">
                 <div id="dg-busca-list"></div>
-                <div onclick="dgSelecionarBusca('__manual__','✏️ Digitar manualmente')" style="padding:10px 14px;cursor:pointer;border-top:1px solid var(--border);font-size:12px;color:var(--text2);font-family:var(--mono);transition:background .15s" onmouseover="this.style.background='var(--nav-hover-bg)'" onmouseout="this.style.background='transparent'">✏️ Digitar manualmente</div>
+                <div onclick="dgSelecionarBusca('__manual__','Digitar manualmente')" style="padding:10px 14px;cursor:pointer;border-top:1px solid var(--border);font-size:12px;color:var(--text2);font-family:var(--mono);transition:background .15s" onmouseover="this.style.background='var(--nav-hover-bg)'" onmouseout="this.style.background='transparent'">Digitar manualmente</div>
               </div>
             </div>
             <input type="hidden" id="dg-busca-select">
@@ -1680,13 +1681,13 @@ body.controle-light .fResultadoPreview{
             </div>
           </div>
           <div style="grid-column:1/-1">
-            <label class="form-label">Observação <span style="text-transform:none;font-weight:400;letter-spacing:0;opacity:.6">(opcional)</span></label>
-            <textarea class="form-input" id="dg-obs" rows="2" placeholder="Informações adicionais..." style="resize:vertical;line-height:1.5"></textarea>
+            <label class="form-label">Observacao do solicitante <span style="text-transform:none;font-weight:400;letter-spacing:0;opacity:.6">(opcional)</span></label>
+            <textarea class="form-input" id="dg-obs" rows="3" placeholder="Ex: preciso da digitalizacao completa do processo, conferir anexos..." style="resize:vertical;line-height:1.5"></textarea>
           </div>
         </div>
         <div style="display:flex;gap:8px;justify-content:flex-end">
           <div id="dg-status" style="flex:1;font-size:12px;color:var(--green);align-self:center;font-family:var(--mono)"></div>
-          <button class="btn btn-primary" onclick="dgAdicionar()">+ Registrar</button>
+          <button class="btn btn-primary" onclick="dgAdicionar()">Enviar pedido</button>
         </div>
       </div>
 
@@ -3792,6 +3793,8 @@ function gerarCertidao(){
 function abrirDigitalizacao() {
   const data = document.getElementById('dg-data');
   if(data && !data.value) data.value = new Date().toISOString().slice(0,10);
+  const ano = document.getElementById('dg-ano');
+  if(ano && !ano.value) ano.value = String(new Date().getFullYear());
   dgConfigurarPermissoesDigitalizacao();
   dgShowTab('novo');
 }
@@ -3888,37 +3891,30 @@ document.addEventListener('click', function(e) {
 });
 
 async function dgAdicionar() {
-  const processo = document.getElementById('dg-processo').value.trim();
-  const data = document.getElementById('dg-data').value;
+  const processoRaw = document.getElementById('dg-processo').value.trim();
+  const anoRaw = document.getElementById('dg-ano').value.trim();
+  const data = document.getElementById('dg-data').value || new Date().toISOString().slice(0,10);
   const obs = document.getElementById('dg-obs').value.trim();
-  if(!processo){ alert('Informe o número do processo.'); return; }
-  if(!data){ alert('Informe a data.'); return; }
-  let detalhe = '';
-  if(dgMotivo === 'analista'){
-    detalhe = document.getElementById('dg-analista').value;
-    if(!detalhe){ alert('Selecione o analista.'); return; }
-  } else {
-    const selVal = document.getElementById('dg-busca-select').value;
-    if(!selVal){ alert('Selecione uma busca do histórico.'); return; }
-    if(selVal === '__manual__'){
-      detalhe = document.getElementById('dg-busca').value.trim();
-      if(!detalhe){ alert('Descreva a busca manualmente.'); return; }
-    } else { detalhe = selVal; }
-  }
+  if(!processoRaw){ alert('Informe o numero do processo.'); return; }
+  if(!/^\d{4}$/.test(anoRaw)){ alert('Informe o ano com 4 digitos.'); return; }
+  const processo = processoRaw.includes('/') ? processoRaw : processoRaw + '/' + anoRaw;
+  const detalhe = usuarioNome();
   const btn = document.querySelector('#dg-pane-novo .btn-primary');
-  btn.textContent = 'Salvando...'; btn.disabled = true;
+  btn.textContent = 'Enviando...'; btn.disabled = true;
   try {
     const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao`, {
       method:'POST',
       headers:{'Content-Type':'application/json','Prefer':'return=representation',...getAuthHeaders()},
       body: JSON.stringify({
         processo,
+        ano: Number(anoRaw),
         data,
-        motivo: dgMotivo,
+        motivo: 'analista',
         detalhe,
         obs,
+        observacao_solicitante: obs,
         status:'pedido',
-        status_detalhado:'solicitado',
+        status_detalhado:'tramitando',
         solicitante_email:usuarioEmail(),
         solicitante_nome:usuarioNome()
       })
@@ -3936,27 +3932,19 @@ async function dgAdicionar() {
       registro?.id || ''
     )));
     document.getElementById('dg-processo').value = '';
+    document.getElementById('dg-ano').value = String(new Date().getFullYear());
     document.getElementById('dg-obs').value = '';
-    document.getElementById('dg-analista').value = '';
-    document.getElementById('dg-busca').value = '';
-    document.getElementById('dg-busca-select').value = '';
-    document.getElementById('dg-busca-label').textContent = 'Selecione uma busca...';
-    document.getElementById('dg-busca-label').style.color = 'var(--text3)';
-    document.getElementById('dg-busca-dropdown').style.display = 'none';
-    document.getElementById('dg-busca-arrow').style.transform = '';
-    document.getElementById('dg-field-busca-manual').style.display = 'none';
     const st = document.getElementById('dg-status');
-    st.textContent = '✓ Registrado!';
+    st.textContent = 'Pedido enviado!';
     setTimeout(()=>st.textContent='',3000);
     notificacoesAtualizarContador();
     diShow('digitalizacao');
   } catch(e) {
     alert('Erro ao salvar. Tente novamente.');
   } finally {
-    btn.textContent = '+ Registrar'; btn.disabled = false;
+    btn.textContent = 'Enviar pedido'; btn.disabled = false;
   }
 }
-
 async function dgCarregarLista(filtro='') {
   const lista = document.getElementById('dg-lista');
   const countEl = document.getElementById('dg-count');
@@ -3987,54 +3975,39 @@ function dgFiltrar() {
 }
 
 function dgItemHtml(r) {
-  const detalhe = r.detalhe || '';
-  const statusDetalhado = r.status_detalhado || (r.status === 'entregue' ? 'concluido' : 'solicitado');
+  const statusDetalhado = r.status_detalhado || (r.status === 'entregue' ? 'concluido' : 'tramitando');
+  const normalizado = statusDetalhado === 'solicitado' ? 'tramitando' : statusDetalhado;
   const statusMap = {
-    solicitado:{label:'Solicitado', color:'var(--amber)', bg:'#fff7df'},
+    tramitando:{label:'Tramitando', color:'var(--amber)', bg:'#fff7df'},
     pedido_feito:{label:'Pedido feito', color:'var(--blue)', bg:'#eef5ff'},
-    concluido:{label:'Concluido', color:'var(--green)', bg:'#eaf8f1'}
+    concluido:{label:'Digitalizacao finalizada', color:'var(--green)', bg:'#eaf8f1'}
   };
-  const status = statusMap[statusDetalhado] || statusMap.solicitado;
-  const badgeColor = r.motivo === 'analista' ? 'var(--blue)' : 'var(--accent)';
-  const badgeLabel = r.motivo === 'analista' ? 'Analista pediu' : 'Busca de projeto';
+  const status = statusMap[normalizado] || statusMap.tramitando;
   const dt = r.data ? r.data.split('-').reverse().join('/') : '-';
-  const solicitante = r.solicitante_nome || r.solicitante_email || 'Solicitante nao registrado';
-  const obs = r.obs ? ' - ' + controleEscape(r.obs) : '';
+  const solicitante = r.solicitante_nome || r.solicitante_email || r.detalhe || 'Solicitante nao registrado';
+  const obsSolicitante = r.observacao_solicitante || r.obs || '';
+  const obsResposta = r.observacao_resposta || '';
   const podeGerenciar = window._dgPodeGerenciar !== false;
   let acao = '';
   if(!podeGerenciar) {
     acao = '<span style="font-size:11px;padding:5px 10px;border-radius:999px;border:1px solid '+status.color+';color:'+status.color+';font-family:var(--mono);font-weight:800">'+status.label+'</span>';
-  } else if(statusDetalhado === 'solicitado') {
-    acao = '<button class="btn btn-sm btn-primary" onclick="dgAtualizarStatus(\''+r.id+'\',\'pedido_feito\')">Marcar pedido feito</button>';
-  } else if(statusDetalhado === 'pedido_feito') {
-    acao = '<button class="btn btn-sm btn-primary" onclick="dgAtualizarStatus(\''+r.id+'\',\'concluido\')">Concluir</button>';
+  } else if(normalizado === 'tramitando') {
+    acao = '<button class="btn btn-sm btn-primary" onclick="dgAtualizarStatus(\''+r.id+'\',\'pedido_feito\')">Pedido feito</button>';
+  } else if(normalizado === 'pedido_feito') {
+    acao = '<button class="btn btn-sm btn-primary" onclick="dgAtualizarStatus(\''+r.id+'\',\'concluido\')">Finalizar digitalizacao</button>';
   } else {
-    acao = '<span style="font-size:11px;padding:5px 10px;border-radius:999px;border:1px solid var(--green);color:var(--green);font-family:var(--mono);font-weight:800">Concluido</span>';
+    acao = '<span style="font-size:11px;padding:5px 10px;border-radius:999px;border:1px solid var(--green);color:var(--green);font-family:var(--mono);font-weight:800">Finalizada</span>';
   }
-  return `<div id="dg-item-${r.id}" style="padding:12px 0;border-bottom:1px solid var(--border);animation:fadeIn .2s ease">
-    <div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:flex-start">
-      <div>
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-          <span style="font-size:14px;font-weight:800;font-family:var(--mono);color:var(--text)">${controleEscape(r.processo||'')}</span>
-          <span style="font-size:10px;padding:3px 8px;border-radius:999px;border:1px solid ${badgeColor};color:${badgeColor};font-family:var(--mono);font-weight:800">${badgeLabel}</span>
-          <span style="font-size:10px;padding:3px 8px;border-radius:999px;border:1px solid ${status.color};color:${status.color};background:${status.bg};font-family:var(--mono);font-weight:800">${status.label}</span>
-        </div>
-        <div style="font-size:12px;color:var(--text2);margin-top:6px;line-height:1.45">${controleEscape(detalhe)}${obs}</div>
-        <div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:5px">Solicitado por ${controleEscape(solicitante)} em ${controleEscape(dt)}</div>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px;flex-shrink:0">
-        ${acao}
-        ${podeGerenciar?`<button onclick="dgRemover('${r.id}')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:2px 4px;line-height:1;border-radius:4px" title="Remover">x</button>`:''}
-      </div>
-    </div>
-  </div>`;
+  const respostaBox = podeGerenciar ? '<div style="margin-top:9px;display:grid;gap:6px"><label class="form-label" style="margin:0">Observacao do atendimento</label><textarea class="form-input" id="dg-resposta-'+r.id+'" rows="2" placeholder="Ex: pedido enviado para a empresa, retorno previsto..." style="resize:vertical;line-height:1.45">'+controleEscape(obsResposta)+'</textarea><button class="btn btn-sm" onclick="dgSalvarResposta(\''+r.id+'\')" style="justify-self:start">Salvar observacao</button></div>' : (obsResposta ? '<div style="font-size:12px;color:var(--text2);margin-top:7px;line-height:1.45"><strong>Retorno:</strong> '+controleEscape(obsResposta)+'</div>' : '');
+  return '<div id="dg-item-'+r.id+'" style="padding:12px 0;border-bottom:1px solid var(--border);animation:fadeIn .2s ease"><div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:flex-start"><div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:800;font-family:var(--mono);color:var(--text)">'+controleEscape(r.processo||'')+'</span><span style="font-size:10px;padding:3px 8px;border-radius:999px;border:1px solid '+status.color+';color:'+status.color+';background:'+status.bg+';font-family:var(--mono);font-weight:800">'+status.label+'</span></div><div style="font-size:12px;color:var(--text2);margin-top:6px;line-height:1.45">'+(obsSolicitante?'<strong>Pedido:</strong> '+controleEscape(obsSolicitante):'Sem observacao do solicitante.')+'</div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:5px">Solicitado por '+controleEscape(solicitante)+' em '+controleEscape(dt)+'</div>'+respostaBox+'</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">'+acao+(podeGerenciar?'<button onclick="dgRemover(\''+r.id+'\')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:2px 4px;line-height:1;border-radius:4px" title="Remover">x</button>':'')+'</div></div></div>';
 }
-
 async function dgAtualizarStatus(id, novoStatusDetalhado) {
   const payload = {
     status_detalhado: novoStatusDetalhado,
     status: novoStatusDetalhado === 'concluido' ? 'entregue' : 'pedido'
   };
+  payload.responsavel_email = usuarioEmail();
+  payload.responsavel_nome = usuarioNome();
   if(novoStatusDetalhado === 'pedido_feito') payload.pedido_feito_em = new Date().toISOString();
   if(novoStatusDetalhado === 'concluido') payload.concluido_em = new Date().toISOString();
   try {
@@ -4050,10 +4023,10 @@ async function dgAtualizarStatus(id, novoStatusDetalhado) {
         await notificacaoCriar(
           r.solicitante_email,
           novoStatusDetalhado === 'pedido_feito' ? 'digitalizacao_pedido_feito' : 'digitalizacao_concluida',
-          novoStatusDetalhado === 'pedido_feito' ? 'Pedido de digitalizacao feito' : 'Digitalizacao disponivel',
+          novoStatusDetalhado === 'pedido_feito' ? 'Pedido de digitalizacao feito' : 'Digitalizacao finalizada',
           novoStatusDetalhado === 'pedido_feito'
             ? `O pedido de digitalizacao do processo ${r.processo} foi feito.`
-            : `A digitalizacao do processo ${r.processo} ja esta disponivel.`,
+            : `A digitalizacao do processo ${r.processo} foi finalizada.`,
           'digitalizacao',
           r.id
         );
@@ -4065,8 +4038,32 @@ async function dgAtualizarStatus(id, novoStatusDetalhado) {
   } catch(e) { alert('Erro ao atualizar status.'); }
 }
 
+async function dgSalvarResposta(id){
+  const elResp = document.getElementById('dg-resposta-'+id);
+  const observacao_resposta = elResp ? elResp.value.trim() : '';
+  try{
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?id=eq.${id}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Prefer':'return=representation',...getAuthHeaders()},
+      body:JSON.stringify({
+        observacao_resposta,
+        responsavel_email:usuarioEmail(),
+        responsavel_nome:usuarioNome()
+      })
+    });
+    const data = await resp.json();
+    if(Array.isArray(data) && data[0]){
+      const r = data[0];
+      const item = document.getElementById('dg-item-'+id);
+      if(item) item.outerHTML = dgItemHtml(r);
+    }
+  }catch(e){
+    alert('Erro ao salvar observacao.');
+  }
+}
+
 async function dgToggleStatus(id, statusAtual) {
-  await dgAtualizarStatus(id, statusAtual === 'pedido' ? 'concluido' : 'solicitado');
+  await dgAtualizarStatus(id, statusAtual === 'pedido' ? 'concluido' : 'tramitando');
 }
 async function dgRemover(id) {
   if(!confirm('Remover este registro?')) return;
