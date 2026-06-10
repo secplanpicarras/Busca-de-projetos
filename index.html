@@ -982,6 +982,14 @@ body.controle-light #page-monitor{width:100%}
 body.controle-light #page-monitor .monitor-embed{box-shadow:none}
 body.controle-light:has(#page-monitor[style*="block"]) .content-inner{max-width:none;padding:24px}
 
+/* Pre-Analise incorporada */
+#page-preanalise > :not(.preanalise-embed){display:none!important}
+.preanalise-embed{height:calc(100vh - 52px);min-height:720px;border:0;border-radius:0;overflow:hidden;background:#edf2f4;margin:-24px}
+.preanalise-embed iframe{width:100%;height:100%;border:0;display:block;background:#edf2f4}
+body.controle-light #page-preanalise{width:100%}
+body.controle-light #page-preanalise .preanalise-embed{box-shadow:none}
+body.controle-light:has(#page-preanalise[style*="block"]) .content-inner{max-width:none;padding:24px}
+
 /* Digitalização no modelo claro */
 /* Monitor IPM em modal */
 body.controle-light #page-digitalizacao{width:100%}
@@ -1252,7 +1260,7 @@ body.controle-light .fResultadoPreview{
 .admin-stat{border:1px solid #d9e0e5;background:#fff;border-radius:12px;padding:12px}
 .admin-stat span{font-size:10px;font-family:var(--mono);font-weight:900;color:#607080;text-transform:uppercase;letter-spacing:.06em}
 .admin-stat strong{display:block;font-size:24px;color:#061524;margin-top:4px;line-height:1}
-.admin-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 170px;gap:8px;margin-bottom:12px}
+.admin-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 170px 190px;gap:8px;margin-bottom:12px}
 .admin-preview{border:1px dashed #b8cbd4;background:#f8fbfb;border-radius:10px;padding:10px;margin-top:12px}
 .admin-preview-title{font-size:11px;font-family:var(--mono);font-weight:900;text-transform:uppercase;color:#40586a;margin-bottom:8px;letter-spacing:.06em}
 .admin-preview-list{display:flex;gap:6px;flex-wrap:wrap}
@@ -1264,7 +1272,36 @@ body.controle-light .fResultadoPreview{
 .admin-quick button{border:1px solid #d9e0e5;background:#fff;border-radius:9px;padding:9px 10px;text-align:left;cursor:pointer;color:#172026;font-weight:900;font-size:12px}
 .admin-quick button:hover{border-color:#1d6f7a;background:#f4fbfb}
 @media (max-width:980px){.admin-grid{grid-template-columns:1fr}.admin-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media (max-width:700px){.admin-toolbar{grid-template-columns:1fr}}
+.admin-rules{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.admin-rule{border:1px solid #d9e0e5;background:#fff;border-radius:12px;padding:12px}
+.admin-rule strong{display:block;font-size:13px;color:#061524;margin-bottom:5px}
+.admin-rule span{display:block;font-size:11px;color:#607080;line-height:1.35}
+.admin-audit{margin-top:16px}
+.admin-audit-list{display:grid;gap:8px;max-height:260px;overflow:auto}
+.admin-audit-item{border:1px solid #d9e0e5;background:#fff;border-radius:10px;padding:10px 12px}
+.admin-audit-item strong{display:block;font-size:12px;color:#061524}
+.admin-audit-item span{display:block;font-size:11px;color:#607080;margin-top:3px;line-height:1.35}
+.admin-catalog{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.admin-module{border:1px solid #d9e0e5;background:#fff;border-radius:12px;padding:12px;min-height:112px;display:flex;flex-direction:column;gap:8px}
+.admin-module-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.admin-module-name{font-size:14px;font-weight:900;color:#061524;line-height:1.1}
+.admin-module-desc{font-size:11px;color:#607080;line-height:1.35}
+.admin-module-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:auto}
+.admin-module-badge{font-size:9px;font-family:var(--mono);font-weight:900;text-transform:uppercase;letter-spacing:.04em;padding:3px 7px;border-radius:999px;border:1px solid #d6e1e5;background:#eef5f6;color:#315465}
+.admin-module-badge.ok{background:#e8f6f3;color:#12766c;border-color:#bfe4dd}
+.admin-module-badge.warn{background:#fff7df;color:#a36d00;border-color:#f3dc9b}
+.admin-module-badge.admin{background:#eef3ff;color:#3150a3;border-color:#cbd8ff}
+.notif-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.notif-summary{font-size:12px;color:var(--text2);font-weight:700}
+.notif-list{display:grid;gap:8px;max-height:520px;overflow:auto}
+.notif-item{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--surface)}
+.notif-item.unread{background:#eef8f8;border-color:#bfe4dd}
+.notif-item-title{font-weight:900;color:var(--text);font-size:13px}
+.notif-item-msg{font-size:12px;color:var(--text2);line-height:1.45;margin-top:4px}
+.notif-item-meta{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px}
+@media (max-width:900px){.admin-rules{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1100px){.admin-catalog{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:700px){.admin-toolbar{grid-template-columns:1fr}.admin-rules,.admin-catalog{grid-template-columns:1fr}}
 
 </style>
 </head>
@@ -1385,6 +1422,11 @@ body.controle-light .fResultadoPreview{
             <div class="hmod-lbl">Relatorio IPM</div>
             <div class="hmod-name">Monitor</div>
             <span class="hchip hchip-b">Painel de prazos</span>
+          </div>
+          <div class="hmod hmod-sm" onclick="navTo('preanalise')" style="cursor:pointer">
+            <div class="hmod-lbl">Projetos</div>
+            <div class="hmod-name">Pr&eacute;-An&aacute;lise</div>
+            <span class="hchip hchip-g">Checklist e parecer</span>
           </div>
         </div>
         <div class="home-feed" style="position:relative;z-index:1" id="home-feed-wrap">
@@ -1685,6 +1727,13 @@ body.controle-light .fResultadoPreview{
         </div>
       </div>
 
+      <!-- PAGE PRE-ANALISE -->
+      <div id="page-preanalise" style="display:none">
+        <div class="preanalise-embed">
+          <iframe id="preAnaliseFrame" data-src="http://127.0.0.1:8765/?embed=1&apiBase=http%3A%2F%2F127.0.0.1%3A8765" title="Pr&eacute;-An&aacute;lise SEPLAN"></iframe>
+        </div>
+      </div>
+
       <!-- PAGE ADMIN -->
       <div id="page-admin" style="display:none">
         <div class="page-header">
@@ -1697,6 +1746,19 @@ body.controle-light .fResultadoPreview{
           <div class="admin-stat"><span>Analistas</span><strong id="admin-stat-analista">0</strong></div>
           <div class="admin-stat"><span>Inativos</span><strong id="admin-stat-inativo">0</strong></div>
         </div>
+        <div class="admin-rules">
+          <div class="admin-rule"><strong>Admin</strong><span>Acesso total, incluindo Equipe, Mesa, historico e configuracoes.</span></div>
+          <div class="admin-rule"><strong>Analista</strong><span>Busca, digitalizacao, agenda e Monitor IPM para rotina diaria.</span></div>
+          <div class="admin-rule"><strong>Digitalizacao</strong><span>Fila de pedidos e atualizacao de status dos documentos.</span></div>
+          <div class="admin-rule"><strong>Usuario basico</strong><span>Consulta simples e pedidos proprios, quando necessario.</span></div>
+        </div>
+        <div class="admin-list-head" style="margin-bottom:10px">
+          <div>
+            <div class="admin-form-title">Catalogo de modulos</div>
+            <div class="admin-form-sub">Base para liberar, bloquear e preparar novas areas da Central.</div>
+          </div>
+        </div>
+        <div class="admin-catalog" id="admin-catalogo"></div>
         <div class="admin-grid">
           <div class="card admin-form-card">
             <div class="admin-form-head">
@@ -1770,8 +1832,28 @@ body.controle-light .fResultadoPreview{
                 <option value="usuario">Usuario basico</option>
                 <option value="inativo">Inativos</option>
               </select>
+              <select class="form-select" id="admin-filtro-modulo" onchange="adminRenderLista()">
+                <option value="">Todos os modulos</option>
+                <option value="busca">Busca de projeto</option>
+                <option value="historico">Historico</option>
+                <option value="controle">Mesa de controle</option>
+                <option value="digitalizacao">Digitalizacao</option>
+                <option value="monitor">Monitor IPM</option>
+                <option value="agenda">Agenda</option>
+                <option value="admin">Equipe</option>
+              </select>
             </div>
             <div id="admin-lista" class="admin-list"><div class="empty-note">Carregando...</div></div>
+            <div class="admin-audit">
+              <div class="admin-list-head" style="margin-top:14px">
+                <div>
+                  <div class="admin-form-title">Alteracoes recentes</div>
+                  <div class="admin-form-sub">Historico de permissoes alteradas por administradores.</div>
+                </div>
+                <button class="btn btn-sm" onclick="adminCarregarAuditoria()">Atualizar</button>
+              </div>
+              <div id="admin-auditoria" class="admin-audit-list"><div class="empty-note">Carregando...</div></div>
+            </div>
           </div>
         </div>
       </div>
@@ -1991,7 +2073,11 @@ body.controle-light .fResultadoPreview{
         <span class="modal-title">Notificações</span>
         <button class="modal-close" onclick="closeModal('modalNotificacoes')">×</button>
       </div>
-      <div id="notificacoes-lista" style="display:grid;gap:8px"></div>
+      <div class="notif-toolbar">
+        <div class="notif-summary" id="notificacoes-resumo">Carregando...</div>
+        <button class="btn btn-sm" id="notificacoes-marcar-todas" onclick="notificacoesMarcarTodasLidas()">Marcar todas como lidas</button>
+      </div>
+      <div id="notificacoes-lista" class="notif-list"></div>
     </div>
   </div>
 
@@ -2018,6 +2104,10 @@ body.controle-light .fResultadoPreview{
     <button class="dock-item" id="nav-controle" onclick="navTo('controle')">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h10M4 18h7"/><path stroke-linecap="round" stroke-linejoin="round" d="m17 16 2 2 4-5"/></svg>
       <div class="dock-tip">Mesa de controle</div>
+    </button>
+    <button class="dock-item" id="nav-preanalise" onclick="navTo('preanalise')">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M8 6h10M8 12h10M8 18h6"/><path stroke-linecap="round" stroke-linejoin="round" d="m3.5 6 1 1 2-2M3.5 12l1 1 2-2M3.5 18l1 1 2-2"/></svg>
+      <div class="dock-tip">Pr&eacute;-An&aacute;lise</div>
     </button>
     <button class="dock-item" id="nav-monitor" onclick="navTo('monitor')">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M4 19V5m0 14h18M8 16v-5m5 5V8m5 8v-9"/></svg>
@@ -2060,6 +2150,15 @@ if(pdfjsLib) pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.co
 
 let names=[],namesMeta=[],sheetData=null,pdfDoc=null,pdfPages=[];
 let inscricao='',currentSearch=null,buscaSelecionada=null,buscasCache={};
+
+window.addEventListener('message', (event) => {
+  const data = event.data || {};
+  if(data.source !== 'pre-analise') return;
+  window._preAnaliseLastEvent = data;
+  if(data.type === 'process:saved' || data.type === 'analysis:completed'){
+    if(typeof loadHomeStats === 'function') loadHomeStats();
+  }
+});
 
 // AUTH — Supabase Auth
 let currentUser = null;
@@ -2196,20 +2295,32 @@ function usuarioPodeGerenciarDigitalizacao(perfil){
   return ['admin','digitalizacao'].includes((perfil?.papel||'').toLowerCase());
 }
 
-const MODULOS_CENTRAL = ['home','busca','historico','controle','digitalizacao','monitor','agenda','admin'];
+const MODULOS_CENTRAL = ['home','busca','historico','controle','preanalise','digitalizacao','monitor','agenda','admin'];
 const MODULOS_LABELS = {
   home:'Inicio',
   busca:'Busca de projeto',
   historico:'Historico',
   controle:'Mesa de controle',
+  preanalise:'Pre-Analise',
   digitalizacao:'Digitalizacao',
   monitor:'Monitor IPM',
   agenda:'Agenda',
   admin:'Equipe'
 };
+const MODULOS_CATALOGO = [
+  {id:'busca', nome:'Busca de projeto', status:'ativo', tipo:'operacional', desc:'Consulta de projetos aprovados por matricula, inscricao e proprietarios.'},
+  {id:'digitalizacao', nome:'Digitalizacao', status:'ativo', tipo:'operacional', desc:'Pedidos, acompanhamento e retorno de digitalizacao.'},
+  {id:'agenda', nome:'Agenda', status:'ativo', tipo:'operacional', desc:'Agendamentos dos analistas e horarios disponiveis.'},
+  {id:'monitor', nome:'Monitor IPM', status:'ativo', tipo:'operacional', desc:'Importacao de relatorios IPM, atrasos e responsaveis.'},
+  {id:'controle', nome:'Mesa de controle', status:'ativo', tipo:'gestao', desc:'Fila interna de acompanhamento rapido das buscas.'},
+  {id:'historico', nome:'Historico', status:'ativo', tipo:'gestao', desc:'Buscas salvas e registros oficiais da Central.'},
+  {id:'admin', nome:'Equipe', status:'ativo', tipo:'admin', desc:'Usuarios, perfis, permissoes e auditoria.'},
+  {id:'regin', nome:'Regin', status:'planejado', tipo:'futuro', desc:'Modulo futuro para consulta e acompanhamento de processos Regin.'},
+  {id:'habitese', nome:'Habite-se', status:'planejado', tipo:'futuro', desc:'Modulo futuro para controle de pedidos e acompanhamento de Habite-se.'}
+];
 const MODULOS_POR_PERFIL = {
   admin:['*'],
-  analista:['home','busca','digitalizacao','agenda','monitor'],
+  analista:['home','busca','preanalise','digitalizacao','agenda','monitor'],
   digitalizacao:['home','digitalizacao'],
   usuario:['home','busca','digitalizacao']
 };
@@ -2313,37 +2424,56 @@ async function notificacoesAtualizarContador(){
 
 async function abrirNotificacoes(){
   const box = document.getElementById('notificacoes-lista');
+  const resumo = document.getElementById('notificacoes-resumo');
+  const btnTodas = document.getElementById('notificacoes-marcar-todas');
   if(!box) return;
   document.getElementById('modalNotificacoes').style.display='flex';
-  box.innerHTML = '<div class="empty-note">Carregando notificações...</div>';
+  box.innerHTML = '<div class="empty-note">Carregando notificacoes...</div>';
+  if(resumo) resumo.textContent = 'Carregando...';
+  if(btnTodas) btnTodas.style.display = 'none';
   try{
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/notificacoes?destinatario_email=eq.${encodeURIComponent(usuarioEmail())}&order=criada_em.desc&limit=30`,{headers:{...getAuthHeaders()}});
+    const url = SUPABASE_URL + '/rest/v1/notificacoes?destinatario_email=eq.' + encodeURIComponent(usuarioEmail()) + '&order=criada_em.desc&limit=30';
+    const resp = await authFetch(url,{headers:{...getAuthHeaders()}});
     const rows = await resp.json();
     if(!Array.isArray(rows) || !rows.length){
-      box.innerHTML = '<div class="empty-note">Nenhuma notificação.</div>';
+      box.innerHTML = '<div class="empty-note">Nenhuma notificacao.</div>';
+      if(resumo) resumo.textContent = '0 notificacoes';
       return;
     }
+    const naoLidas = rows.filter(n => !n.lida).length;
+    if(resumo) resumo.textContent = rows.length + ' notificacao(oes), ' + naoLidas + ' nao lida(s)';
+    if(btnTodas) btnTodas.style.display = naoLidas ? '' : 'none';
     box.innerHTML = rows.map(n => {
       const dt = n.criada_em ? new Date(n.criada_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
-      return `<div style="border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:${n.lida?'var(--surface)':'#eef8f8'}">
-        <div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start">
-          <div>
-            <div style="font-weight:800;color:var(--text);font-size:13px">${controleEscape(n.titulo||'Notificação')}</div>
-            <div style="font-size:12px;color:var(--text2);line-height:1.45;margin-top:4px">${controleEscape(n.mensagem||'')}</div>
-            <div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px">${controleEscape(dt)}</div>
-          </div>
-          ${n.lida?'':`<button class="btn btn-sm" onclick="notificacaoMarcarLida('${n.id}')">Lida</button>`}
-        </div>
-      </div>`;
+      const cls = n.lida ? 'notif-item' : 'notif-item unread';
+      const page = notificacaoPaginaDestino(n);
+      const btnAbrir = page ? '<button class="btn btn-sm btn-primary" onclick="notificacaoAbrirReferencia(\'' + n.id + '\',\'' + page + '\')">Abrir</button>' : '';
+      const btnLida = n.lida ? '' : '<button class="btn btn-sm" onclick="notificacaoMarcarLida(\'' + n.id + '\')">Lida</button>';
+      const btn = '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">' + btnAbrir + btnLida + '</div>';
+      const nova = n.lida ? '' : ' - nova';
+      return '<div class="' + cls + '"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><div class="notif-item-title">' + controleEscape(n.titulo||'Notificacao') + '</div><div class="notif-item-msg">' + controleEscape(n.mensagem||'') + '</div><div class="notif-item-meta">' + controleEscape(dt + nova) + '</div></div>' + btn + '</div></div>';
     }).join('');
   }catch(e){
-    box.innerHTML = '<div class="empty-note">Não foi possível carregar as notificações.</div>';
+    box.innerHTML = '<div class="empty-note">Nao foi possivel carregar as notificacoes.</div>';
+    if(resumo) resumo.textContent = 'Erro ao carregar';
   }
+}
+
+function notificacaoPaginaDestino(n){
+  const ref = (n.referencia_tipo || '').toLowerCase();
+  const tipo = (n.tipo || '').toLowerCase();
+  if(ref === 'digitalizacao' || tipo.includes('digitalizacao')) return 'digitalizacao';
+  if(ref === 'monitor' || ref === 'ipm' || tipo.includes('monitor') || tipo.includes('ipm')) return 'monitor';
+  if(ref === 'agenda' || tipo.includes('agenda')) return 'agenda';
+  if(ref === 'equipe' || ref === 'perfil' || ref === 'admin' || tipo.includes('perfil')) return 'admin';
+  if(ref === 'meu_perfil' || tipo.includes('acesso')) return 'home';
+  if(ref === 'busca' || ref === 'historico' || tipo.includes('busca')) return 'historico';
+  return '';
 }
 
 async function notificacaoMarcarLida(id){
   try{
-    await authFetch(`${SUPABASE_URL}/rest/v1/notificacoes?id=eq.${id}`,{
+    await authFetch(SUPABASE_URL + '/rest/v1/notificacoes?id=eq.' + id,{
       method:'PATCH',
       headers:{'Content-Type':'application/json','Prefer':'return=minimal',...getAuthHeaders()},
       body:JSON.stringify({lida:true})
@@ -2353,6 +2483,25 @@ async function notificacaoMarcarLida(id){
   }catch(e){}
 }
 
+async function notificacaoAbrirReferencia(id, page){
+  await notificacaoMarcarLida(id);
+  closeModal('modalNotificacoes');
+  navTo(page);
+}
+
+async function notificacoesMarcarTodasLidas(){
+  if(!usuarioEmail()) return;
+  try{
+    const url = SUPABASE_URL + '/rest/v1/notificacoes?destinatario_email=eq.' + encodeURIComponent(usuarioEmail()) + '&lida=eq.false';
+    await authFetch(url,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Prefer':'return=minimal',...getAuthHeaders()},
+      body:JSON.stringify({lida:true})
+    });
+    abrirNotificacoes();
+    notificacoesAtualizarContador();
+  }catch(e){}
+}
 async function refreshToken(){
   const refresh = sessionStorage.getItem('seplan_refresh');
   if(!refresh) return false;
@@ -2428,6 +2577,12 @@ async function navTo(page){
     const frame = document.getElementById('monitorFramePage');
     if(frame && !frame.src) frame.src = 'monitor.html';
   }
+  if(page==='preanalise'){
+    const pagePre = document.getElementById('page-preanalise');
+    if(pagePre) pagePre.style.display = 'block';
+    const frame = document.getElementById('preAnaliseFrame');
+    if(frame && !frame.getAttribute('src')) frame.src = frame.dataset.src || 'http://127.0.0.1:8765/?embed=1';
+  }
   if(page==='digitalizacao'){ abrirDigitalizacao(); }
   if(page==='admin'){ adminInit(); }
 }
@@ -2437,7 +2592,29 @@ let adminPerfisCache = [];
 let adminEditandoEmail = '';
 function adminInit(){
   adminRenderChecks();
+  adminRenderCatalogo();
   adminCarregarPerfis();
+  adminCarregarAuditoria();
+}
+
+function adminRenderCatalogo(){
+  const box = document.getElementById('admin-catalogo');
+  if(!box) return;
+  box.innerHTML = MODULOS_CATALOGO.map(m => {
+    const statusCls = m.status === 'ativo' ? 'ok' : 'warn';
+    const tipoCls = m.tipo === 'admin' ? 'admin' : '';
+    return `<div class="admin-module">
+      <div class="admin-module-top">
+        <div class="admin-module-name">${controleEscape(m.nome)}</div>
+        <span class="admin-module-badge ${statusCls}">${m.status === 'ativo' ? 'ativo' : 'planejado'}</span>
+      </div>
+      <div class="admin-module-desc">${controleEscape(m.desc)}</div>
+      <div class="admin-module-meta">
+        <span class="admin-module-badge ${tipoCls}">${controleEscape(m.tipo)}</span>
+        <span class="admin-module-badge">${controleEscape(m.id)}</span>
+      </div>
+    </div>`;
+  }).join('');
 }
 
 function adminStatus(msg, tipo='ok'){
@@ -2562,8 +2739,20 @@ async function adminSalvarPerfil(){
     });
     if(!resp.ok) throw new Error(await resp.text());
     if(email === usuarioEmail()) _usuarioPerfilCache = null;
+    await adminRegistrarAuditoria(email, adminEditandoEmail ? 'perfil_atualizado' : 'perfil_criado', payload);
+    if(email !== usuarioEmail()){
+      await notificacaoCriar(
+        email,
+        'acesso_atualizado',
+        'Seu acesso foi atualizado',
+        'Seu perfil na Central SEPLAN foi atualizado por um administrador.',
+        'meu_perfil',
+        email
+      );
+    }
     await aplicarPermissoesModulos();
     await adminCarregarPerfis();
+    await adminCarregarAuditoria();
     adminSetEditando(email);
     adminStatus('Perfil salvo com sucesso.');
   }catch(e){
@@ -2579,9 +2768,70 @@ async function adminAlternarAtivo(email, ativo){
       headers:{'Content-Type':'application/json','Prefer':'return=minimal',...getAuthHeaders()},
       body:JSON.stringify({ativo})
     });
+    await adminRegistrarAuditoria(email, ativo ? 'usuario_ativado' : 'usuario_inativado', {ativo});
+    if(email !== usuarioEmail()){
+      await notificacaoCriar(
+        email,
+        ativo ? 'acesso_ativado' : 'acesso_inativado',
+        ativo ? 'Seu acesso foi ativado' : 'Seu acesso foi inativado',
+        ativo ? 'Seu acesso na Central SEPLAN foi ativado.' : 'Seu acesso na Central SEPLAN foi inativado.',
+        'meu_perfil',
+        email
+      );
+    }
     await adminCarregarPerfis();
+    await adminCarregarAuditoria();
     adminStatus(ativo ? 'Usuario ativado.' : 'Usuario inativado.');
   }catch(e){ adminStatus('Nao foi possivel atualizar o usuario.', 'err'); }
+}
+
+async function adminRegistrarAuditoria(alvo_email, acao, detalhes={}){
+  try{
+    await authFetch(`${SUPABASE_URL}/rest/v1/auditoria_perfis`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Prefer':'return=minimal',...getAuthHeaders()},
+      body:JSON.stringify({
+        autor_email:usuarioEmail(),
+        alvo_email,
+        acao,
+        detalhes
+      })
+    });
+  }catch(e){
+    console.warn('auditoria_perfis indisponivel', e.message);
+  }
+}
+
+async function adminCarregarAuditoria(){
+  const box = document.getElementById('admin-auditoria');
+  if(!box) return;
+  box.innerHTML = '<div class="empty-note">Carregando alteracoes...</div>';
+  try{
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/auditoria_perfis?select=*&order=criada_em.desc&limit=12`,{headers:{...getAuthHeaders()}});
+    const rows = await resp.json();
+    if(!Array.isArray(rows) || !rows.length){
+      box.innerHTML = '<div class="empty-note">Nenhuma alteracao registrada ainda.</div>';
+      return;
+    }
+    box.innerHTML = rows.map(r => {
+      const dt = r.criada_em ? new Date(r.criada_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
+      const acao = {
+        perfil_criado:'Perfil criado',
+        perfil_atualizado:'Perfil atualizado',
+        usuario_ativado:'Usuario ativado',
+        usuario_inativado:'Usuario inativado'
+      }[r.acao] || r.acao || 'Alteracao';
+      const papel = r.detalhes?.papel ? ` Papel: ${r.detalhes.papel}.` : '';
+      const extras = listaModulos(r.detalhes?.modulos_permitidos).length ? ` Extras: ${listaModulos(r.detalhes.modulos_permitidos).map(m=>MODULOS_LABELS[m]||m).join(', ')}.` : '';
+      const bloqueios = listaModulos(r.detalhes?.modulos_bloqueados).length ? ` Bloqueios: ${listaModulos(r.detalhes.modulos_bloqueados).map(m=>MODULOS_LABELS[m]||m).join(', ')}.` : '';
+      return `<div class="admin-audit-item">
+        <strong>${controleEscape(acao)} - ${controleEscape(r.alvo_email||'')}</strong>
+        <span>${controleEscape(dt)} por ${controleEscape(r.autor_email||'')}.${controleEscape(papel+extras+bloqueios)}</span>
+      </div>`;
+    }).join('');
+  }catch(e){
+    box.innerHTML = '<div class="empty-note">Auditoria ainda nao esta configurada no Supabase.</div>';
+  }
 }
 
 async function adminCarregarPerfis(){
@@ -2616,6 +2866,7 @@ function adminRenderLista(){
   if(!box) return;
   const termo = (document.getElementById('admin-filtro')?.value || '').toLowerCase().trim();
   const filtroPapel = document.getElementById('admin-filtro-papel')?.value || '';
+  const filtroModulo = document.getElementById('admin-filtro-modulo')?.value || '';
   let rows = adminPerfisCache.slice();
   if(termo){
     rows = rows.filter(p => `${p.nome||''} ${p.email||''}`.toLowerCase().includes(termo));
@@ -2624,6 +2875,9 @@ function adminRenderLista(){
     rows = rows.filter(p => p.ativo === false);
   } else if(filtroPapel){
     rows = rows.filter(p => (p.papel||'').toLowerCase() === filtroPapel);
+  }
+  if(filtroModulo){
+    rows = rows.filter(p => adminModulosEfetivos(p.papel, p.modulos_permitidos, p.modulos_bloqueados).includes(filtroModulo));
   }
   if(!rows.length){
     box.innerHTML = '<div class="empty-note">Nenhum usuario encontrado neste filtro.</div>';
