@@ -1033,10 +1033,61 @@ body.controle-light #page-digitalizacao .form-input:focus{
   border-color:#1d6f7a;
   box-shadow:0 0 0 3px rgba(29,111,122,.10);
 }
+body.controle-light #page-digitalizacao .dg-resumo{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:10px;
+  margin-bottom:12px;
+}
+body.controle-light #page-digitalizacao .dg-card{
+  border:1px solid #d9e0e5;
+  border-radius:10px;
+  background:#fbfcfd;
+  padding:12px;
+}
+body.controle-light #page-digitalizacao .dg-card small{
+  display:block;
+  color:#607080;
+  font-family:var(--mono);
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+}
+body.controle-light #page-digitalizacao .dg-card strong{
+  display:block;
+  color:#061826;
+  font-size:24px;
+  line-height:1.1;
+  margin-top:4px;
+}
+body.controle-light #page-digitalizacao .dg-filtros{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:0 0 12px;
+}
+body.controle-light #page-digitalizacao .dg-filter{
+  border:1px solid #cfd9df;
+  background:#fff;
+  color:#172026;
+  border-radius:999px;
+  padding:7px 12px;
+  font-size:12px;
+  font-weight:800;
+  font-family:'Nunito',var(--sans);
+  cursor:pointer;
+}
+body.controle-light #page-digitalizacao .dg-filter.active{
+  background:#103942;
+  border-color:#103942;
+  color:#fff;
+}
 @media(max-width:760px){
   body.controle-light #page-digitalizacao .digitalizacao-header{display:block}
   body.controle-light #page-digitalizacao .digitalizacao-header .btn{margin-top:10px;width:100%;justify-content:center}
   body.controle-light #dg-pane-novo > div:first-child{grid-template-columns:1fr!important}
+  body.controle-light #page-digitalizacao .dg-resumo{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 #modalMonitor .modal{
   width:min(1560px,calc(100vw - 72px));
@@ -1504,7 +1555,7 @@ body.controle-light .fResultadoPreview{
           <div class="btn-row" style="margin-top:1rem">
             <button class="btn" onclick="goTo(2)">← Voltar</button>
             <button class="btn btn-green" id="btnSalvarBusca" style="display:none" onclick="openSalvar()">💾 Salvar busca</button>
-            <button class="btn btn-primary" onclick="startSearch()">↺ Buscar novamente</button>
+            <button class="btn btn-primary" id="btnNovaBusca" style="display:none" onclick="novaBusca()">+ Nova busca</button>
           </div>
         </div>
       </div>
@@ -1693,10 +1744,17 @@ body.controle-light .fResultadoPreview{
 
       <!-- ABA REGISTROS -->
       <div id="dg-pane-lista" style="display:none">
-        <div style="display:flex;gap:8px;margin-bottom:1rem">
-          <input class="form-input" id="dg-pesquisa" placeholder="🔍  Pesquisar por processo..." oninput="dgFiltrar()" style="flex:1">
+        <div id="dg-resumo" class="dg-resumo"></div>
+        <div class="dg-filtros">
+          <button class="dg-filter active" id="dg-filter-todos" onclick="dgSetFiltroStatus('todos')">Todos</button>
+          <button class="dg-filter" id="dg-filter-tramitando" onclick="dgSetFiltroStatus('tramitando')">Tramitando</button>
+          <button class="dg-filter" id="dg-filter-pedido_feito" onclick="dgSetFiltroStatus('pedido_feito')">Pedido feito</button>
+          <button class="dg-filter" id="dg-filter-concluido" onclick="dgSetFiltroStatus('concluido')">Finalizados</button>
         </div>
-        <div id="dg-lista" style="max-height:380px;overflow-y:auto"></div>
+        <div style="display:flex;gap:8px;margin-bottom:1rem">
+          <input class="form-input" id="dg-pesquisa" placeholder="Buscar por processo..." oninput="dgFiltrar()" style="flex:1">
+        </div>
+        <div id="dg-lista" style="max-height:430px;overflow-y:auto"></div>
         <div id="dg-count" style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:.5rem;text-align:right"></div>
       </div>
 
@@ -2923,6 +2981,45 @@ function goTo(step){
   });
 }
 function goManual(){ names=[]; namesMeta=[]; renderNames(); goTo(2); }
+
+function novaBusca(){
+  names = [];
+  namesMeta = [];
+  inscricao = '';
+  currentSearch = null;
+  pdfDoc = null;
+  pdfPages = [];
+  const pdfInput = document.getElementById('pdfInput');
+  if(pdfInput) pdfInput.value = '';
+  const inscricaoInput = document.getElementById('inscricaoInput');
+  if(inscricaoInput) inscricaoInput.value = '';
+  const newNameInput = document.getElementById('newNameInput');
+  if(newNameInput) newNameInput.value = '';
+  const progressWrap = document.getElementById('progressWrap');
+  if(progressWrap) progressWrap.style.display = 'none';
+  const progressFill = document.getElementById('progressFill');
+  if(progressFill) progressFill.style.width = '0%';
+  const progressMsg = document.getElementById('progressMsg');
+  if(progressMsg) progressMsg.textContent = 'Processando...';
+  const searchStatus = document.getElementById('searchStatusCard');
+  if(searchStatus) searchStatus.style.display = 'none';
+  const searchFill = document.getElementById('searchFill');
+  if(searchFill) searchFill.style.width = '0%';
+  const searchMsg = document.getElementById('searchMsg');
+  if(searchMsg) searchMsg.textContent = 'Carregando planilha...';
+  const results = document.getElementById('resultsContainer');
+  if(results) results.innerHTML = '';
+  const salvar = document.getElementById('btnSalvarBusca');
+  if(salvar) salvar.style.display = 'none';
+  const nova = document.getElementById('btnNovaBusca');
+  if(nova) nova.style.display = 'none';
+  renderNames();
+  const highlight = document.getElementById('highlightPanel');
+  if(highlight) highlight.innerHTML = '<div class="empty-note">Nenhum PDF carregado.</div>';
+  showTab('names');
+  goTo(1);
+}
+
 function showTab(t){
   document.getElementById('tabNamesContent').style.display=t==='names'?'block':'none';
   document.getElementById('tabPDFContent').style.display=t==='pdf'?'block':'none';
@@ -3058,6 +3155,7 @@ async function startSearch(){
   document.getElementById('searchStatusCard').style.display='block';
   document.getElementById('resultsContainer').innerHTML='';
   document.getElementById('btnSalvarBusca').style.display='none';
+  document.getElementById('btnNovaBusca').style.display='none';
   setSearchProgress(10,'Carregando planilha...');
   diShow('busca');
   try{
@@ -3096,6 +3194,7 @@ async function startSearch(){
     const podeSalvar = await usuarioPodeSalvarBusca();
     window._podeSalvarBusca = podeSalvar;
     document.getElementById('btnSalvarBusca').style.display=podeSalvar?'inline-flex':'none';
+    document.getElementById('btnNovaBusca').style.display='inline-flex';
   }catch(err){setSearchProgress(0,'Erro ao carregar planilha.');console.error(err);}
 }
 
@@ -3236,8 +3335,8 @@ async function salvarBusca(){
     protocolo,
     matricula,
     inscricao: currentSearch.inscricao||'',
-    nomes: currentSearch.proprietarios||[],
     resultado: {
+      proprietarios: currentSearch.proprietarios||[],
       inscricao_resultados: currentSearch.inscricao_resultados||[],
       nome_resultados: confirmados,
       tem_resultado: temRes
@@ -3764,7 +3863,7 @@ function gerarCertidao(){
   if(!buscaSelecionada) return;
   const b=buscaSelecionada;
   const dt=new Date(b.criado_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-  const props=Array.isArray(b.proprietarios)?b.proprietarios:[];
+  const props=Array.isArray(b.proprietarios) ? b.proprietarios : (Array.isArray(b.resultado?.proprietarios) ? b.resultado.proprietarios : []);
   const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Certidão de Nada Consta</title>
 <style>body{font-family:Arial,sans-serif;font-size:12pt;line-height:1.6;margin:0;padding:0}.page{max-width:700px;margin:60px auto;padding:0 40px}.header{text-align:center;border-bottom:2px solid #333;padding-bottom:16px;margin-bottom:32px}.header h2{font-size:13pt;font-weight:700;margin:0 0 4px;text-transform:uppercase}.header p{font-size:10pt;margin:0;color:#555}h1{font-size:14pt;text-align:center;font-weight:700;text-transform:uppercase;margin:0 0 32px}.corpo{text-align:justify;margin-bottom:24px}.destaque{font-weight:700}.rodape{margin-top:60px;text-align:center;font-size:10pt;color:#555;border-top:1px solid #ccc;padding-top:12px}.assinatura{margin-top:80px;text-align:center}.assinatura .linha{width:280px;border-top:1px solid #333;margin:0 auto 6px}.assinatura p{font-size:10pt;margin:2px 0}@media print{.page{margin:20px auto}}</style>
 </head><body><div class="page">
@@ -3945,9 +4044,38 @@ async function dgAdicionar() {
     btn.textContent = 'Enviar pedido'; btn.disabled = false;
   }
 }
+
+function dgStatusNormalizado(r){
+  const statusDetalhado = r.status_detalhado || (r.status === 'entregue' ? 'concluido' : 'tramitando');
+  return statusDetalhado === 'solicitado' ? 'tramitando' : statusDetalhado;
+}
+
+function dgResumoHtml(data){
+  const total = data.length;
+  const tramitando = data.filter(r => dgStatusNormalizado(r) === 'tramitando').length;
+  const pedidoFeito = data.filter(r => dgStatusNormalizado(r) === 'pedido_feito').length;
+  const concluido = data.filter(r => dgStatusNormalizado(r) === 'concluido').length;
+  return [
+    ['Total', total],
+    ['Tramitando', tramitando],
+    ['Pedido feito', pedidoFeito],
+    ['Finalizados', concluido]
+  ].map(([label, value]) => '<div class="dg-card"><small>'+label+'</small><strong>'+value+'</strong></div>').join('');
+}
+
+function dgSetFiltroStatus(status){
+  window._dgFiltroStatus = status || 'todos';
+  ['todos','tramitando','pedido_feito','concluido'].forEach(s => {
+    const btn = document.getElementById('dg-filter-'+s);
+    if(btn) btn.classList.toggle('active', s === window._dgFiltroStatus);
+  });
+  dgCarregarLista(document.getElementById('dg-pesquisa')?.value.trim() || '');
+}
+
 async function dgCarregarLista(filtro='') {
   const lista = document.getElementById('dg-lista');
   const countEl = document.getElementById('dg-count');
+  const resumoEl = document.getElementById('dg-resumo');
   lista.innerHTML = '<div style="font-size:12px;color:var(--text3);font-family:var(--mono);padding:1rem;text-align:center">Carregando...</div>';
   const perfil = await usuarioPerfil();
   window._dgPodeGerenciar = usuarioPodeGerenciarDigitalizacao(perfil);
@@ -3958,12 +4086,18 @@ async function dgCarregarLista(filtro='') {
     const resp = await fetch(url, { headers:{...getAuthHeaders()} });
     const data = await resp.json();
     if(!Array.isArray(data)||!data.length){
+      if(resumoEl) resumoEl.innerHTML = dgResumoHtml([]);
       lista.innerHTML = '<div style="font-size:13px;color:var(--text3);text-align:center;padding:1.5rem;font-family:var(--mono)">Nenhum registro encontrado.</div>';
       countEl.textContent = '';
       return;
     }
-    countEl.textContent = data.length + ' registro(s)';
-    lista.innerHTML = data.map(r => dgItemHtml(r)).join('');
+    if(resumoEl) resumoEl.innerHTML = dgResumoHtml(data);
+    const filtroStatus = window._dgFiltroStatus || 'todos';
+    const filtrados = filtroStatus === 'todos' ? data : data.filter(r => dgStatusNormalizado(r) === filtroStatus);
+    countEl.textContent = filtrados.length + ' de ' + data.length + ' registro(s)';
+    lista.innerHTML = filtrados.length
+      ? filtrados.map(r => dgItemHtml(r)).join('')
+      : '<div style="font-size:13px;color:var(--text3);text-align:center;padding:1.5rem;font-family:var(--mono)">Nenhum registro neste filtro.</div>';
   } catch(e) {
     lista.innerHTML = '<div style="font-size:12px;color:var(--red);font-family:var(--mono);padding:1rem">Erro ao carregar</div>';
   }
@@ -3975,8 +4109,7 @@ function dgFiltrar() {
 }
 
 function dgItemHtml(r) {
-  const statusDetalhado = r.status_detalhado || (r.status === 'entregue' ? 'concluido' : 'tramitando');
-  const normalizado = statusDetalhado === 'solicitado' ? 'tramitando' : statusDetalhado;
+  const normalizado = dgStatusNormalizado(r);
   const statusMap = {
     tramitando:{label:'Tramitando', color:'var(--amber)', bg:'#fff7df'},
     pedido_feito:{label:'Pedido feito', color:'var(--blue)', bg:'#eef5ff'},
