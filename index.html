@@ -3375,9 +3375,11 @@ async function openSalvar(){
 async function salvarBusca(){
   const protocolo=document.getElementById('fProtocolo').value.trim();
   const matricula=document.getElementById('fMatricula').value.trim();
-  if(!protocolo){alert('Informe o número/ano do protocolo.');return;}
+  if(!protocolo){alert('Informe o numero/ano do protocolo.');return;}
   const confirmados=currentSearch._confirmados||[];
   const temRes=confirmados.length>0||(currentSearch.inscricao_resultados||[]).length>0;
+  const btnSalvar = document.querySelector('#modalCadastro .btn-primary');
+  if(btnSalvar){ btnSalvar.disabled = true; btnSalvar.textContent = 'Salvando...'; }
   const payload={
     protocolo,
     matricula,
@@ -3389,18 +3391,49 @@ async function salvarBusca(){
       tem_resultado: temRes
     }
   };
-  const resp=await authFetch(`${SUPABASE_URL}/rest/v1/buscas`,{
-    method:'POST',
-    headers:{'Content-Type':'application/json',...getAuthHeaders(),'Prefer':'return=representation'},
-    body:JSON.stringify(payload)
-  });
-  if(resp.ok){
-    const saved = await resp.json();
-    const savedBusca = Array.isArray(saved) ? saved[0] : null;
-    if(savedBusca) controleCriarDeBusca(savedBusca, { silent:true });
-    closeModal('modalCadastro');diShow('salvo');loadHomeStats();
+  try{
+    let resp=await authFetch(`${SUPABASE_URL}/rest/v1/buscas`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Prefer':'return=representation'},
+      body:JSON.stringify(payload)
+    });
+    let err = null;
+    if(!resp.ok){
+      err = await resp.clone().json().catch(()=>null);
+      const msg = JSON.stringify(err || {});
+      if(err?.code === 'PGRST204' || /schema cache|Could not find/i.test(msg)){
+        const payloadBasico = {
+          protocolo,
+          matricula,
+          inscricao: currentSearch.inscricao||''
+        };
+        resp = await authFetch(`${SUPABASE_URL}/rest/v1/buscas`,{
+          method:'POST',
+          headers:{'Content-Type':'application/json','Prefer':'return=representation'},
+          body:JSON.stringify(payloadBasico)
+        });
+        if(resp.ok){
+          const saved = await resp.json();
+          const savedBusca = Array.isArray(saved) ? {...saved[0], resultado: payload.resultado} : null;
+          if(savedBusca) controleCriarDeBusca(savedBusca, { silent:true });
+          closeModal('modalCadastro');diShow('salvo');loadHomeStats();
+          alert('Busca salva com dados basicos. Para salvar os processos confirmados no historico, precisa atualizar a tabela buscas no Supabase com a coluna resultado.');
+          return;
+        }
+      }
+    }
+    if(resp.ok){
+      const saved = await resp.json();
+      const savedBusca = Array.isArray(saved) ? saved[0] : null;
+      if(savedBusca) controleCriarDeBusca(savedBusca, { silent:true });
+      closeModal('modalCadastro');diShow('salvo');loadHomeStats();
+    } else {
+      err = err || await resp.json().catch(()=>({message:'Erro desconhecido'}));
+      alert('Erro ao salvar: '+JSON.stringify(err));
+    }
+  } finally {
+    if(btnSalvar){ btnSalvar.disabled = false; btnSalvar.textContent = '?? Salvar'; }
   }
-  else{const err=await resp.json();alert('Erro ao salvar: '+JSON.stringify(err));}
 }
 
 // HISTÓRICO
