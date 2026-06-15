@@ -925,7 +925,7 @@ async function getLatestGeneralRel(){
 async function responsaveisPorProcesso(){
   const map=new Map();
   try{
-    const rows=await supa.get('processos?select=numero,responsavel_email,responsavel_nome,relatorio_importado_em&not.responsavel_email=is.null&order=relatorio_importado_em.asc&limit=8000');
+    const rows=await supa.get('processos?select=numero,responsavel_email,responsavel_nome,relatorio_importado_em&responsavel_email=not.is.null&order=relatorio_importado_em.asc&limit=8000');
     if(Array.isArray(rows)){
       rows.forEach(r=>{
         if(r.numero&&r.responsavel_email)map.set(protocoloKey(r.numero),{email:r.responsavel_email,nome:r.responsavel_nome||r.responsavel_email,em:r.relatorio_importado_em});
