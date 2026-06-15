@@ -2610,17 +2610,29 @@ async function refreshToken(){
   return false;
 }
 
-// Fetch com refresh automático — usa no lugar de fetch direto
+function respostaAuthExpirada(resp){
+  if(resp.status === 401) return Promise.resolve(true);
+  if(resp.status !== 400 && resp.status !== 403) return Promise.resolve(false);
+  return resp.clone().json()
+    .then(err => err?.code === 'PGRST303' || /jwt expired/i.test(err?.message || ''))
+    .catch(() => false);
+}
+
+// Fetch com refresh automatico - usa no lugar de fetch direto
 async function authFetch(url, opts={}){
-  opts.headers = {...getAuthHeaders(), ...(opts.headers||{})};
-  let resp = await fetch(url, opts);
-  if(resp.status === 401){
+  const baseOpts = {...opts};
+  const headersOriginais = {...(opts.headers || {})};
+  const montarOpts = () => ({
+    ...baseOpts,
+    headers: {...headersOriginais, ...getAuthHeaders()}
+  });
+  let resp = await fetch(url, montarOpts());
+  if(await respostaAuthExpirada(resp)){
     const ok = await refreshToken();
     if(ok){
-      opts.headers = {...getAuthHeaders(), ...(opts.headers||{})};
-      resp = await fetch(url, opts);
+      resp = await fetch(url, montarOpts());
     } else {
-      // Token expirado e sem refresh — faz logout
+      alert('Sua sessao expirou. Entre novamente para continuar.');
       logout();
     }
   }
