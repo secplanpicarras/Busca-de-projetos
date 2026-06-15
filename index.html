@@ -1437,7 +1437,7 @@ body.controle-light .fResultadoPreview{
           <div class="dash-tile warn" onclick="navTo('digitalizacao')">
             <span>Digitaliza&ccedil;&atilde;o</span>
             <strong id="dash-dig-pendentes">0</strong>
-            <small>Pedidos ainda nao entregues</small>
+            <small id="dash-dig-sub">Pedidos ainda nao entregues</small>
           </div>
           <div class="dash-tile info" onclick="navTo('agenda')">
             <span>Agenda</span>
@@ -2533,7 +2533,8 @@ async function abrirNotificacoes(){
       const dt = n.criada_em ? new Date(n.criada_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
       const cls = n.lida ? 'notif-item' : 'notif-item unread';
       const page = notificacaoPaginaDestino(n);
-      const btnAbrir = page ? '<button class="btn btn-sm btn-primary" onclick="notificacaoAbrirReferencia(\'' + n.id + '\',\'' + page + '\')">Abrir</button>' : '';
+      const refId = String(n.referencia_id || '').replaceAll("'", "\\'");
+      const btnAbrir = page ? '<button class="btn btn-sm btn-primary" onclick="notificacaoAbrirReferencia(\'' + n.id + '\',\'' + page + '\',\'' + refId + '\')">Abrir</button>' : '';
       const btnLida = n.lida ? '' : '<button class="btn btn-sm" onclick="notificacaoMarcarLida(\'' + n.id + '\')">Lida</button>';
       const btn = '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">' + btnAbrir + btnLida + '</div>';
       const nova = n.lida ? '' : ' - nova';
@@ -2569,7 +2570,8 @@ async function notificacaoMarcarLida(id){
   }catch(e){}
 }
 
-async function notificacaoAbrirReferencia(id, page){
+async function notificacaoAbrirReferencia(id, page, referenciaId=''){
+  if(page === 'digitalizacao' && referenciaId) window._dgReferenciaId = referenciaId;
   await notificacaoMarcarLida(id);
   closeModal('modalNotificacoes');
   navTo(page);
@@ -3964,7 +3966,7 @@ function abrirDigitalizacao() {
   const ano = document.getElementById('dg-ano');
   if(ano && !ano.value) ano.value = String(new Date().getFullYear());
   dgConfigurarPermissoesDigitalizacao();
-  dgShowTab('novo');
+  dgShowTab(window._dgReferenciaId ? 'lista' : 'novo');
 }
 
 async function dgConfigurarPermissoesDigitalizacao(){
@@ -4106,6 +4108,7 @@ async function dgAdicionar() {
     st.textContent = 'Pedido enviado!';
     setTimeout(()=>st.textContent='',3000);
     notificacoesAtualizarContador();
+    loadHomeStats();
     diShow('digitalizacao');
   } catch(e) {
     alert('Erro ao salvar. Tente novamente.');
@@ -4167,9 +4170,29 @@ async function dgCarregarLista(filtro='') {
     lista.innerHTML = filtrados.length
       ? filtrados.map(r => dgItemHtml(r)).join('')
       : '<div style="font-size:13px;color:var(--text3);text-align:center;padding:1.5rem;font-family:var(--mono)">Nenhum registro neste filtro.</div>';
+    dgDestacarReferencia();
   } catch(e) {
     lista.innerHTML = '<div style="font-size:12px;color:var(--red);font-family:var(--mono);padding:1rem">Erro ao carregar</div>';
   }
+}
+
+function dgDestacarReferencia(){
+  const refId = window._dgReferenciaId;
+  if(!refId) return;
+  setTimeout(() => {
+    const el = document.getElementById('dg-item-' + refId);
+    if(!el) return;
+    el.scrollIntoView({behavior:'smooth', block:'center'});
+    el.style.background = '#fffbea';
+    el.style.outline = '2px solid #d9a900';
+    el.style.borderRadius = '10px';
+    setTimeout(() => {
+      el.style.background = '';
+      el.style.outline = '';
+      el.style.borderRadius = '';
+    }, 4500);
+    window._dgReferenciaId = '';
+  }, 120);
 }
 
 function dgFiltrar() {
@@ -4236,6 +4259,7 @@ async function dgAtualizarStatus(id, novoStatusDetalhado) {
       const el = document.getElementById('dg-item-'+id);
       if(el) el.outerHTML = dgItemHtml(r);
       notificacoesAtualizarContador();
+      loadHomeStats();
     }
   } catch(e) { alert('Erro ao atualizar status.'); }
 }
@@ -4256,8 +4280,19 @@ async function dgSalvarResposta(id){
     const data = await resp.json();
     if(Array.isArray(data) && data[0]){
       const r = data[0];
+      if(r.solicitante_email && r.solicitante_email !== usuarioEmail()){
+        await notificacaoCriar(
+          r.solicitante_email,
+          'digitalizacao_resposta',
+          'Pedido de digitalizacao atualizado',
+          `Foi adicionada uma observacao ao pedido do processo ${r.processo}.`,
+          'digitalizacao',
+          r.id
+        );
+      }
       const item = document.getElementById('dg-item-'+id);
       if(item) item.outerHTML = dgItemHtml(r);
+      notificacoesAtualizarContador();
     }
   }catch(e){
     alert('Erro ao salvar observacao.');
@@ -4299,7 +4334,7 @@ async function dgCarregarAnalistas() {
     if(Array.isArray(data)) data.forEach(r => {
       if(contagem[r.detalhe]!==undefined) {
         contagem[r.detalhe]++;
-        if(r.status==='pedido') pendentes[r.detalhe]++;
+        if(dgStatusNormalizado(r)!=='concluido') pendentes[r.detalhe]++;
       }
     });
     grid.innerHTML = analistas.map(a => {
@@ -4388,16 +4423,20 @@ async function loadHomeStats(){
   try{
     const perfil = await usuarioPerfil();
     const filtroUsuario = usuarioPodeGerenciarDigitalizacao(perfil) || !usuarioEmail() ? '' : `&solicitante_email=eq.${encodeURIComponent(usuarioEmail())}`;
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?select=id,status${filtroUsuario}`);
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?select=id,status,status_detalhado${filtroUsuario}`);
     const data = await resp.json();
     if(Array.isArray(data)){
-      const pend = data.filter(r=>r.status==='pedido').length;
+      const tramitando = data.filter(r=>dgStatusNormalizado(r)==='tramitando').length;
+      const pedidoFeito = data.filter(r=>dgStatusNormalizado(r)==='pedido_feito').length;
+      const pend = tramitando + pedidoFeito;
       countTo(document.getElementById('home-ndig'), data.length, 800);
       const dashDig = document.getElementById('dash-dig-pendentes');
       if(dashDig) dashDig.textContent = pend;
+      const dashDigSub = document.getElementById('dash-dig-sub');
+      if(dashDigSub) dashDigSub.textContent = tramitando + ' tramitando | ' + pedidoFeito + ' pedido feito';
       const chip = document.getElementById('hchip-dig');
       const badge = document.getElementById('hbadge-dig');
-      if(chip){chip.textContent = pend + ' pendentes'; chip.className = pend>0?'hchip hchip-a':'hchip hchip-g';}
+      if(chip){chip.textContent = pend ? pend + ' nao entregue(s)' : 'Tudo entregue'; chip.className = pend>0?'hchip hchip-a':'hchip hchip-g';}
       if(badge){badge.textContent = pend + ' pend.'; badge.style.background=pend>0?'rgba(239,159,39,.15)':'rgba(26,158,110,.15)'; badge.style.color=pend>0?'#EF9F27':'#4ecb9e';}
     }
   }catch(e){}
