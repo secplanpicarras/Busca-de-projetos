@@ -86,7 +86,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .topbar-avatar{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#1a6fad,#1a9e6e);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:#fff;cursor:pointer;font-family:var(--sans)}
 .topbar-notif{position:relative;width:30px;height:30px;border-radius:8px;border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);background:transparent;transition:all .2s}
 .topbar-notif:hover{border-color:var(--border2);color:var(--text);background:rgba(255,255,255,.04)}
+.topbar-notif.has-unread{border-color:rgba(226,75,74,.55);color:var(--red);background:rgba(226,75,74,.08)}
+.topbar-notif.has-unread::after{content:'';position:absolute;inset:-5px;border-radius:12px;border:1px solid rgba(226,75,74,.38);animation:notifRing 1.8s ease-out infinite}
 .notif-dot{position:absolute;top:-5px;right:-5px;min-width:17px;height:17px;border-radius:999px;background:var(--red);color:#fff;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg)}
+@keyframes notifRing{0%{opacity:.8;transform:scale(.82)}75%,100%{opacity:0;transform:scale(1.28)}}
 .topbar-menu{width:30px;height:30px;border-radius:8px;border:0.5px solid var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);transition:all .2s}
 .topbar-menu:hover{border-color:var(--border2);color:var(--text)}
 
@@ -2227,6 +2230,7 @@ const SUPABASE_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 let homeCanvasInited = false;
 let dgMotivo = 'analista';
 let _diBusy=false,_diTimer,_diAf,_diCleanup=null;
+let _notifPollTimer=null,_notifUnreadCount=null,_notifLatestId='';
 const SHEET_ID='1AGrwH3KW1dgtvUr8H2uPlaj_Vleq7mwYDGoW6JHkOFI';
 
 const pdfjsLib=window['pdfjs-dist/build/pdf'];
@@ -2296,7 +2300,7 @@ function showApp(){
   homeTick();
   initHomeCanvas();
   loadHomeStats();
-  notificacoesAtualizarContador();
+  notificacoesIniciarMonitor();
   const nome = email.split('@')[0];
   const elUser = document.getElementById('usuarioLogado');
   if(elUser) elUser.textContent=nome;
@@ -2307,6 +2311,10 @@ function logout(){
   sessionStorage.removeItem('seplan_refresh');
   sessionStorage.removeItem('seplan_email');
   _usuarioPerfilCache = null;
+  if(_notifPollTimer) clearInterval(_notifPollTimer);
+  _notifPollTimer = null;
+  _notifUnreadCount = null;
+  _notifLatestId = '';
   // Só recarrega se não estiver já na tela de login
   if(document.getElementById('app').style.display !== 'none'){
     location.reload();
@@ -2496,16 +2504,49 @@ async function notificacaoResponsaveisDigitalizacao(){
   return atual ? [atual] : [];
 }
 
-async function notificacoesAtualizarContador(){
+function notificacaoAplicarEstado(n, latest=null, avisar=false){
   const badge = document.getElementById('notif-count');
-  if(!badge || !usuarioEmail()) return;
+  const btn = document.querySelector('.topbar-notif');
+  if(!badge) return;
+  badge.textContent = n > 99 ? '99+' : String(n);
+  badge.style.display = n ? 'flex' : 'none';
+  if(btn) btn.classList.toggle('has-unread', n > 0);
+  if(avisar && n > 0 && latest && typeof diShow === 'function'){
+    window._diNotif = latest;
+    diShow('notificacao');
+  }
+}
+
+async function notificacoesAtualizarContador(opts={}){
+  const badge = document.getElementById('notif-count');
+  if(!badge || !usuarioEmail()) return 0;
+  const avisarNovas = opts.avisarNovas !== false;
   try{
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/notificacoes?select=id&destinatario_email=eq.${encodeURIComponent(usuarioEmail())}&lida=eq.false`,{headers:{...getAuthHeaders()}});
+    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/notificacoes?select=id,titulo,mensagem,referencia_tipo,referencia_id,criada_em&destinatario_email=eq.${encodeURIComponent(usuarioEmail())}&lida=eq.false&order=criada_em.desc&limit=100`,{headers:{...getAuthHeaders()}});
     const rows = await resp.json();
     const n = Array.isArray(rows) ? rows.length : 0;
-    badge.textContent = n > 99 ? '99+' : String(n);
-    badge.style.display = n ? 'flex' : 'none';
-  }catch(e){ badge.style.display='none'; }
+    const latest = Array.isArray(rows) ? rows[0] : null;
+    const latestId = latest?.id || '';
+    const tinhaBase = _notifUnreadCount !== null;
+    const nova = tinhaBase && n > (_notifUnreadCount || 0) && latestId && latestId !== _notifLatestId;
+    notificacaoAplicarEstado(n, latest, avisarNovas && nova);
+    _notifUnreadCount = n;
+    _notifLatestId = latestId;
+    return n;
+  }catch(e){
+    badge.style.display='none';
+    const btn = document.querySelector('.topbar-notif');
+    if(btn) btn.classList.remove('has-unread');
+    return 0;
+  }
+}
+
+function notificacoesIniciarMonitor(){
+  if(_notifPollTimer) clearInterval(_notifPollTimer);
+  _notifUnreadCount = null;
+  _notifLatestId = '';
+  notificacoesAtualizarContador({avisarNovas:false});
+  _notifPollTimer = setInterval(()=>notificacoesAtualizarContador({avisarNovas:true}), 12000);
 }
 
 async function abrirNotificacoes(){
@@ -4118,25 +4159,52 @@ async function dgAdicionar() {
   const detalhe = usuarioNome();
   const btn = document.querySelector('#dg-pane-novo .btn-primary');
   btn.textContent = 'Enviando...'; btn.disabled = true;
+  const payloadCompleto = {
+    processo,
+    ano: Number(anoRaw),
+    data,
+    motivo: 'analista',
+    detalhe,
+    obs,
+    observacao_solicitante: obs,
+    status:'pedido',
+    status_detalhado:'tramitando',
+    solicitante_email:usuarioEmail(),
+    solicitante_nome:usuarioNome()
+  };
+  const payloadBasico = {
+    processo,
+    data,
+    motivo: 'analista',
+    detalhe,
+    obs,
+    status:'pedido'
+  };
   try {
-    const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao`, {
+    let resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao`, {
       method:'POST',
       headers:{'Content-Type':'application/json','Prefer':'return=representation',...getAuthHeaders()},
-      body: JSON.stringify({
-        processo,
-        ano: Number(anoRaw),
-        data,
-        motivo: 'analista',
-        detalhe,
-        obs,
-        observacao_solicitante: obs,
-        status:'pedido',
-        status_detalhado:'tramitando',
-        solicitante_email:usuarioEmail(),
-        solicitante_nome:usuarioNome()
-      })
+      body: JSON.stringify(payloadCompleto)
     });
-    if(!resp.ok) throw new Error();
+    let err = null;
+    if(!resp.ok){
+      err = await resp.clone().json().catch(()=>null);
+      const msg = JSON.stringify(err || {});
+      if(err?.code === 'PGRST204' || /schema cache|Could not find|column/i.test(msg)){
+        resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao`, {
+          method:'POST',
+          headers:{'Content-Type':'application/json','Prefer':'return=representation',...getAuthHeaders()},
+          body: JSON.stringify(payloadBasico)
+        });
+        if(resp.ok){
+          alert('Pedido salvo em modo basico. Para vincular ao usuario, notificacoes e status detalhado, rode a atualizacao da tabela digitalizacao no Supabase.');
+        }
+      }
+    }
+    if(!resp.ok){
+      const detalheErro = err?.message || await resp.clone().text().catch(()=> '');
+      throw new Error(detalheErro || 'Erro desconhecido do Supabase.');
+    }
     const saved = await resp.json();
     const registro = Array.isArray(saved) ? saved[0] : null;
     const responsaveis = await notificacaoResponsaveisDigitalizacao();
@@ -4158,7 +4226,8 @@ async function dgAdicionar() {
     loadHomeStats();
     diShow('digitalizacao');
   } catch(e) {
-    alert('Erro ao salvar. Tente novamente.');
+    console.error('Erro ao salvar digitalizacao:', e);
+    alert('Erro ao salvar digitalizacao:\n' + (e.message || 'Tente novamente.'));
   } finally {
     btn.textContent = 'Enviar pedido'; btn.disabled = false;
   }
@@ -4673,6 +4742,14 @@ const _diCfgs={
   erro:{w:240,h:52,dur:3500,build(){
     _diPad.innerHTML=`<div id="di-ai" style="width:24px;height:24px;border-radius:50%;background:rgba(226,75,74,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;font-weight:800;color:#E24B4A">!</div><div style="flex:1;margin-left:8px"><div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:700;color:#E24B4A;text-transform:uppercase">Erro</div><div style="font-size:10px;color:rgba(255,255,255,.4);margin-top:1px">Verifique e tente novamente</div></div>`;
     let s=1,dir=1,af;function pulse(){s+=dir*.008;if(s>1.12||s<1)dir*=-1;const el=document.getElementById('di-ai');if(el)el.style.transform=`scale(${s})`;af=requestAnimationFrame(pulse);}pulse();
+    return()=>{cancelAnimationFrame(af);};
+  }},
+  notificacao:{w:330,h:58,dur:5200,build(){
+    const n = window._diNotif || {};
+    const titulo = controleEscape(n.titulo || 'Nova notificacao');
+    const msg = controleEscape(n.mensagem || 'Voce recebeu uma atualizacao na Central.');
+    _diPad.innerHTML=`<div id="di-notif-dot" style="width:26px;height:26px;border-radius:50%;background:rgba(226,75,74,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#E24B4A"><svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a3 3 0 0 1-5.714 0"/></svg></div><div style="flex:1;min-width:0;margin-left:8px"><div style="font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;color:#fff;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${titulo}</div><div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${msg}</div></div><button onclick="abrirNotificacoes()" style="border:0;background:#1d7d87;color:#fff;border-radius:999px;padding:6px 10px;font-size:10px;font-weight:800;cursor:pointer;pointer-events:auto">Abrir</button>`;
+    let s=1,dir=1,af;function pulse(){s+=dir*.006;if(s>1.12||s<1)dir*=-1;const el=document.getElementById('di-notif-dot');if(el)el.style.transform=`scale(${s})`;af=requestAnimationFrame(pulse);}pulse();
     return()=>{cancelAnimationFrame(af);};
   }},
   digitalizacao:{w:270,h:52,dur:3500,build(){
