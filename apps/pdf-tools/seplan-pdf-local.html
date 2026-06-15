@@ -1,0 +1,2519 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SEPLAN PDF - Local</title>
+    <style>
+:root {
+  color-scheme: light;
+  --bg: #f6f7f4;
+  --ink: #1f2724;
+  --muted: #62706c;
+  --line: #d9dfdc;
+  --panel: #ffffff;
+  --brand: #116149;
+  --brand-dark: #0a4031;
+  --accent: #d99f2b;
+  --danger: #a83d3d;
+  --shadow: 0 18px 45px rgba(23, 34, 31, 0.12);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px clamp(18px, 4vw, 54px) 22px;
+  background: #ffffff;
+  border-bottom: 1px solid var(--line);
+}
+
+.eyebrow {
+  margin: 0 0 6px;
+  color: var(--brand);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+h1,
+h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+h1 {
+  font-size: clamp(1.85rem, 4vw, 3rem);
+  line-height: 1.02;
+}
+
+h2 {
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.privacy {
+  flex: 0 0 auto;
+  border: 1px solid #bfd0c8;
+  border-radius: 999px;
+  padding: 9px 14px;
+  color: var(--brand-dark);
+  background: #eef7f2;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.shell {
+  width: min(1220px, calc(100% - 32px));
+  margin: 24px auto 48px;
+}
+
+.notice-band {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 13px 16px;
+  border: 1px solid #c9d8d1;
+  border-left: 5px solid var(--brand);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.notice-band strong {
+  color: var(--brand-dark);
+}
+
+.toolnav {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(185px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.tool-tab {
+  min-height: 86px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--ink);
+  text-align: left;
+  padding: 16px;
+  cursor: pointer;
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.tool-tab span,
+.tool-tab small {
+  display: block;
+}
+
+.tool-tab span {
+  font-weight: 850;
+  font-size: 1.04rem;
+}
+
+.tool-tab small {
+  margin-top: 5px;
+  color: var(--muted);
+  line-height: 1.25;
+}
+
+.tool-tab:hover,
+.tool-tab.active {
+  border-color: var(--brand);
+  box-shadow: 0 10px 24px rgba(17, 97, 73, 0.12);
+  transform: translateY(-1px);
+}
+
+.workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 14px;
+  align-items: start;
+}
+
+.tool-panel,
+.status-panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  box-shadow: var(--shadow);
+}
+
+.tool-panel {
+  display: none;
+  min-height: 560px;
+  padding: clamp(18px, 3vw, 30px);
+}
+
+.tool-panel.active {
+  display: block;
+}
+
+.panel-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.dropzone {
+  display: grid;
+  place-items: center;
+  gap: 6px;
+  min-height: 178px;
+  padding: 24px;
+  border: 2px dashed #afbbb7;
+  border-radius: 8px;
+  background: #f8faf8;
+  cursor: pointer;
+  text-align: center;
+}
+
+.dropzone:hover,
+.dropzone.dragover {
+  border-color: var(--brand);
+  background: #eef7f2;
+}
+
+.compact-zone {
+  min-height: 132px;
+  padding: 18px;
+}
+
+.dropzone input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.dropzone strong {
+  font-size: 1.2rem;
+}
+
+.dropzone span,
+.note,
+.status,
+.metrics {
+  color: var(--muted);
+}
+
+.file-list {
+  display: grid;
+  gap: 9px;
+  padding: 0;
+  margin: 18px 0;
+  list-style: none;
+}
+
+.file-list li {
+  display: grid;
+  grid-template-columns: 42px 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  min-height: 54px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.file-index {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #eef7f2;
+  color: var(--brand-dark);
+  font-weight: 850;
+}
+
+.file-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 750;
+}
+
+.file-size {
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.icon-btn,
+.ghost,
+.primary,
+.download {
+  border: 0;
+  border-radius: 8px;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.icon-btn {
+  width: 36px;
+  aspect-ratio: 1;
+  background: #eef1ef;
+  color: var(--ink);
+}
+
+.icon-btn:hover {
+  background: #dfe8e3;
+}
+
+.ghost {
+  padding: 10px 13px;
+  background: #eef1ef;
+  color: var(--ink);
+}
+
+.primary,
+.download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 18px;
+  margin-top: 18px;
+  background: var(--brand);
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.primary:hover,
+.download:hover {
+  background: var(--brand-dark);
+}
+
+.primary:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.controls-grid label {
+  display: grid;
+  gap: 7px;
+}
+
+.controls-grid span {
+  color: var(--ink);
+  font-weight: 800;
+}
+
+input[type="number"],
+input[type="text"],
+select {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid #cdd6d2;
+  border-radius: 8px;
+  padding: 0 12px;
+  background: #ffffff;
+  color: var(--ink);
+}
+
+textarea {
+  width: 100%;
+  min-height: 90px;
+  border: 1px solid #cdd6d2;
+  border-radius: 8px;
+  padding: 10px 12px;
+  background: #ffffff;
+  color: var(--ink);
+  resize: vertical;
+  font: inherit;
+}
+
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--brand);
+}
+
+output {
+  color: var(--brand-dark);
+  font-weight: 850;
+}
+
+.note {
+  margin: 16px 0 0;
+  line-height: 1.5;
+}
+
+.segmented {
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: min(620px, 100%);
+  gap: 6px;
+  padding: 6px;
+  margin-top: 18px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #f3f5f4;
+}
+
+.mode {
+  min-height: 42px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.mode.active {
+  background: #ffffff;
+  color: var(--brand-dark);
+  box-shadow: 0 6px 14px rgba(23, 34, 31, 0.08);
+}
+
+.status-panel {
+  position: sticky;
+  top: 14px;
+  padding: 22px;
+}
+
+.status-panel h2 {
+  margin-bottom: 14px;
+}
+
+.status {
+  min-height: 72px;
+  line-height: 1.45;
+}
+
+.metrics {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  font-size: 0.95rem;
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+
+.metric strong {
+  color: var(--ink);
+}
+
+.download-area {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.download {
+  width: 100%;
+  margin-top: 0;
+}
+
+.safety-box {
+  display: grid;
+  gap: 6px;
+  margin-top: 18px;
+  padding: 12px;
+  border: 1px solid #dbe4df;
+  border-radius: 8px;
+  background: #f8faf8;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.safety-box strong {
+  color: var(--brand-dark);
+}
+
+.safety-box small {
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.error {
+  color: var(--danger);
+}
+
+@media (max-width: 920px) {
+  .topbar,
+  .workspace {
+    display: block;
+  }
+
+  .privacy {
+    display: inline-block;
+    margin-top: 16px;
+  }
+
+  .toolnav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .status-panel {
+    position: static;
+    margin-top: 14px;
+  }
+
+  .controls-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .notice-band {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .shell {
+    width: min(100% - 20px, 1220px);
+    margin-top: 12px;
+  }
+
+  .toolnav,
+  .segmented {
+    grid-template-columns: 1fr;
+  }
+
+  .file-list li {
+    grid-template-columns: 36px 1fr auto;
+  }
+
+  .file-size {
+    grid-column: 2 / -1;
+  }
+}
+
+</style>
+    <script>
+      window.SEPLAN_PDF_LIBS = {
+        pdfLib: "./vendor/pdf-lib.min.js",
+        pdfJs: "./vendor/pdf.min.js",
+        pdfWorker: "./vendor/pdf.worker.min.js",
+        jsZip: "./vendor/jszip.min.js",
+      };
+    </script>
+    <script src="./vendor/pdf-lib.min.js"></script>
+    <script src="./vendor/pdf.min.js"></script>
+    <script src="./vendor/jszip.min.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Central SEPLAN</p>
+        <h1>Ferramentas PDF</h1>
+      </div>
+      <div class="privacy">Processamento local no navegador</div>
+    </header>
+
+    <main class="shell">
+      <section class="notice-band" aria-label="Aviso institucional">
+        <strong>Homologacao SEPLAN PDF</strong>
+        <span>Os arquivos sao processados no proprio navegador e nao sao enviados para servidor. Para melhor desempenho, use Chrome ou Edge atualizado e evite arquivos acima de 120 MB nesta versao local.</span>
+      </section>
+
+      <nav class="toolnav" aria-label="Ferramentas">
+        <button class="tool-tab active" data-tool="merge" type="button">
+          <span>Juntar</span>
+          <small>Unir varios PDFs</small>
+        </button>
+        <button class="tool-tab" data-tool="compress" type="button">
+          <span>Compactar</span>
+          <small>Escolher qualidade ou tamanho</small>
+        </button>
+        <button class="tool-tab" data-tool="split" type="button">
+          <span>Dividir</span>
+          <small>Metade, blocos ou paginas</small>
+        </button>
+        <button class="tool-tab" data-tool="extract" type="button">
+          <span>Extrair</span>
+          <small>Gerar PDF por intervalo</small>
+        </button>
+        <button class="tool-tab" data-tool="organize" type="button">
+          <span>Organizar</span>
+          <small>Remover e reordenar paginas</small>
+        </button>
+        <button class="tool-tab" data-tool="rotate" type="button">
+          <span>Girar</span>
+          <small>Rotacionar paginas</small>
+        </button>
+        <button class="tool-tab" data-tool="watermark" type="button">
+          <span>Marca d'agua</span>
+          <small>Texto sobre o PDF</small>
+        </button>
+        <button class="tool-tab" data-tool="numbers" type="button">
+          <span>Numerar</span>
+          <small>Adicionar numero de pagina</small>
+        </button>
+        <button class="tool-tab" data-tool="pdfToJpg" type="button">
+          <span>PDF para JPG</span>
+          <small>Exportar paginas como imagens</small>
+        </button>
+        <button class="tool-tab" data-tool="jpgToPdf" type="button">
+          <span>JPG para PDF</span>
+          <small>Criar PDF com imagens</small>
+        </button>
+        <button class="tool-tab" data-tool="crop" type="button">
+          <span>Cortar</span>
+          <small>Ajustar margens do PDF</small>
+        </button>
+        <button class="tool-tab" data-tool="sign" type="button">
+          <span>Assinar</span>
+          <small>Inserir assinatura textual</small>
+        </button>
+        <button class="tool-tab" data-tool="textStamp" type="button">
+          <span>Texto</span>
+          <small>Adicionar texto/carimbo</small>
+        </button>
+        <button class="tool-tab" data-tool="redact" type="button">
+          <span>Tarjar</span>
+          <small>Ocultar area sensivel</small>
+        </button>
+        <button class="tool-tab" data-tool="compare" type="button">
+          <span>Comparar</span>
+          <small>Ver diferencas entre PDFs</small>
+        </button>
+        <button class="tool-tab" data-tool="textExtract" type="button">
+          <span>PDF para TXT</span>
+          <small>Extrair texto pesquisavel</small>
+        </button>
+        <button class="tool-tab" data-tool="flattenForms" type="button">
+          <span>Formularios</span>
+          <small>Achatar campos preenchidos</small>
+        </button>
+        <button class="tool-tab" data-tool="metadata" type="button">
+          <span>Metadados</span>
+          <small>Limpar ou definir dados</small>
+        </button>
+        <button class="tool-tab" data-tool="cover" type="button">
+          <span>Capa</span>
+          <small>Adicionar folha de rosto</small>
+        </button>
+        <button class="tool-tab" data-tool="nup" type="button">
+          <span>2 em 1</span>
+          <small>Mais paginas por folha</small>
+        </button>
+      </nav>
+
+      <section class="workspace">
+        <article class="tool-panel active" id="merge">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Juntar PDF</p>
+              <h2>Combine arquivos na ordem desejada</h2>
+            </div>
+            <button class="ghost" id="clearMerge" type="button">Limpar</button>
+          </div>
+          <label class="dropzone" for="mergeFiles">
+            <input id="mergeFiles" type="file" accept="application/pdf" multiple />
+            <strong>Selecionar PDFs</strong>
+            <span>Arraste ou escolha dois ou mais arquivos.</span>
+          </label>
+          <ol class="file-list" id="mergeList"></ol>
+          <button class="primary" id="mergeBtn" type="button">Juntar PDFs</button>
+        </article>
+
+        <article class="tool-panel" id="compress">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Compactar PDF</p>
+              <h2>Reduza o peso e defina uma meta de tamanho</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="compressFile">
+            <input id="compressFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>A compactacao renderiza as paginas em imagem para reduzir o arquivo.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Qualidade JPEG</span>
+              <input id="quality" type="range" min="35" max="92" value="72" />
+              <output id="qualityOut">72%</output>
+            </label>
+            <label>
+              <span>Resolucao</span>
+              <select id="dpi">
+                <option value="96">Leve</option>
+                <option value="130" selected>Equilibrada</option>
+                <option value="170">Alta</option>
+                <option value="220">Muito alta</option>
+              </select>
+            </label>
+            <label>
+              <span>Tamanho alvo em MB</span>
+              <input id="targetMb" type="number" min="0.1" step="0.1" placeholder="Opcional" />
+            </label>
+          </div>
+          <p class="note">Para preservar texto pesquisavel, use a qualidade alta. Para chegar em um tamanho especifico, o app pode reduzir qualidade e resolucao automaticamente.</p>
+          <button class="primary" id="compressBtn" type="button">Compactar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="split">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Dividir PDF</p>
+              <h2>Quebre um processo em partes menores</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="splitFile">
+            <input id="splitFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Exemplo: um PDF de 30 paginas pode virar duas partes de 15.</span>
+          </label>
+          <div class="segmented" role="group" aria-label="Modo de divisao">
+            <button class="mode active" data-mode="half" type="button">Metade</button>
+            <button class="mode" data-mode="every" type="button">A cada N paginas</button>
+            <button class="mode" data-mode="ranges" type="button">Intervalos</button>
+          </div>
+          <div class="controls-grid">
+            <label data-split-control="every" hidden>
+              <span>Paginas por arquivo</span>
+              <input id="pagesPerPart" type="number" min="1" value="10" />
+            </label>
+            <label data-split-control="ranges" hidden>
+              <span>Intervalos</span>
+              <input id="splitRanges" type="text" placeholder="1-5, 6-10, 11-15" />
+            </label>
+          </div>
+          <button class="primary" id="splitBtn" type="button">Dividir PDF</button>
+        </article>
+
+        <article class="tool-panel" id="extract">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Extrair paginas</p>
+              <h2>Crie um novo PDF com paginas escolhidas</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="extractFile">
+            <input id="extractFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Informe paginas soltas ou intervalos.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Paginas</span>
+              <input id="extractRanges" type="text" placeholder="1-3, 8, 12-15" />
+            </label>
+          </div>
+          <button class="primary" id="extractBtn" type="button">Extrair paginas</button>
+        </article>
+
+        <article class="tool-panel" id="organize">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Organizar PDF</p>
+              <h2>Reordene, remova e gire paginas em uma etapa</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="organizeFile">
+            <input id="organizeFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Use intervalos como 1-3, 7, 9-10.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Nova ordem</span>
+              <input id="organizeOrder" type="text" placeholder="Opcional: 3, 1, 2, 4-8" />
+            </label>
+            <label>
+              <span>Remover paginas</span>
+              <input id="organizeRemove" type="text" placeholder="Opcional: 5, 8-10" />
+            </label>
+            <label>
+              <span>Girar paginas</span>
+              <select id="organizeRotate">
+                <option value="0">Nao girar</option>
+                <option value="90">90 graus</option>
+                <option value="180">180 graus</option>
+                <option value="270">270 graus</option>
+              </select>
+            </label>
+          </div>
+          <p class="note">Se a nova ordem ficar vazia, o app mantem todas as paginas na ordem original e aplica apenas remocao/giro.</p>
+          <button class="primary" id="organizeBtn" type="button">Organizar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="rotate">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Girar PDF</p>
+              <h2>Rotacione todas as paginas ou apenas algumas</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="rotateFile">
+            <input id="rotateFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Informe paginas especificas ou deixe em branco para todas.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Paginas</span>
+              <input id="rotateRanges" type="text" placeholder="Opcional: 1-3, 8" />
+            </label>
+            <label>
+              <span>Rotacao</span>
+              <select id="rotateAngle">
+                <option value="90">90 graus</option>
+                <option value="180">180 graus</option>
+                <option value="270">270 graus</option>
+              </select>
+            </label>
+          </div>
+          <button class="primary" id="rotateBtn" type="button">Girar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="watermark">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Marca d'agua</p>
+              <h2>Aplique texto em todas as paginas</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="watermarkFile">
+            <input id="watermarkFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Ideal para rascunho, copia interna ou protocolo.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Texto</span>
+              <input id="watermarkText" type="text" value="SEPLAN" />
+            </label>
+            <label>
+              <span>Tamanho</span>
+              <input id="watermarkSize" type="number" min="12" max="120" value="54" />
+            </label>
+            <label>
+              <span>Opacidade</span>
+              <input id="watermarkOpacity" type="range" min="8" max="55" value="18" />
+            </label>
+          </div>
+          <button class="primary" id="watermarkBtn" type="button">Adicionar marca d'agua</button>
+        </article>
+
+        <article class="tool-panel" id="numbers">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Numerar paginas</p>
+              <h2>Adicione numeracao no rodape do PDF</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="numbersFile">
+            <input id="numbersFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Escolha inicio, formato e posicao.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Comecar em</span>
+              <input id="numbersStart" type="number" min="1" value="1" />
+            </label>
+            <label>
+              <span>Formato</span>
+              <select id="numbersFormat">
+                <option value="simple">1</option>
+                <option value="page">Pagina 1</option>
+                <option value="total">Pagina 1 de 10</option>
+              </select>
+            </label>
+            <label>
+              <span>Posicao</span>
+              <select id="numbersPosition">
+                <option value="bottom-center">Rodape central</option>
+                <option value="bottom-right">Rodape direito</option>
+                <option value="bottom-left">Rodape esquerdo</option>
+              </select>
+            </label>
+          </div>
+          <button class="primary" id="numbersBtn" type="button">Numerar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="pdfToJpg">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">PDF para JPG</p>
+              <h2>Exporte cada pagina como imagem</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="pdfToJpgFile">
+            <input id="pdfToJpgFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>O resultado sai em ZIP com uma imagem por pagina.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Qualidade</span>
+              <input id="pdfToJpgQuality" type="range" min="55" max="95" value="86" />
+            </label>
+            <label>
+              <span>Resolucao</span>
+              <select id="pdfToJpgDpi">
+                <option value="120">Leve</option>
+                <option value="160" selected>Boa</option>
+                <option value="220">Alta</option>
+              </select>
+            </label>
+          </div>
+          <button class="primary" id="pdfToJpgBtn" type="button">Converter para JPG</button>
+        </article>
+
+        <article class="tool-panel" id="jpgToPdf">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">JPG para PDF</p>
+              <h2>Transforme imagens em um unico PDF</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="jpgToPdfFiles">
+            <input id="jpgToPdfFiles" type="file" accept="image/jpeg,image/png" multiple />
+            <strong>Selecionar imagens</strong>
+            <span>Use JPG ou PNG. Cada imagem vira uma pagina.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Tamanho da pagina</span>
+              <select id="jpgPageSize">
+                <option value="a4" selected>A4 com margem</option>
+                <option value="image">Tamanho da imagem</option>
+              </select>
+            </label>
+            <label>
+              <span>Orientacao A4</span>
+              <select id="jpgOrientation">
+                <option value="auto" selected>Automatica</option>
+                <option value="portrait">Retrato</option>
+                <option value="landscape">Paisagem</option>
+              </select>
+            </label>
+          </div>
+          <button class="primary" id="jpgToPdfBtn" type="button">Criar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="crop">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Cortar PDF</p>
+              <h2>Remova margens das paginas</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="cropFile">
+            <input id="cropFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Informe margens em milimetros.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Paginas</span>
+              <input id="cropRanges" type="text" placeholder="Opcional: 1-3, 8" />
+            </label>
+            <label>
+              <span>Topo mm</span>
+              <input id="cropTop" type="number" min="0" step="1" value="0" />
+            </label>
+            <label>
+              <span>Direita mm</span>
+              <input id="cropRight" type="number" min="0" step="1" value="0" />
+            </label>
+            <label>
+              <span>Baixo mm</span>
+              <input id="cropBottom" type="number" min="0" step="1" value="0" />
+            </label>
+            <label>
+              <span>Esquerda mm</span>
+              <input id="cropLeft" type="number" min="0" step="1" value="0" />
+            </label>
+          </div>
+          <button class="primary" id="cropBtn" type="button">Cortar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="sign">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Assinar PDF</p>
+              <h2>Adicione uma assinatura textual ao documento</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="signFile">
+            <input id="signFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Assinatura visual simples para protocolos e minutas.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Nome/assinatura</span>
+              <input id="signText" type="text" placeholder="Nome do responsavel" />
+            </label>
+            <label>
+              <span>Pagina</span>
+              <input id="signPage" type="number" min="1" value="1" />
+            </label>
+            <label>
+              <span>Posicao</span>
+              <select id="signPosition">
+                <option value="bottom-right" selected>Rodape direito</option>
+                <option value="bottom-center">Rodape central</option>
+                <option value="bottom-left">Rodape esquerdo</option>
+              </select>
+            </label>
+          </div>
+          <p class="note">Esta assinatura e visual. Assinatura digital com certificado deve entrar na fase backend.</p>
+          <button class="primary" id="signBtn" type="button">Assinar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="textStamp">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Adicionar texto</p>
+              <h2>Insira texto ou carimbo em paginas escolhidas</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="textStampFile">
+            <input id="textStampFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Use para protocolo, observacao, minuta ou conferencia.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Texto</span>
+              <input id="stampText" type="text" value="CONFERIDO" />
+            </label>
+            <label>
+              <span>Paginas</span>
+              <input id="stampRanges" type="text" placeholder="Opcional: todas" />
+            </label>
+            <label>
+              <span>Posicao</span>
+              <select id="stampPosition">
+                <option value="top-left">Topo esquerdo</option>
+                <option value="top-right" selected>Topo direito</option>
+                <option value="center">Centro</option>
+                <option value="bottom-left">Rodape esquerdo</option>
+                <option value="bottom-right">Rodape direito</option>
+              </select>
+            </label>
+            <label>
+              <span>Tamanho</span>
+              <input id="stampSize" type="number" min="8" max="72" value="18" />
+            </label>
+          </div>
+          <button class="primary" id="textStampBtn" type="button">Adicionar texto</button>
+        </article>
+
+        <article class="tool-panel" id="redact">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Tarjar PDF</p>
+              <h2>Remova visualmente uma area sensivel</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="redactFile">
+            <input id="redactFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>O PDF final e achatado em imagem para esconder o conteudo coberto.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Paginas</span>
+              <input id="redactRanges" type="text" placeholder="Opcional: todas" />
+            </label>
+            <label>
+              <span>Esquerda %</span>
+              <input id="redactX" type="number" min="0" max="100" step="1" value="10" />
+            </label>
+            <label>
+              <span>Topo %</span>
+              <input id="redactY" type="number" min="0" max="100" step="1" value="10" />
+            </label>
+            <label>
+              <span>Largura %</span>
+              <input id="redactW" type="number" min="1" max="100" step="1" value="35" />
+            </label>
+            <label>
+              <span>Altura %</span>
+              <input id="redactH" type="number" min="1" max="100" step="1" value="8" />
+            </label>
+          </div>
+          <p class="note">Use percentuais da pagina. Exemplo: esquerda 10, topo 10, largura 35, altura 8 cobre uma faixa no canto superior esquerdo.</p>
+          <button class="primary" id="redactBtn" type="button">Tarjar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="compare">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Comparar PDFs</p>
+              <h2>Gere imagens lado a lado para conferencia</h2>
+            </div>
+          </div>
+          <div class="controls-grid">
+            <label class="dropzone compact-zone" for="compareFileA">
+              <input id="compareFileA" type="file" accept="application/pdf" />
+              <strong>PDF original</strong>
+              <span>Primeira versao.</span>
+            </label>
+            <label class="dropzone compact-zone" for="compareFileB">
+              <input id="compareFileB" type="file" accept="application/pdf" />
+              <strong>PDF revisado</strong>
+              <span>Segunda versao.</span>
+            </label>
+            <label>
+              <span>Resolucao</span>
+              <select id="compareDpi">
+                <option value="90">Leve</option>
+                <option value="130" selected>Boa</option>
+                <option value="170">Alta</option>
+              </select>
+            </label>
+          </div>
+          <p class="note">O resultado sai em ZIP com uma imagem por pagina, mostrando original e revisado lado a lado.</p>
+          <button class="primary" id="compareBtn" type="button">Comparar PDFs</button>
+        </article>
+
+        <article class="tool-panel" id="textExtract">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">PDF para TXT</p>
+              <h2>Extraia texto de PDFs pesquisaveis</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="textExtractFile">
+            <input id="textExtractFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Funciona quando o PDF ja possui camada de texto.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Paginas</span>
+              <input id="textExtractRanges" type="text" placeholder="Opcional: todas" />
+            </label>
+          </div>
+          <p class="note">PDF escaneado sem OCR pode gerar pouco ou nenhum texto.</p>
+          <button class="primary" id="textExtractBtn" type="button">Extrair TXT</button>
+        </article>
+
+        <article class="tool-panel" id="flattenForms">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Achatar formularios</p>
+              <h2>Converta campos preenchidos em conteudo fixo</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="flattenFormsFile">
+            <input id="flattenFormsFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Use para evitar edicao acidental de campos de formulario.</span>
+          </label>
+          <button class="primary" id="flattenFormsBtn" type="button">Achatar formulario</button>
+        </article>
+
+        <article class="tool-panel" id="metadata">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Metadados</p>
+              <h2>Limpe ou padronize informacoes internas do PDF</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="metadataFile">
+            <input id="metadataFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Altere titulo, autor, assunto e palavras-chave.</span>
+          </label>
+          <div class="segmented" role="group" aria-label="Modo de metadados">
+            <button class="metadata-mode active" data-metadata-mode="set" type="button">Definir</button>
+            <button class="metadata-mode" data-metadata-mode="clear" type="button">Limpar</button>
+          </div>
+          <div class="controls-grid" id="metadataFields">
+            <label>
+              <span>Titulo</span>
+              <input id="metadataTitle" type="text" placeholder="Documento SEPLAN" />
+            </label>
+            <label>
+              <span>Autor</span>
+              <input id="metadataAuthor" type="text" placeholder="Central SEPLAN" />
+            </label>
+            <label>
+              <span>Assunto</span>
+              <input id="metadataSubject" type="text" placeholder="Processo administrativo" />
+            </label>
+            <label>
+              <span>Palavras-chave</span>
+              <input id="metadataKeywords" type="text" placeholder="seplan, pdf, processo" />
+            </label>
+          </div>
+          <button class="primary" id="metadataBtn" type="button">Salvar metadados</button>
+        </article>
+
+        <article class="tool-panel" id="cover">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Adicionar capa</p>
+              <h2>Crie uma folha de rosto antes do PDF</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="coverFile">
+            <input id="coverFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>A capa sera inserida como primeira pagina.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Titulo</span>
+              <input id="coverTitle" type="text" value="Documento SEPLAN" />
+            </label>
+            <label>
+              <span>Subtitulo</span>
+              <input id="coverSubtitle" type="text" placeholder="Processo, protocolo ou assunto" />
+            </label>
+            <label>
+              <span>Responsavel</span>
+              <input id="coverOwner" type="text" placeholder="Secretaria / Setor" />
+            </label>
+            <label>
+              <span>Data</span>
+              <input id="coverDate" type="text" placeholder="Opcional" />
+            </label>
+          </div>
+          <button class="primary" id="coverBtn" type="button">Adicionar capa</button>
+        </article>
+
+        <article class="tool-panel" id="nup">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Paginas por folha</p>
+              <h2>Monte uma versao economica para conferencia</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="nupFile">
+            <input id="nupFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Gera novo PDF com 2 ou 4 paginas por folha A4.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Layout</span>
+              <select id="nupCount">
+                <option value="2" selected>2 paginas por folha</option>
+                <option value="4">4 paginas por folha</option>
+              </select>
+            </label>
+            <label>
+              <span>Orientacao</span>
+              <select id="nupOrientation">
+                <option value="portrait">A4 retrato</option>
+                <option value="landscape" selected>A4 paisagem</option>
+              </select>
+            </label>
+            <label>
+              <span>Resolucao</span>
+              <select id="nupDpi">
+                <option value="100">Leve</option>
+                <option value="140" selected>Boa</option>
+                <option value="180">Alta</option>
+              </select>
+            </label>
+          </div>
+          <p class="note">Esta ferramenta renderiza as paginas como imagem, ideal para conferencia e impressao, nao para preservar texto pesquisavel.</p>
+          <button class="primary" id="nupBtn" type="button">Gerar PDF 2 em 1</button>
+        </article>
+
+        <aside class="status-panel">
+          <h2>Status</h2>
+          <div id="status" class="status">Aguardando arquivos.</div>
+          <div class="metrics" id="metrics"></div>
+          <div class="download-area" id="downloads"></div>
+          <div class="safety-box">
+            <strong>Privacidade</strong>
+            <span>Nenhum PDF e salvo neste app. Ao recarregar a pagina, os arquivos selecionados sao descartados.</span>
+            <small>Versao 1.0-homologacao</small>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script>
+const libs = window.SEPLAN_PDF_LIBS || {};
+const missingLibs = [];
+if (!window.PDFLib) missingLibs.push("PDFLib");
+if (!window.JSZip) missingLibs.push("JSZip");
+if (!window.pdfjsLib) missingLibs.push("PDF.js");
+
+const { PDFDocument, StandardFonts, degrees, rgb } = window.PDFLib || {};
+if (window.pdfjsLib) window.pdfjsLib.GlobalWorkerOptions.workerSrc = libs.pdfWorker;
+
+const APP_VERSION = "1.0-homologacao";
+const WARN_TOTAL_BYTES = 120 * 1024 * 1024;
+const HARD_TOTAL_BYTES = 250 * 1024 * 1024;
+
+const state = {
+  mergeFiles: [],
+  splitMode: "half",
+};
+
+const els = {
+  status: document.querySelector("#status"),
+  metrics: document.querySelector("#metrics"),
+  downloads: document.querySelector("#downloads"),
+  mergeFiles: document.querySelector("#mergeFiles"),
+  mergeList: document.querySelector("#mergeList"),
+  compressFile: document.querySelector("#compressFile"),
+  splitFile: document.querySelector("#splitFile"),
+  extractFile: document.querySelector("#extractFile"),
+  organizeFile: document.querySelector("#organizeFile"),
+  rotateFile: document.querySelector("#rotateFile"),
+  watermarkFile: document.querySelector("#watermarkFile"),
+  numbersFile: document.querySelector("#numbersFile"),
+  pdfToJpgFile: document.querySelector("#pdfToJpgFile"),
+  jpgToPdfFiles: document.querySelector("#jpgToPdfFiles"),
+  cropFile: document.querySelector("#cropFile"),
+  signFile: document.querySelector("#signFile"),
+  textStampFile: document.querySelector("#textStampFile"),
+  redactFile: document.querySelector("#redactFile"),
+  compareFileA: document.querySelector("#compareFileA"),
+  compareFileB: document.querySelector("#compareFileB"),
+  textExtractFile: document.querySelector("#textExtractFile"),
+  flattenFormsFile: document.querySelector("#flattenFormsFile"),
+  metadataFile: document.querySelector("#metadataFile"),
+  coverFile: document.querySelector("#coverFile"),
+  nupFile: document.querySelector("#nupFile"),
+  quality: document.querySelector("#quality"),
+  qualityOut: document.querySelector("#qualityOut"),
+};
+
+function setStatus(message, error = false) {
+  els.status.textContent = message;
+  els.status.classList.toggle("error", error);
+}
+
+function currentPanelFiles(button) {
+  const panel = button.closest(".tool-panel");
+  if (!panel) return [];
+  return Array.from(panel.querySelectorAll('input[type="file"]')).flatMap((input) => Array.from(input.files || []));
+}
+
+function validateFileLoad(files) {
+  const total = files.reduce((sum, file) => sum + file.size, 0);
+  if (!files.length) return;
+  if (total > HARD_TOTAL_BYTES) {
+    throw new Error(`Os arquivos selecionados somam ${formatSize(total)}. Nesta versao de homologacao, use ate ${formatSize(HARD_TOTAL_BYTES)} por operacao.`);
+  }
+  if (total > WARN_TOTAL_BYTES) {
+    setStatus(`Aviso: os arquivos somam ${formatSize(total)}. Pode demorar ou exigir uma maquina com mais memoria.`);
+  }
+}
+
+function setBusy(button, busy, label) {
+  button.disabled = busy;
+  button.dataset.originalLabel ||= button.textContent;
+  button.textContent = busy ? label : button.dataset.originalLabel;
+}
+
+function bytesToMb(bytes) {
+  return bytes / 1024 / 1024;
+}
+
+function formatSize(bytes) {
+  if (!bytes) return "0 KB";
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${bytesToMb(bytes).toFixed(2)} MB`;
+}
+
+function fileStem(name) {
+  return name.replace(/\.pdf$/i, "").replace(/[^\w.-]+/g, "-").replace(/-+/g, "-").slice(0, 70) || "documento";
+}
+
+async function fileBytes(file) {
+  return new Uint8Array(await file.arrayBuffer());
+}
+
+function resetOutput() {
+  els.metrics.innerHTML = "";
+  els.downloads.innerHTML = "";
+}
+
+function addMetric(label, value) {
+  const row = document.createElement("div");
+  row.className = "metric";
+  row.innerHTML = `<span>${label}</span><strong>${value}</strong>`;
+  els.metrics.append(row);
+}
+
+function downloadBlob(blob, name) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = name;
+  link.className = "download";
+  link.textContent = `Baixar ${name}`;
+  els.downloads.append(link);
+}
+
+function downloadPdf(bytes, name) {
+  downloadBlob(new Blob([bytes], { type: "application/pdf" }), name);
+}
+
+function downloadText(text, name) {
+  downloadBlob(new Blob([text], { type: "text/plain;charset=utf-8" }), name);
+}
+
+function parseRanges(input, pageCount) {
+  const chunks = input.split(",").map((part) => part.trim()).filter(Boolean);
+  if (!chunks.length) throw new Error("Informe pelo menos uma pagina ou intervalo.");
+
+  const pages = [];
+  for (const chunk of chunks) {
+    const match = chunk.match(/^(\d+)(?:\s*-\s*(\d+))?$/);
+    if (!match) throw new Error(`Intervalo invalido: ${chunk}`);
+
+    const start = Number(match[1]);
+    const end = Number(match[2] || match[1]);
+    if (start < 1 || end < start || end > pageCount) {
+      throw new Error(`Intervalo fora do PDF: ${chunk}. Este arquivo tem ${pageCount} paginas.`);
+    }
+
+    for (let page = start; page <= end; page += 1) pages.push(page - 1);
+  }
+  return pages;
+}
+
+function parseRangeGroups(input, pageCount) {
+  return input.split(",").map((part) => part.trim()).filter(Boolean).map((part) => {
+    const pages = parseRanges(part, pageCount);
+    return { label: part.replace(/\s+/g, ""), pages };
+  });
+}
+
+function allPageIndexes(pageCount) {
+  return Array.from({ length: pageCount }, (_, index) => index);
+}
+
+function optionalPages(input, pageCount) {
+  const value = input.trim();
+  return value ? parseRanges(value, pageCount) : allPageIndexes(pageCount);
+}
+
+function uniqueIndexes(indexes) {
+  return [...new Set(indexes)];
+}
+
+function pageNumberText(format, pageNumber, totalPages) {
+  if (format === "page") return `Pagina ${pageNumber}`;
+  if (format === "total") return `Pagina ${pageNumber} de ${totalPages}`;
+  return String(pageNumber);
+}
+
+function pageNumberPosition(position, page, textWidth) {
+  const margin = 34;
+  const y = 24;
+  if (position === "bottom-left") return { x: margin, y };
+  if (position === "bottom-right") return { x: page.getWidth() - textWidth - margin, y };
+  return { x: (page.getWidth() - textWidth) / 2, y };
+}
+
+function mmToPt(value) {
+  return Number(value || 0) * 2.83465;
+}
+
+function textPosition(position, page, textWidth, size) {
+  const margin = 36;
+  if (position === "top-left") return { x: margin, y: page.getHeight() - margin - size };
+  if (position === "top-right") return { x: page.getWidth() - textWidth - margin, y: page.getHeight() - margin - size };
+  if (position === "bottom-left") return { x: margin, y: margin };
+  if (position === "bottom-right") return { x: page.getWidth() - textWidth - margin, y: margin };
+  return { x: (page.getWidth() - textWidth) / 2, y: (page.getHeight() - size) / 2 };
+}
+
+async function renderPdfPage(source, pageNumber, dpi) {
+  const page = await source.getPage(pageNumber);
+  const scale = dpi / 72;
+  const viewport = page.getViewport({ scale });
+  const canvas = document.createElement("canvas");
+  const context = canvas.getContext("2d", { alpha: false });
+  canvas.width = Math.ceil(viewport.width);
+  canvas.height = Math.ceil(viewport.height);
+  context.fillStyle = "#ffffff";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+  await page.render({ canvasContext: context, viewport }).promise;
+  return { canvas, viewport, scale };
+}
+
+function readPercentBox(prefix) {
+  const x = Number(document.querySelector(`#${prefix}X`).value);
+  const y = Number(document.querySelector(`#${prefix}Y`).value);
+  const w = Number(document.querySelector(`#${prefix}W`).value);
+  const h = Number(document.querySelector(`#${prefix}H`).value);
+  if ([x, y, w, h].some((value) => !Number.isFinite(value))) throw new Error("Informe percentuais validos para a area.");
+  if (x < 0 || y < 0 || w <= 0 || h <= 0 || x + w > 100 || y + h > 100) {
+    throw new Error("A area precisa ficar dentro da pagina, entre 0% e 100%.");
+  }
+  return { x, y, w, h };
+}
+
+function installDropzones() {
+  document.querySelectorAll(".dropzone").forEach((zone) => {
+    zone.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      zone.classList.add("dragover");
+    });
+    zone.addEventListener("dragleave", () => zone.classList.remove("dragover"));
+    zone.addEventListener("drop", (event) => {
+      event.preventDefault();
+      zone.classList.remove("dragover");
+      const input = zone.querySelector("input");
+      input.files = event.dataTransfer.files;
+      input.dispatchEvent(new Event("change"));
+    });
+  });
+}
+
+function renderMergeList() {
+  els.mergeList.innerHTML = "";
+  state.mergeFiles.forEach((file, index) => {
+    const item = document.createElement("li");
+    item.innerHTML = `
+      <span class="file-index">${index + 1}</span>
+      <span class="file-name">${file.name}</span>
+      <span class="file-size">${formatSize(file.size)}</span>
+      <span>
+        <button class="icon-btn" data-action="up" data-index="${index}" type="button" title="Subir">^</button>
+        <button class="icon-btn" data-action="down" data-index="${index}" type="button" title="Descer">v</button>
+        <button class="icon-btn" data-action="remove" data-index="${index}" type="button" title="Remover">x</button>
+      </span>
+    `;
+    els.mergeList.append(item);
+  });
+}
+
+async function mergePdfs() {
+  resetOutput();
+  if (state.mergeFiles.length < 2) throw new Error("Selecione pelo menos dois PDFs para juntar.");
+
+  const output = await PDFDocument.create();
+  let totalPages = 0;
+  for (const file of state.mergeFiles) {
+    setStatus(`Incluindo ${file.name}...`);
+    const pdf = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+    const pages = await output.copyPages(pdf, pdf.getPageIndices());
+    pages.forEach((page) => output.addPage(page));
+    totalPages += pages.length;
+  }
+
+  const bytes = await output.save({ useObjectStreams: true });
+  downloadPdf(bytes, "pdfs-juntos-seplan.pdf");
+  addMetric("Arquivos", state.mergeFiles.length);
+  addMetric("Paginas", totalPages);
+  addMetric("Tamanho final", formatSize(bytes.length));
+  setStatus("PDFs juntados com sucesso.");
+}
+
+async function createPdfFromPages(sourcePdf, pageIndexes) {
+  const out = await PDFDocument.create();
+  const pages = await out.copyPages(sourcePdf, pageIndexes);
+  pages.forEach((page) => out.addPage(page));
+  return out.save({ useObjectStreams: true });
+}
+
+async function splitPdf() {
+  resetOutput();
+  const file = els.splitFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para dividir.");
+
+  const source = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+  const count = source.getPageCount();
+  let groups = [];
+
+  if (state.splitMode === "half") {
+    const middle = Math.ceil(count / 2);
+    groups = [
+      { label: `paginas-1-${middle}`, pages: Array.from({ length: middle }, (_, i) => i) },
+      { label: `paginas-${middle + 1}-${count}`, pages: Array.from({ length: count - middle }, (_, i) => i + middle) },
+    ].filter((group) => group.pages.length);
+  }
+
+  if (state.splitMode === "every") {
+    const size = Number(document.querySelector("#pagesPerPart").value);
+    if (!Number.isInteger(size) || size < 1) throw new Error("Informe um numero valido de paginas por arquivo.");
+    for (let start = 0; start < count; start += size) {
+      const end = Math.min(start + size, count);
+      groups.push({
+        label: `paginas-${start + 1}-${end}`,
+        pages: Array.from({ length: end - start }, (_, i) => i + start),
+      });
+    }
+  }
+
+  if (state.splitMode === "ranges") {
+    groups = parseRangeGroups(document.querySelector("#splitRanges").value, count);
+  }
+
+  await downloadGroupsAsZip(groups, source, `${fileStem(file.name)}-dividido.zip`);
+  addMetric("Paginas originais", count);
+  addMetric("Arquivos gerados", groups.length);
+  setStatus("PDF dividido com sucesso.");
+}
+
+async function extractPages() {
+  resetOutput();
+  const file = els.extractFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para extrair paginas.");
+
+  const source = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+  const pages = parseRanges(document.querySelector("#extractRanges").value, source.getPageCount());
+  const bytes = await createPdfFromPages(source, pages);
+
+  downloadPdf(bytes, `${fileStem(file.name)}-paginas-extraidas.pdf`);
+  addMetric("Paginas extraidas", pages.length);
+  addMetric("Tamanho final", formatSize(bytes.length));
+  setStatus("Paginas extraidas com sucesso.");
+}
+
+async function downloadGroupsAsZip(groups, source, name) {
+  if (!groups.length) throw new Error("Nenhum intervalo para gerar.");
+  const zip = new window.JSZip();
+
+  for (const [index, group] of groups.entries()) {
+    setStatus(`Gerando parte ${index + 1} de ${groups.length}...`);
+    const bytes = await createPdfFromPages(source, group.pages);
+    zip.file(`${String(index + 1).padStart(2, "0")}-${group.label}.pdf`, bytes);
+  }
+
+  const blob = await zip.generateAsync({ type: "blob" });
+  downloadBlob(blob, name);
+  addMetric("Tamanho ZIP", formatSize(blob.size));
+}
+
+async function renderPdfToCompressedBytes(file, quality, dpi) {
+  const data = await file.arrayBuffer();
+  const source = await window.pdfjsLib.getDocument({ data, disableWorker: true }).promise;
+  const out = await PDFDocument.create();
+
+  for (let pageNumber = 1; pageNumber <= source.numPages; pageNumber += 1) {
+    setStatus(`Compactando pagina ${pageNumber} de ${source.numPages}...`);
+    const { canvas, viewport, scale } = await renderPdfPage(source, pageNumber, dpi);
+
+    const jpegBytes = await new Promise((resolve) => {
+      canvas.toBlob(async (blob) => resolve(new Uint8Array(await blob.arrayBuffer())), "image/jpeg", quality);
+    });
+    const image = await out.embedJpg(jpegBytes);
+    const pdfPage = out.addPage([viewport.width / scale, viewport.height / scale]);
+    pdfPage.drawImage(image, {
+      x: 0,
+      y: 0,
+      width: pdfPage.getWidth(),
+      height: pdfPage.getHeight(),
+    });
+    canvas.width = 1;
+    canvas.height = 1;
+  }
+
+  return out.save({ useObjectStreams: true });
+}
+
+async function compressPdf() {
+  resetOutput();
+  const file = els.compressFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para compactar.");
+
+  const targetMb = Number(document.querySelector("#targetMb").value);
+  const targetBytes = targetMb > 0 ? targetMb * 1024 * 1024 : null;
+  const startQuality = Number(els.quality.value) / 100;
+  const startDpi = Number(document.querySelector("#dpi").value);
+  const attempts = targetBytes
+    ? [
+        [startQuality, startDpi],
+        [Math.min(startQuality, 0.72), Math.min(startDpi, 130)],
+        [0.58, 110],
+        [0.46, 96],
+        [0.36, 82],
+      ]
+    : [[startQuality, startDpi]];
+
+  let best = null;
+  for (const [quality, dpi] of attempts) {
+    const bytes = await renderPdfToCompressedBytes(file, quality, dpi);
+    best = { bytes, quality, dpi };
+    if (!targetBytes || bytes.length <= targetBytes) break;
+  }
+
+  downloadPdf(best.bytes, `${fileStem(file.name)}-compactado.pdf`);
+  addMetric("Original", formatSize(file.size));
+  addMetric("Final", formatSize(best.bytes.length));
+  addMetric("Reducao", `${Math.max(0, 100 - (best.bytes.length / file.size) * 100).toFixed(1)}%`);
+  addMetric("Qualidade usada", `${Math.round(best.quality * 100)}% / ${best.dpi} dpi`);
+  if (targetBytes && best.bytes.length > targetBytes) {
+    setStatus("Compactacao concluida, mas o PDF ficou acima da meta. Tente uma meta maior ou um arquivo com menos imagens.");
+  } else {
+    setStatus("PDF compactado com sucesso.");
+  }
+}
+
+async function organizePdf() {
+  resetOutput();
+  const file = els.organizeFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para organizar.");
+
+  const source = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+  const count = source.getPageCount();
+  const orderInput = document.querySelector("#organizeOrder").value.trim();
+  const removeInput = document.querySelector("#organizeRemove").value.trim();
+  const rotateAngle = Number(document.querySelector("#organizeRotate").value);
+  const orderedPages = orderInput ? parseRanges(orderInput, count) : allPageIndexes(count);
+  const removed = new Set(removeInput ? parseRanges(removeInput, count) : []);
+  const pageIndexes = orderedPages.filter((index) => !removed.has(index));
+
+  if (!pageIndexes.length) throw new Error("A organizacao removeria todas as paginas.");
+
+  const out = await PDFDocument.create();
+  const pages = await out.copyPages(source, pageIndexes);
+  pages.forEach((page) => {
+    if (rotateAngle) {
+      const current = page.getRotation().angle || 0;
+      page.setRotation(degrees((current + rotateAngle) % 360));
+    }
+    out.addPage(page);
+  });
+
+  const bytes = await out.save({ useObjectStreams: true });
+  downloadPdf(bytes, `${fileStem(file.name)}-organizado.pdf`);
+  addMetric("Paginas originais", count);
+  addMetric("Paginas finais", pageIndexes.length);
+  addMetric("Tamanho final", formatSize(bytes.length));
+  setStatus("PDF organizado com sucesso.");
+}
+
+async function rotatePdf() {
+  resetOutput();
+  const file = els.rotateFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para girar.");
+
+  const source = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+  const out = await PDFDocument.create();
+  const count = source.getPageCount();
+  const selected = new Set(optionalPages(document.querySelector("#rotateRanges").value, count));
+  const angle = Number(document.querySelector("#rotateAngle").value);
+  const pages = await out.copyPages(source, allPageIndexes(count));
+
+  pages.forEach((page, index) => {
+    if (selected.has(index)) {
+      const current = page.getRotation().angle || 0;
+      page.setRotation(degrees((current + angle) % 360));
+    }
+    out.addPage(page);
+  });
+
+  const bytes = await out.save({ useObjectStreams: true });
+  downloadPdf(bytes, `${fileStem(file.name)}-girado.pdf`);
+  addMetric("Paginas giradas", selected.size);
+  addMetric("Rotacao", `${angle} graus`);
+  setStatus("PDF girado com sucesso.");
+}
+
+async function watermarkPdf() {
+  resetOutput();
+  const file = els.watermarkFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para adicionar marca d'agua.");
+
+  const text = document.querySelector("#watermarkText").value.trim();
+  if (!text) throw new Error("Informe o texto da marca d'agua.");
+
+  const pdf = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+  const font = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const size = Number(document.querySelector("#watermarkSize").value);
+  const opacity = Number(document.querySelector("#watermarkOpacity").value) / 100;
+
+  pdf.getPages().forEach((page) => {
+    const textWidth = font.widthOfTextAtSize(text, size);
+    page.drawText(text, {
+      x: (page.getWidth() - textWidth) / 2,
+      y: page.getHeight() / 2,
+      size,
+      font,
+      color: rgb(0.1, 0.38, 0.29),
+      opacity,
+      rotate: degrees(35),
+    });
+  });
+
+  const bytes = await pdf.save({ useObjectStreams: true });
+  downloadPdf(bytes, `${fileStem(file.name)}-marca-dagua.pdf`);
+  addMetric("Paginas", pdf.getPageCount());
+  addMetric("Texto", text);
+  setStatus("Marca d'agua adicionada com sucesso.");
+}
+
+async function numberPdf() {
+  resetOutput();
+  const file = els.numbersFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para numerar.");
+
+  const pdf = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+  const font = await pdf.embedFont(StandardFonts.Helvetica);
+  const pages = pdf.getPages();
+  const start = Number(document.querySelector("#numbersStart").value);
+  const format = document.querySelector("#numbersFormat").value;
+  const position = document.querySelector("#numbersPosition").value;
+  if (!Number.isInteger(start) || start < 1) throw new Error("Informe um numero inicial valido.");
+
+  pages.forEach((page, index) => {
+    const pageNumber = start + index;
+    const text = pageNumberText(format, pageNumber, start + pages.length - 1);
+    const size = 10;
+    const textWidth = font.widthOfTextAtSize(text, size);
+    const point = pageNumberPosition(position, page, textWidth);
+    page.drawText(text, {
+      ...point,
+      size,
+      font,
+      color: rgb(0.12, 0.15, 0.14),
+    });
+  });
+
+  const bytes = await pdf.save({ useObjectStreams: true });
+  downloadPdf(bytes, `${fileStem(file.name)}-numerado.pdf`);
+  addMetric("Paginas numeradas", pages.length);
+  addMetric("Inicio", start);
+  setStatus("PDF numerado com sucesso.");
+}
+
+async function canvasToJpegBytes(canvas, quality) {
+  return new Promise((resolve) => {
+    canvas.toBlob(async (blob) => resolve(new Uint8Array(await blob.arrayBuffer())), "image/jpeg", quality);
+  });
+}
+
+async function pdfToJpg() {
+  resetOutput();
+  const file = els.pdfToJpgFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para converter em JPG.");
+
+  const data = await file.arrayBuffer();
+  const source = await window.pdfjsLib.getDocument({ data, disableWorker: true }).promise;
+  const zip = new window.JSZip();
+  const quality = Number(document.querySelector("#pdfToJpgQuality").value) / 100;
+  const dpi = Number(document.querySelector("#pdfToJpgDpi").value);
+
+  for (let pageNumber = 1; pageNumber <= source.numPages; pageNumber += 1) {
+    setStatus(`Convertendo pagina ${pageNumber} de ${source.numPages}...`);
+    const { canvas } = await renderPdfPage(source, pageNumber, dpi);
+    const jpg = await canvasToJpegBytes(canvas, quality);
+    zip.file(`${fileStem(file.name)}-pagina-${String(pageNumber).padStart(3, "0")}.jpg`, jpg);
+    canvas.width = 1;
+    canvas.height = 1;
+  }
+
+  const blob = await zip.generateAsync({ type: "blob" });
+  downloadBlob(blob, `${fileStem(file.name)}-jpg.zip`);
+  addMetric("Imagens", source.numPages);
+  addMetric("Tamanho ZIP", formatSize(blob.size));
+  setStatus("PDF convertido para JPG com sucesso.");
+}
+
+async function embedImage(pdf, file) {
+  const bytes = await fileBytes(file);
+  if (file.type === "image/png" || file.name.toLowerCase().endsWith(".png")) {
+    return pdf.embedPng(bytes);
+  }
+  return pdf.embedJpg(bytes);
+}
+
+function a4SizeForImage(image, orientation) {
+  const portrait = [595.28, 841.89];
+  const landscape = [841.89, 595.28];
+  if (orientation === "portrait") return portrait;
+  if (orientation === "landscape") return landscape;
+  return image.width > image.height ? landscape : portrait;
+}
+
+async function jpgToPdf() {
+  resetOutput();
+  const files = Array.from(els.jpgToPdfFiles.files);
+  if (!files.length) throw new Error("Selecione uma ou mais imagens.");
+
+  const pdf = await PDFDocument.create();
+  const pageSize = document.querySelector("#jpgPageSize").value;
+  const orientation = document.querySelector("#jpgOrientation").value;
+
+  for (const [index, file] of files.entries()) {
+    setStatus(`Incluindo imagem ${index + 1} de ${files.length}...`);
+    const image = await embedImage(pdf, file);
+    const size = pageSize === "image" ? [image.width, image.height] : a4SizeForImage(image, orientation);
+    const page = pdf.addPage(size);
+    const margin = pageSize === "image" ? 0 : 36;
+    const maxWidth = page.getWidth() - margin * 2;
+    const maxHeight = page.getHeight() - margin * 2;
+    const ratio = Math.min(maxWidth / image.width, maxHeight / image.height);
+    const width = image.width * ratio;
+    const height = image.height * ratio;
+    page.drawImage(image, {
+      x: (page.getWidth() - width) / 2,
+      y: (page.getHeight() - height) / 2,
+      width,
+      height,
+    });
+  }
+
+  const bytes = await pdf.save({ useObjectStreams: true });
+  downloadPdf(bytes, "imagens-seplan.pdf");
+  addMetric("Imagens", files.length);
+  addMetric("Tamanho final", formatSize(bytes.length));
+  setStatus("Imagens convertidas para PDF com sucesso.");
+}
+
+async function cropPdf() {
+  resetOutput();
+  const file = els.cropFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para cortar.");
+
+  const pdf = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+  const pages = pdf.getPages();
+  const selected = new Set(optionalPages(document.querySelector("#cropRanges").value, pages.length));
+  const top = mmToPt(document.querySelector("#cropTop").value);
+  const right = mmToPt(document.querySelector("#cropRight").value);
+  const bottom = mmToPt(document.querySelector("#cropBottom").value);
+  const left = mmToPt(document.querySelector("#cropLeft").value);
+  if (top + right + bottom + left === 0) throw new Error("Informe pelo menos uma margem para cortar.");
+
+  pages.forEach((page, index) => {
+    if (!selected.has(index)) return;
+    const width = page.getWidth();
+    const height = page.getHeight();
+    const newWidth = width - left - right;
+    const newHeight = height - top - bottom;
+    if (newWidth <= 40 || newHeight <= 40) throw new Error("As margens informadas cortam demais a pagina.");
+    page.setCropBox(left, bottom, newWidth, newHeight);
+  });
+
+  const bytes = await pdf.save({ useObjectStreams: true });
+  downloadPdf(bytes, `${fileStem(file.name)}-cortado.pdf`);
+  addMetric("Paginas cortadas", selected.size);
+  addMetric("Tamanho final", formatSize(bytes.length));
+  setStatus("PDF cortado com sucesso.");
+}
+
+async function signPdf() {
+  resetOutput();
+  const file = els.signFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para assinar.");
+
+  const text = document.querySelector("#signText").value.trim();
+  if (!text) throw new Error("Informe o nome ou texto da assinatura.");
+
+  const pdf = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+  const pages = pdf.getPages();
+  const pageNumber = Number(document.querySelector("#signPage").value);
+  if (!Number.isInteger(pageNumber) || pageNumber < 1 || pageNumber > pages.length) {
+    throw new Error(`Informe uma pagina entre 1 e ${pages.length}.`);
+  }
+
+  const page = pages[pageNumber - 1];
+  const signatureFont = await pdf.embedFont(StandardFonts.TimesRomanItalic);
+  const labelFont = await pdf.embedFont(StandardFonts.Helvetica);
+  const size = 22;
+  const textWidth = signatureFont.widthOfTextAtSize(text, size);
+  const position = textPosition(document.querySelector("#signPosition").value, page, textWidth, size);
+  page.drawText(text, {
+    ...position,
+    size,
+    font: signatureFont,
+    color: rgb(0.05, 0.17, 0.14),
+  });
+  page.drawLine({
+    start: { x: position.x - 8, y: position.y - 8 },
+    end: { x: position.x + Math.max(textWidth, 170) + 8, y: position.y - 8 },
+    thickness: 0.8,
+    color: rgb(0.05, 0.17, 0.14),
+  });
+  page.drawText("Assinatura", {
+    x: position.x,
+    y: position.y - 22,
+    size: 8,
+    font: labelFont,
+    color: rgb(0.35, 0.42, 0.39),
+  });
+
+  const bytes = await pdf.save({ useObjectStreams: true });
+  downloadPdf(bytes, `${fileStem(file.name)}-assinado.pdf`);
+  addMetric("Pagina assinada", pageNumber);
+  addMetric("Assinatura", text);
+  setStatus("Assinatura visual adicionada com sucesso.");
+}
+
+async function textStampPdf() {
+  resetOutput();
+  const file = els.textStampFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para adicionar texto.");
+
+  const text = document.querySelector("#stampText").value.trim();
+  if (!text) throw new Error("Informe o texto que sera inserido.");
+
+  const pdf = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+  const pages = pdf.getPages();
+  const selected = new Set(optionalPages(document.querySelector("#stampRanges").value, pages.length));
+  const font = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const size = Number(document.querySelector("#stampSize").value);
+  const positionName = document.querySelector("#stampPosition").value;
+
+  pages.forEach((page, index) => {
+    if (!selected.has(index)) return;
+    const textWidth = font.widthOfTextAtSize(text, size);
+    const position = textPosition(positionName, page, textWidth, size);
+    page.drawText(text, {
+      ...position,
+      size,
+      font,
+      color: rgb(0.02, 0.38, 0.29),
+    });
+  });
+
+  const bytes = await pdf.save({ useObjectStreams: true });
+  downloadPdf(bytes, `${fileStem(file.name)}-texto.pdf`);
+  addMetric("Paginas alteradas", selected.size);
+  addMetric("Texto", text);
+  setStatus("Texto adicionado com sucesso.");
+}
+
+async function redactPdf() {
+  resetOutput();
+  const file = els.redactFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para tarjar.");
+
+  const data = await file.arrayBuffer();
+  const source = await window.pdfjsLib.getDocument({ data, disableWorker: true }).promise;
+  const selected = new Set(optionalPages(document.querySelector("#redactRanges").value, source.numPages));
+  const box = readPercentBox("redact");
+  const out = await PDFDocument.create();
+  const dpi = 160;
+
+  for (let pageNumber = 1; pageNumber <= source.numPages; pageNumber += 1) {
+    setStatus(`Processando pagina ${pageNumber} de ${source.numPages}...`);
+    const { canvas, viewport, scale } = await renderPdfPage(source, pageNumber, dpi);
+    if (selected.has(pageNumber - 1)) {
+      const context = canvas.getContext("2d");
+      context.fillStyle = "#000000";
+      context.fillRect(
+        (box.x / 100) * canvas.width,
+        (box.y / 100) * canvas.height,
+        (box.w / 100) * canvas.width,
+        (box.h / 100) * canvas.height
+      );
+    }
+
+    const jpg = await canvasToJpegBytes(canvas, 0.9);
+    const image = await out.embedJpg(jpg);
+    const page = out.addPage([viewport.width / scale, viewport.height / scale]);
+    page.drawImage(image, {
+      x: 0,
+      y: 0,
+      width: page.getWidth(),
+      height: page.getHeight(),
+    });
+    canvas.width = 1;
+    canvas.height = 1;
+  }
+
+  const bytes = await out.save({ useObjectStreams: true });
+  downloadPdf(bytes, `${fileStem(file.name)}-tarjado.pdf`);
+  addMetric("Paginas tarjadas", selected.size);
+  addMetric("Tamanho final", formatSize(bytes.length));
+  setStatus("PDF tarjado com sucesso.");
+}
+
+async function comparePdfs() {
+  resetOutput();
+  const fileA = els.compareFileA.files[0];
+  const fileB = els.compareFileB.files[0];
+  if (!fileA || !fileB) throw new Error("Selecione os dois PDFs para comparar.");
+
+  const sourceA = await window.pdfjsLib.getDocument({ data: await fileA.arrayBuffer(), disableWorker: true }).promise;
+  const sourceB = await window.pdfjsLib.getDocument({ data: await fileB.arrayBuffer(), disableWorker: true }).promise;
+  const pageCount = Math.max(sourceA.numPages, sourceB.numPages);
+  const dpi = Number(document.querySelector("#compareDpi").value);
+  const zip = new window.JSZip();
+
+  for (let pageNumber = 1; pageNumber <= pageCount; pageNumber += 1) {
+    setStatus(`Comparando pagina ${pageNumber} de ${pageCount}...`);
+    const renderedA = pageNumber <= sourceA.numPages ? await renderPdfPage(sourceA, pageNumber, dpi) : null;
+    const renderedB = pageNumber <= sourceB.numPages ? await renderPdfPage(sourceB, pageNumber, dpi) : null;
+    const widthA = renderedA?.canvas.width || 420;
+    const widthB = renderedB?.canvas.width || 420;
+    const height = Math.max(renderedA?.canvas.height || 540, renderedB?.canvas.height || 540);
+    const gap = 28;
+    const header = 44;
+    const canvas = document.createElement("canvas");
+    canvas.width = widthA + widthB + gap;
+    canvas.height = height + header;
+    const context = canvas.getContext("2d", { alpha: false });
+    context.fillStyle = "#ffffff";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = "#123b31";
+    context.font = "18px Arial";
+    context.fillText("Original", 8, 28);
+    context.fillText("Revisado", widthA + gap + 8, 28);
+    context.strokeStyle = "#d9dfdc";
+    context.beginPath();
+    context.moveTo(widthA + gap / 2, 0);
+    context.lineTo(widthA + gap / 2, canvas.height);
+    context.stroke();
+
+    if (renderedA) context.drawImage(renderedA.canvas, 0, header);
+    if (renderedB) context.drawImage(renderedB.canvas, widthA + gap, header);
+    if (!renderedA || !renderedB) {
+      context.fillStyle = "#a83d3d";
+      context.font = "16px Arial";
+      const x = renderedA ? widthA + gap + 20 : 20;
+      context.fillText("Pagina inexistente nesta versao", x, header + 40);
+    }
+
+    const jpg = await canvasToJpegBytes(canvas, 0.88);
+    zip.file(`comparacao-pagina-${String(pageNumber).padStart(3, "0")}.jpg`, jpg);
+    renderedA?.canvas && (renderedA.canvas.width = 1);
+    renderedB?.canvas && (renderedB.canvas.width = 1);
+    canvas.width = 1;
+    canvas.height = 1;
+  }
+
+  const blob = await zip.generateAsync({ type: "blob" });
+  downloadBlob(blob, "comparacao-pdfs-seplan.zip");
+  addMetric("Paginas comparadas", pageCount);
+  addMetric("Original", `${sourceA.numPages} paginas`);
+  addMetric("Revisado", `${sourceB.numPages} paginas`);
+  setStatus("Comparacao gerada com sucesso.");
+}
+
+async function extractTextPdf() {
+  resetOutput();
+  const file = els.textExtractFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para extrair texto.");
+
+  const source = await window.pdfjsLib.getDocument({ data: await file.arrayBuffer(), disableWorker: true }).promise;
+  const selected = new Set(optionalPages(document.querySelector("#textExtractRanges").value, source.numPages));
+  const parts = [];
+  let extractedChars = 0;
+
+  for (let pageNumber = 1; pageNumber <= source.numPages; pageNumber += 1) {
+    if (!selected.has(pageNumber - 1)) continue;
+    setStatus(`Extraindo texto da pagina ${pageNumber} de ${source.numPages}...`);
+    const page = await source.getPage(pageNumber);
+    const content = await page.getTextContent();
+    const text = content.items.map((item) => item.str).join(" ").replace(/\s+/g, " ").trim();
+    extractedChars += text.length;
+    parts.push(`--- Pagina ${pageNumber} ---\n${text}`);
+  }
+
+  if (!extractedChars) {
+    throw new Error("Nao foi encontrado texto pesquisavel. Talvez o PDF seja escaneado e precise de OCR.");
+  }
+
+  const output = parts.join("\n\n");
+  downloadText(output, `${fileStem(file.name)}.txt`);
+  addMetric("Paginas lidas", selected.size);
+  addMetric("Caracteres", extractedChars);
+  setStatus("Texto extraido com sucesso.");
+}
+
+async function flattenFormsPdf() {
+  resetOutput();
+  const file = els.flattenFormsFile.files[0];
+  if (!file) throw new Error("Selecione um PDF com formulario.");
+
+  const pdf = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+  const form = pdf.getForm();
+  const fields = form.getFields();
+  if (!fields.length) throw new Error("Este PDF nao possui campos de formulario detectaveis.");
+
+  form.flatten();
+  const bytes = await pdf.save({ useObjectStreams: true });
+  downloadPdf(bytes, `${fileStem(file.name)}-formulario-fixo.pdf`);
+  addMetric("Campos achatados", fields.length);
+  addMetric("Tamanho final", formatSize(bytes.length));
+  setStatus("Formulario achatado com sucesso.");
+}
+
+function metadataValue(id) {
+  return document.querySelector(id).value.trim();
+}
+
+function a4PageSize(orientation) {
+  return orientation === "landscape" ? [841.89, 595.28] : [595.28, 841.89];
+}
+
+function drawWrappedText(page, text, options) {
+  const { x, y, maxWidth, size, font, color, lineHeight } = options;
+  const words = text.split(/\s+/).filter(Boolean);
+  const lines = [];
+  let current = "";
+  words.forEach((word) => {
+    const next = current ? `${current} ${word}` : word;
+    if (font.widthOfTextAtSize(next, size) <= maxWidth) {
+      current = next;
+    } else {
+      if (current) lines.push(current);
+      current = word;
+    }
+  });
+  if (current) lines.push(current);
+  lines.forEach((line, index) => {
+    page.drawText(line, { x, y: y - index * lineHeight, size, font, color });
+  });
+  return lines.length * lineHeight;
+}
+
+async function metadataPdf() {
+  resetOutput();
+  const file = els.metadataFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para editar metadados.");
+
+  const mode = document.querySelector(".metadata-mode.active").dataset.metadataMode;
+  const pdf = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+  const now = new Date();
+
+  if (mode === "clear") {
+    pdf.setTitle("");
+    pdf.setAuthor("");
+    pdf.setSubject("");
+    pdf.setKeywords([]);
+    pdf.setCreator("");
+    pdf.setProducer("");
+  } else {
+    pdf.setTitle(metadataValue("#metadataTitle") || "Documento SEPLAN");
+    pdf.setAuthor(metadataValue("#metadataAuthor") || "Central SEPLAN");
+    pdf.setSubject(metadataValue("#metadataSubject") || "Documento administrativo");
+    const keywords = metadataValue("#metadataKeywords").split(",").map((word) => word.trim()).filter(Boolean);
+    pdf.setKeywords(keywords);
+    pdf.setCreator("Central SEPLAN PDF");
+    pdf.setProducer("Central SEPLAN PDF");
+  }
+
+  pdf.setModificationDate(now);
+  const bytes = await pdf.save({ useObjectStreams: true });
+  downloadPdf(bytes, `${fileStem(file.name)}-metadados.pdf`);
+  addMetric("Modo", mode === "clear" ? "Limpar" : "Definir");
+  addMetric("Tamanho final", formatSize(bytes.length));
+  setStatus("Metadados atualizados com sucesso.");
+}
+
+async function addCoverPdf() {
+  resetOutput();
+  const file = els.coverFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para receber capa.");
+
+  const source = await PDFDocument.load(await fileBytes(file), { ignoreEncryption: true });
+  const out = await PDFDocument.create();
+  const [width, height] = a4PageSize("portrait");
+  const cover = out.addPage([width, height]);
+  const titleFont = await out.embedFont(StandardFonts.HelveticaBold);
+  const bodyFont = await out.embedFont(StandardFonts.Helvetica);
+  const title = metadataValue("#coverTitle") || "Documento SEPLAN";
+  const subtitle = metadataValue("#coverSubtitle");
+  const owner = metadataValue("#coverOwner");
+  const dateText = metadataValue("#coverDate") || new Date().toLocaleDateString("pt-BR");
+
+  cover.drawRectangle({
+    x: 0,
+    y: height - 92,
+    width,
+    height: 92,
+    color: rgb(0.04, 0.28, 0.21),
+  });
+  cover.drawText("CENTRAL SEPLAN", {
+    x: 54,
+    y: height - 58,
+    size: 16,
+    font: titleFont,
+    color: rgb(1, 1, 1),
+  });
+  cover.drawLine({
+    start: { x: 54, y: height - 126 },
+    end: { x: width - 54, y: height - 126 },
+    thickness: 1.2,
+    color: rgb(0.85, 0.62, 0.17),
+  });
+
+  let cursor = height - 210;
+  cursor -= drawWrappedText(cover, title, {
+    x: 54,
+    y: cursor,
+    maxWidth: width - 108,
+    size: 32,
+    font: titleFont,
+    color: rgb(0.08, 0.12, 0.11),
+    lineHeight: 40,
+  });
+
+  if (subtitle) {
+    cursor -= 26;
+    cursor -= drawWrappedText(cover, subtitle, {
+      x: 54,
+      y: cursor,
+      maxWidth: width - 108,
+      size: 16,
+      font: bodyFont,
+      color: rgb(0.28, 0.34, 0.32),
+      lineHeight: 23,
+    });
+  }
+
+  const infoY = 150;
+  cover.drawText(owner || "Central SEPLAN", {
+    x: 54,
+    y: infoY,
+    size: 13,
+    font: titleFont,
+    color: rgb(0.08, 0.12, 0.11),
+  });
+  cover.drawText(dateText, {
+    x: 54,
+    y: infoY - 24,
+    size: 12,
+    font: bodyFont,
+    color: rgb(0.35, 0.42, 0.39),
+  });
+
+  const pages = await out.copyPages(source, source.getPageIndices());
+  pages.forEach((page) => out.addPage(page));
+  const bytes = await out.save({ useObjectStreams: true });
+  downloadPdf(bytes, `${fileStem(file.name)}-com-capa.pdf`);
+  addMetric("Paginas originais", source.getPageCount());
+  addMetric("Paginas finais", source.getPageCount() + 1);
+  setStatus("Capa adicionada com sucesso.");
+}
+
+function nupSlots(count, pageWidth, pageHeight, margin, gap) {
+  if (count === 2) {
+    const slotWidth = (pageWidth - margin * 2 - gap) / 2;
+    const slotHeight = pageHeight - margin * 2;
+    return [
+      { x: margin, y: margin, width: slotWidth, height: slotHeight },
+      { x: margin + slotWidth + gap, y: margin, width: slotWidth, height: slotHeight },
+    ];
+  }
+
+  const slotWidth = (pageWidth - margin * 2 - gap) / 2;
+  const slotHeight = (pageHeight - margin * 2 - gap) / 2;
+  return [
+    { x: margin, y: margin + slotHeight + gap, width: slotWidth, height: slotHeight },
+    { x: margin + slotWidth + gap, y: margin + slotHeight + gap, width: slotWidth, height: slotHeight },
+    { x: margin, y: margin, width: slotWidth, height: slotHeight },
+    { x: margin + slotWidth + gap, y: margin, width: slotWidth, height: slotHeight },
+  ];
+}
+
+async function nupPdf() {
+  resetOutput();
+  const file = els.nupFile.files[0];
+  if (!file) throw new Error("Selecione um PDF para montar paginas por folha.");
+
+  const source = await window.pdfjsLib.getDocument({ data: await file.arrayBuffer(), disableWorker: true }).promise;
+  const out = await PDFDocument.create();
+  const count = Number(document.querySelector("#nupCount").value);
+  const dpi = Number(document.querySelector("#nupDpi").value);
+  const pageSize = a4PageSize(document.querySelector("#nupOrientation").value);
+  const margin = 22;
+  const gap = 14;
+  const slots = nupSlots(count, pageSize[0], pageSize[1], margin, gap);
+  let outputPage = null;
+
+  for (let pageNumber = 1; pageNumber <= source.numPages; pageNumber += 1) {
+    setStatus(`Montando pagina ${pageNumber} de ${source.numPages}...`);
+    const slotIndex = (pageNumber - 1) % count;
+    if (slotIndex === 0) outputPage = out.addPage(pageSize);
+
+    const { canvas } = await renderPdfPage(source, pageNumber, dpi);
+    const jpg = await canvasToJpegBytes(canvas, 0.86);
+    const image = await out.embedJpg(jpg);
+    const slot = slots[slotIndex];
+    const ratio = Math.min(slot.width / image.width, slot.height / image.height);
+    const width = image.width * ratio;
+    const height = image.height * ratio;
+    outputPage.drawRectangle({
+      x: slot.x,
+      y: slot.y,
+      width: slot.width,
+      height: slot.height,
+      borderColor: rgb(0.78, 0.84, 0.81),
+      borderWidth: 0.5,
+    });
+    outputPage.drawImage(image, {
+      x: slot.x + (slot.width - width) / 2,
+      y: slot.y + (slot.height - height) / 2,
+      width,
+      height,
+    });
+    canvas.width = 1;
+    canvas.height = 1;
+  }
+
+  const bytes = await out.save({ useObjectStreams: true });
+  downloadPdf(bytes, `${fileStem(file.name)}-${count}-por-folha.pdf`);
+  addMetric("Paginas originais", source.numPages);
+  addMetric("Folhas finais", out.getPageCount());
+  addMetric("Layout", `${count} por folha`);
+  setStatus("PDF economico gerado com sucesso.");
+}
+
+function wireEvents() {
+  if (missingLibs.length) {
+    document.querySelectorAll(".primary").forEach((button) => {
+      button.disabled = true;
+    });
+    setStatus(`Nao foi possivel carregar: ${missingLibs.join(", ")}. Verifique a conexao ou hospede as bibliotecas localmente.`, true);
+    return;
+  }
+
+  document.querySelectorAll(".tool-tab").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".tool-tab, .tool-panel").forEach((el) => el.classList.remove("active"));
+      button.classList.add("active");
+      document.querySelector(`#${button.dataset.tool}`).classList.add("active");
+      resetOutput();
+      setStatus("Aguardando arquivos.");
+    });
+  });
+
+  els.mergeFiles.addEventListener("change", () => {
+    state.mergeFiles = [...state.mergeFiles, ...Array.from(els.mergeFiles.files)];
+    renderMergeList();
+  });
+
+  els.mergeList.addEventListener("click", (event) => {
+    const button = event.target.closest("button");
+    if (!button) return;
+    const index = Number(button.dataset.index);
+    if (button.dataset.action === "remove") state.mergeFiles.splice(index, 1);
+    if (button.dataset.action === "up" && index > 0) {
+      [state.mergeFiles[index - 1], state.mergeFiles[index]] = [state.mergeFiles[index], state.mergeFiles[index - 1]];
+    }
+    if (button.dataset.action === "down" && index < state.mergeFiles.length - 1) {
+      [state.mergeFiles[index + 1], state.mergeFiles[index]] = [state.mergeFiles[index], state.mergeFiles[index + 1]];
+    }
+    renderMergeList();
+  });
+
+  document.querySelector("#clearMerge").addEventListener("click", () => {
+    state.mergeFiles = [];
+    els.mergeFiles.value = "";
+    renderMergeList();
+    resetOutput();
+    setStatus("Lista de PDFs limpa.");
+  });
+
+  document.querySelectorAll(".mode").forEach((button) => {
+    button.addEventListener("click", () => {
+      state.splitMode = button.dataset.mode;
+      document.querySelectorAll(".mode").forEach((el) => el.classList.remove("active"));
+      button.classList.add("active");
+      document.querySelectorAll("[data-split-control]").forEach((control) => {
+        control.hidden = control.dataset.splitControl !== state.splitMode;
+      });
+    });
+  });
+
+  document.querySelectorAll(".metadata-mode").forEach((button) => {
+    button.addEventListener("click", () => {
+      document.querySelectorAll(".metadata-mode").forEach((el) => el.classList.remove("active"));
+      button.classList.add("active");
+      document.querySelector("#metadataFields").hidden = button.dataset.metadataMode === "clear";
+    });
+  });
+
+  els.quality.addEventListener("input", () => {
+    els.qualityOut.textContent = `${els.quality.value}%`;
+  });
+
+  const actions = [
+    ["#mergeBtn", mergePdfs, "Juntando..."],
+    ["#compressBtn", compressPdf, "Compactando..."],
+    ["#splitBtn", splitPdf, "Dividindo..."],
+    ["#extractBtn", extractPages, "Extraindo..."],
+    ["#organizeBtn", organizePdf, "Organizando..."],
+    ["#rotateBtn", rotatePdf, "Girando..."],
+    ["#watermarkBtn", watermarkPdf, "Aplicando..."],
+    ["#numbersBtn", numberPdf, "Numerando..."],
+    ["#pdfToJpgBtn", pdfToJpg, "Convertendo..."],
+    ["#jpgToPdfBtn", jpgToPdf, "Criando PDF..."],
+    ["#cropBtn", cropPdf, "Cortando..."],
+    ["#signBtn", signPdf, "Assinando..."],
+    ["#textStampBtn", textStampPdf, "Adicionando..."],
+    ["#redactBtn", redactPdf, "Tarjando..."],
+    ["#compareBtn", comparePdfs, "Comparando..."],
+    ["#textExtractBtn", extractTextPdf, "Extraindo..."],
+    ["#flattenFormsBtn", flattenFormsPdf, "Achatando..."],
+    ["#metadataBtn", metadataPdf, "Salvando..."],
+    ["#coverBtn", addCoverPdf, "Adicionando..."],
+    ["#nupBtn", nupPdf, "Montando..."],
+  ];
+
+  actions.forEach(([selector, handler, busyLabel]) => {
+    const button = document.querySelector(selector);
+    button.addEventListener("click", async () => {
+      try {
+        validateFileLoad(currentPanelFiles(button));
+        setBusy(button, true, busyLabel);
+        await handler();
+      } catch (error) {
+        console.error(error);
+        setStatus(error.message || "Nao foi possivel concluir a operacao.", true);
+      } finally {
+        setBusy(button, false);
+      }
+    });
+  });
+
+  document.querySelectorAll('input[type="file"]').forEach((input) => {
+    input.addEventListener("change", () => {
+      try {
+        validateFileLoad(Array.from(input.files || []));
+      } catch (error) {
+        input.value = "";
+        setStatus(error.message, true);
+      }
+    });
+  });
+
+  installDropzones();
+  addMetric("Versao", APP_VERSION);
+}
+
+wireEvents();
+
+</script>
+  </body>
+</html>
+

@@ -1,0 +1,756 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>SEPLAN PDF</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script>
+      window.SEPLAN_PDF_LIBS = {
+        pdfLib: "./vendor/pdf-lib.min.js",
+        pdfJs: "./vendor/pdf.min.js",
+        pdfWorker: "./vendor/pdf.worker.min.js",
+        jsZip: "./vendor/jszip.min.js",
+      };
+    </script>
+    <script src="./vendor/pdf-lib.min.js"></script>
+    <script src="./vendor/pdf.min.js"></script>
+    <script src="./vendor/jszip.min.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Central SEPLAN</p>
+        <h1>Ferramentas PDF</h1>
+      </div>
+      <div class="privacy">Processamento local no navegador</div>
+    </header>
+
+    <main class="shell">
+      <section class="notice-band" aria-label="Aviso institucional">
+        <strong>Homologacao SEPLAN PDF</strong>
+        <span>Os arquivos sao processados no proprio navegador e nao sao enviados para servidor. Para melhor desempenho, use Chrome ou Edge atualizado e evite arquivos acima de 120 MB nesta versao local.</span>
+      </section>
+
+      <nav class="toolnav" aria-label="Ferramentas">
+        <button class="tool-tab active" data-tool="merge" type="button">
+          <span>Juntar</span>
+          <small>Unir varios PDFs</small>
+        </button>
+        <button class="tool-tab" data-tool="compress" type="button">
+          <span>Compactar</span>
+          <small>Escolher qualidade ou tamanho</small>
+        </button>
+        <button class="tool-tab" data-tool="split" type="button">
+          <span>Dividir</span>
+          <small>Metade, blocos ou paginas</small>
+        </button>
+        <button class="tool-tab" data-tool="extract" type="button">
+          <span>Extrair</span>
+          <small>Gerar PDF por intervalo</small>
+        </button>
+        <button class="tool-tab" data-tool="organize" type="button">
+          <span>Organizar</span>
+          <small>Remover e reordenar paginas</small>
+        </button>
+        <button class="tool-tab" data-tool="rotate" type="button">
+          <span>Girar</span>
+          <small>Rotacionar paginas</small>
+        </button>
+        <button class="tool-tab" data-tool="watermark" type="button">
+          <span>Marca d'agua</span>
+          <small>Texto sobre o PDF</small>
+        </button>
+        <button class="tool-tab" data-tool="numbers" type="button">
+          <span>Numerar</span>
+          <small>Adicionar numero de pagina</small>
+        </button>
+        <button class="tool-tab" data-tool="pdfToJpg" type="button">
+          <span>PDF para JPG</span>
+          <small>Exportar paginas como imagens</small>
+        </button>
+        <button class="tool-tab" data-tool="jpgToPdf" type="button">
+          <span>JPG para PDF</span>
+          <small>Criar PDF com imagens</small>
+        </button>
+        <button class="tool-tab" data-tool="crop" type="button">
+          <span>Cortar</span>
+          <small>Ajustar margens do PDF</small>
+        </button>
+        <button class="tool-tab" data-tool="sign" type="button">
+          <span>Assinar</span>
+          <small>Inserir assinatura textual</small>
+        </button>
+        <button class="tool-tab" data-tool="textStamp" type="button">
+          <span>Texto</span>
+          <small>Adicionar texto/carimbo</small>
+        </button>
+        <button class="tool-tab" data-tool="redact" type="button">
+          <span>Tarjar</span>
+          <small>Ocultar area sensivel</small>
+        </button>
+        <button class="tool-tab" data-tool="compare" type="button">
+          <span>Comparar</span>
+          <small>Ver diferencas entre PDFs</small>
+        </button>
+        <button class="tool-tab" data-tool="textExtract" type="button">
+          <span>PDF para TXT</span>
+          <small>Extrair texto pesquisavel</small>
+        </button>
+        <button class="tool-tab" data-tool="flattenForms" type="button">
+          <span>Formularios</span>
+          <small>Achatar campos preenchidos</small>
+        </button>
+        <button class="tool-tab" data-tool="metadata" type="button">
+          <span>Metadados</span>
+          <small>Limpar ou definir dados</small>
+        </button>
+        <button class="tool-tab" data-tool="cover" type="button">
+          <span>Capa</span>
+          <small>Adicionar folha de rosto</small>
+        </button>
+        <button class="tool-tab" data-tool="nup" type="button">
+          <span>2 em 1</span>
+          <small>Mais paginas por folha</small>
+        </button>
+      </nav>
+
+      <section class="workspace">
+        <article class="tool-panel active" id="merge">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Juntar PDF</p>
+              <h2>Combine arquivos na ordem desejada</h2>
+            </div>
+            <button class="ghost" id="clearMerge" type="button">Limpar</button>
+          </div>
+          <label class="dropzone" for="mergeFiles">
+            <input id="mergeFiles" type="file" accept="application/pdf" multiple />
+            <strong>Selecionar PDFs</strong>
+            <span>Arraste ou escolha dois ou mais arquivos.</span>
+          </label>
+          <ol class="file-list" id="mergeList"></ol>
+          <button class="primary" id="mergeBtn" type="button">Juntar PDFs</button>
+        </article>
+
+        <article class="tool-panel" id="compress">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Compactar PDF</p>
+              <h2>Reduza o peso e defina uma meta de tamanho</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="compressFile">
+            <input id="compressFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>A compactacao renderiza as paginas em imagem para reduzir o arquivo.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Qualidade JPEG</span>
+              <input id="quality" type="range" min="35" max="92" value="72" />
+              <output id="qualityOut">72%</output>
+            </label>
+            <label>
+              <span>Resolucao</span>
+              <select id="dpi">
+                <option value="96">Leve</option>
+                <option value="130" selected>Equilibrada</option>
+                <option value="170">Alta</option>
+                <option value="220">Muito alta</option>
+              </select>
+            </label>
+            <label>
+              <span>Tamanho alvo em MB</span>
+              <input id="targetMb" type="number" min="0.1" step="0.1" placeholder="Opcional" />
+            </label>
+          </div>
+          <p class="note">Para preservar texto pesquisavel, use a qualidade alta. Para chegar em um tamanho especifico, o app pode reduzir qualidade e resolucao automaticamente.</p>
+          <button class="primary" id="compressBtn" type="button">Compactar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="split">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Dividir PDF</p>
+              <h2>Quebre um processo em partes menores</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="splitFile">
+            <input id="splitFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Exemplo: um PDF de 30 paginas pode virar duas partes de 15.</span>
+          </label>
+          <div class="segmented" role="group" aria-label="Modo de divisao">
+            <button class="mode active" data-mode="half" type="button">Metade</button>
+            <button class="mode" data-mode="every" type="button">A cada N paginas</button>
+            <button class="mode" data-mode="ranges" type="button">Intervalos</button>
+          </div>
+          <div class="controls-grid">
+            <label data-split-control="every" hidden>
+              <span>Paginas por arquivo</span>
+              <input id="pagesPerPart" type="number" min="1" value="10" />
+            </label>
+            <label data-split-control="ranges" hidden>
+              <span>Intervalos</span>
+              <input id="splitRanges" type="text" placeholder="1-5, 6-10, 11-15" />
+            </label>
+          </div>
+          <button class="primary" id="splitBtn" type="button">Dividir PDF</button>
+        </article>
+
+        <article class="tool-panel" id="extract">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Extrair paginas</p>
+              <h2>Crie um novo PDF com paginas escolhidas</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="extractFile">
+            <input id="extractFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Informe paginas soltas ou intervalos.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Paginas</span>
+              <input id="extractRanges" type="text" placeholder="1-3, 8, 12-15" />
+            </label>
+          </div>
+          <button class="primary" id="extractBtn" type="button">Extrair paginas</button>
+        </article>
+
+        <article class="tool-panel" id="organize">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Organizar PDF</p>
+              <h2>Reordene, remova e gire paginas em uma etapa</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="organizeFile">
+            <input id="organizeFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Use intervalos como 1-3, 7, 9-10.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Nova ordem</span>
+              <input id="organizeOrder" type="text" placeholder="Opcional: 3, 1, 2, 4-8" />
+            </label>
+            <label>
+              <span>Remover paginas</span>
+              <input id="organizeRemove" type="text" placeholder="Opcional: 5, 8-10" />
+            </label>
+            <label>
+              <span>Girar paginas</span>
+              <select id="organizeRotate">
+                <option value="0">Nao girar</option>
+                <option value="90">90 graus</option>
+                <option value="180">180 graus</option>
+                <option value="270">270 graus</option>
+              </select>
+            </label>
+          </div>
+          <p class="note">Se a nova ordem ficar vazia, o app mantem todas as paginas na ordem original e aplica apenas remocao/giro.</p>
+          <button class="primary" id="organizeBtn" type="button">Organizar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="rotate">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Girar PDF</p>
+              <h2>Rotacione todas as paginas ou apenas algumas</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="rotateFile">
+            <input id="rotateFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Informe paginas especificas ou deixe em branco para todas.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Paginas</span>
+              <input id="rotateRanges" type="text" placeholder="Opcional: 1-3, 8" />
+            </label>
+            <label>
+              <span>Rotacao</span>
+              <select id="rotateAngle">
+                <option value="90">90 graus</option>
+                <option value="180">180 graus</option>
+                <option value="270">270 graus</option>
+              </select>
+            </label>
+          </div>
+          <button class="primary" id="rotateBtn" type="button">Girar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="watermark">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Marca d'agua</p>
+              <h2>Aplique texto em todas as paginas</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="watermarkFile">
+            <input id="watermarkFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Ideal para rascunho, copia interna ou protocolo.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Texto</span>
+              <input id="watermarkText" type="text" value="SEPLAN" />
+            </label>
+            <label>
+              <span>Tamanho</span>
+              <input id="watermarkSize" type="number" min="12" max="120" value="54" />
+            </label>
+            <label>
+              <span>Opacidade</span>
+              <input id="watermarkOpacity" type="range" min="8" max="55" value="18" />
+            </label>
+          </div>
+          <button class="primary" id="watermarkBtn" type="button">Adicionar marca d'agua</button>
+        </article>
+
+        <article class="tool-panel" id="numbers">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Numerar paginas</p>
+              <h2>Adicione numeracao no rodape do PDF</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="numbersFile">
+            <input id="numbersFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Escolha inicio, formato e posicao.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Comecar em</span>
+              <input id="numbersStart" type="number" min="1" value="1" />
+            </label>
+            <label>
+              <span>Formato</span>
+              <select id="numbersFormat">
+                <option value="simple">1</option>
+                <option value="page">Pagina 1</option>
+                <option value="total">Pagina 1 de 10</option>
+              </select>
+            </label>
+            <label>
+              <span>Posicao</span>
+              <select id="numbersPosition">
+                <option value="bottom-center">Rodape central</option>
+                <option value="bottom-right">Rodape direito</option>
+                <option value="bottom-left">Rodape esquerdo</option>
+              </select>
+            </label>
+          </div>
+          <button class="primary" id="numbersBtn" type="button">Numerar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="pdfToJpg">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">PDF para JPG</p>
+              <h2>Exporte cada pagina como imagem</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="pdfToJpgFile">
+            <input id="pdfToJpgFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>O resultado sai em ZIP com uma imagem por pagina.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Qualidade</span>
+              <input id="pdfToJpgQuality" type="range" min="55" max="95" value="86" />
+            </label>
+            <label>
+              <span>Resolucao</span>
+              <select id="pdfToJpgDpi">
+                <option value="120">Leve</option>
+                <option value="160" selected>Boa</option>
+                <option value="220">Alta</option>
+              </select>
+            </label>
+          </div>
+          <button class="primary" id="pdfToJpgBtn" type="button">Converter para JPG</button>
+        </article>
+
+        <article class="tool-panel" id="jpgToPdf">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">JPG para PDF</p>
+              <h2>Transforme imagens em um unico PDF</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="jpgToPdfFiles">
+            <input id="jpgToPdfFiles" type="file" accept="image/jpeg,image/png" multiple />
+            <strong>Selecionar imagens</strong>
+            <span>Use JPG ou PNG. Cada imagem vira uma pagina.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Tamanho da pagina</span>
+              <select id="jpgPageSize">
+                <option value="a4" selected>A4 com margem</option>
+                <option value="image">Tamanho da imagem</option>
+              </select>
+            </label>
+            <label>
+              <span>Orientacao A4</span>
+              <select id="jpgOrientation">
+                <option value="auto" selected>Automatica</option>
+                <option value="portrait">Retrato</option>
+                <option value="landscape">Paisagem</option>
+              </select>
+            </label>
+          </div>
+          <button class="primary" id="jpgToPdfBtn" type="button">Criar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="crop">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Cortar PDF</p>
+              <h2>Remova margens das paginas</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="cropFile">
+            <input id="cropFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Informe margens em milimetros.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Paginas</span>
+              <input id="cropRanges" type="text" placeholder="Opcional: 1-3, 8" />
+            </label>
+            <label>
+              <span>Topo mm</span>
+              <input id="cropTop" type="number" min="0" step="1" value="0" />
+            </label>
+            <label>
+              <span>Direita mm</span>
+              <input id="cropRight" type="number" min="0" step="1" value="0" />
+            </label>
+            <label>
+              <span>Baixo mm</span>
+              <input id="cropBottom" type="number" min="0" step="1" value="0" />
+            </label>
+            <label>
+              <span>Esquerda mm</span>
+              <input id="cropLeft" type="number" min="0" step="1" value="0" />
+            </label>
+          </div>
+          <button class="primary" id="cropBtn" type="button">Cortar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="sign">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Assinar PDF</p>
+              <h2>Adicione uma assinatura textual ao documento</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="signFile">
+            <input id="signFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Assinatura visual simples para protocolos e minutas.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Nome/assinatura</span>
+              <input id="signText" type="text" placeholder="Nome do responsavel" />
+            </label>
+            <label>
+              <span>Pagina</span>
+              <input id="signPage" type="number" min="1" value="1" />
+            </label>
+            <label>
+              <span>Posicao</span>
+              <select id="signPosition">
+                <option value="bottom-right" selected>Rodape direito</option>
+                <option value="bottom-center">Rodape central</option>
+                <option value="bottom-left">Rodape esquerdo</option>
+              </select>
+            </label>
+          </div>
+          <p class="note">Esta assinatura e visual. Assinatura digital com certificado deve entrar na fase backend.</p>
+          <button class="primary" id="signBtn" type="button">Assinar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="textStamp">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Adicionar texto</p>
+              <h2>Insira texto ou carimbo em paginas escolhidas</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="textStampFile">
+            <input id="textStampFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Use para protocolo, observacao, minuta ou conferencia.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Texto</span>
+              <input id="stampText" type="text" value="CONFERIDO" />
+            </label>
+            <label>
+              <span>Paginas</span>
+              <input id="stampRanges" type="text" placeholder="Opcional: todas" />
+            </label>
+            <label>
+              <span>Posicao</span>
+              <select id="stampPosition">
+                <option value="top-left">Topo esquerdo</option>
+                <option value="top-right" selected>Topo direito</option>
+                <option value="center">Centro</option>
+                <option value="bottom-left">Rodape esquerdo</option>
+                <option value="bottom-right">Rodape direito</option>
+              </select>
+            </label>
+            <label>
+              <span>Tamanho</span>
+              <input id="stampSize" type="number" min="8" max="72" value="18" />
+            </label>
+          </div>
+          <button class="primary" id="textStampBtn" type="button">Adicionar texto</button>
+        </article>
+
+        <article class="tool-panel" id="redact">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Tarjar PDF</p>
+              <h2>Remova visualmente uma area sensivel</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="redactFile">
+            <input id="redactFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>O PDF final e achatado em imagem para esconder o conteudo coberto.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Paginas</span>
+              <input id="redactRanges" type="text" placeholder="Opcional: todas" />
+            </label>
+            <label>
+              <span>Esquerda %</span>
+              <input id="redactX" type="number" min="0" max="100" step="1" value="10" />
+            </label>
+            <label>
+              <span>Topo %</span>
+              <input id="redactY" type="number" min="0" max="100" step="1" value="10" />
+            </label>
+            <label>
+              <span>Largura %</span>
+              <input id="redactW" type="number" min="1" max="100" step="1" value="35" />
+            </label>
+            <label>
+              <span>Altura %</span>
+              <input id="redactH" type="number" min="1" max="100" step="1" value="8" />
+            </label>
+          </div>
+          <p class="note">Use percentuais da pagina. Exemplo: esquerda 10, topo 10, largura 35, altura 8 cobre uma faixa no canto superior esquerdo.</p>
+          <button class="primary" id="redactBtn" type="button">Tarjar PDF</button>
+        </article>
+
+        <article class="tool-panel" id="compare">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Comparar PDFs</p>
+              <h2>Gere imagens lado a lado para conferencia</h2>
+            </div>
+          </div>
+          <div class="controls-grid">
+            <label class="dropzone compact-zone" for="compareFileA">
+              <input id="compareFileA" type="file" accept="application/pdf" />
+              <strong>PDF original</strong>
+              <span>Primeira versao.</span>
+            </label>
+            <label class="dropzone compact-zone" for="compareFileB">
+              <input id="compareFileB" type="file" accept="application/pdf" />
+              <strong>PDF revisado</strong>
+              <span>Segunda versao.</span>
+            </label>
+            <label>
+              <span>Resolucao</span>
+              <select id="compareDpi">
+                <option value="90">Leve</option>
+                <option value="130" selected>Boa</option>
+                <option value="170">Alta</option>
+              </select>
+            </label>
+          </div>
+          <p class="note">O resultado sai em ZIP com uma imagem por pagina, mostrando original e revisado lado a lado.</p>
+          <button class="primary" id="compareBtn" type="button">Comparar PDFs</button>
+        </article>
+
+        <article class="tool-panel" id="textExtract">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">PDF para TXT</p>
+              <h2>Extraia texto de PDFs pesquisaveis</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="textExtractFile">
+            <input id="textExtractFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Funciona quando o PDF ja possui camada de texto.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Paginas</span>
+              <input id="textExtractRanges" type="text" placeholder="Opcional: todas" />
+            </label>
+          </div>
+          <p class="note">PDF escaneado sem OCR pode gerar pouco ou nenhum texto.</p>
+          <button class="primary" id="textExtractBtn" type="button">Extrair TXT</button>
+        </article>
+
+        <article class="tool-panel" id="flattenForms">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Achatar formularios</p>
+              <h2>Converta campos preenchidos em conteudo fixo</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="flattenFormsFile">
+            <input id="flattenFormsFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Use para evitar edicao acidental de campos de formulario.</span>
+          </label>
+          <button class="primary" id="flattenFormsBtn" type="button">Achatar formulario</button>
+        </article>
+
+        <article class="tool-panel" id="metadata">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Metadados</p>
+              <h2>Limpe ou padronize informacoes internas do PDF</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="metadataFile">
+            <input id="metadataFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Altere titulo, autor, assunto e palavras-chave.</span>
+          </label>
+          <div class="segmented" role="group" aria-label="Modo de metadados">
+            <button class="metadata-mode active" data-metadata-mode="set" type="button">Definir</button>
+            <button class="metadata-mode" data-metadata-mode="clear" type="button">Limpar</button>
+          </div>
+          <div class="controls-grid" id="metadataFields">
+            <label>
+              <span>Titulo</span>
+              <input id="metadataTitle" type="text" placeholder="Documento SEPLAN" />
+            </label>
+            <label>
+              <span>Autor</span>
+              <input id="metadataAuthor" type="text" placeholder="Central SEPLAN" />
+            </label>
+            <label>
+              <span>Assunto</span>
+              <input id="metadataSubject" type="text" placeholder="Processo administrativo" />
+            </label>
+            <label>
+              <span>Palavras-chave</span>
+              <input id="metadataKeywords" type="text" placeholder="seplan, pdf, processo" />
+            </label>
+          </div>
+          <button class="primary" id="metadataBtn" type="button">Salvar metadados</button>
+        </article>
+
+        <article class="tool-panel" id="cover">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Adicionar capa</p>
+              <h2>Crie uma folha de rosto antes do PDF</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="coverFile">
+            <input id="coverFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>A capa sera inserida como primeira pagina.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Titulo</span>
+              <input id="coverTitle" type="text" value="Documento SEPLAN" />
+            </label>
+            <label>
+              <span>Subtitulo</span>
+              <input id="coverSubtitle" type="text" placeholder="Processo, protocolo ou assunto" />
+            </label>
+            <label>
+              <span>Responsavel</span>
+              <input id="coverOwner" type="text" placeholder="Secretaria / Setor" />
+            </label>
+            <label>
+              <span>Data</span>
+              <input id="coverDate" type="text" placeholder="Opcional" />
+            </label>
+          </div>
+          <button class="primary" id="coverBtn" type="button">Adicionar capa</button>
+        </article>
+
+        <article class="tool-panel" id="nup">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Paginas por folha</p>
+              <h2>Monte uma versao economica para conferencia</h2>
+            </div>
+          </div>
+          <label class="dropzone" for="nupFile">
+            <input id="nupFile" type="file" accept="application/pdf" />
+            <strong>Selecionar PDF</strong>
+            <span>Gera novo PDF com 2 ou 4 paginas por folha A4.</span>
+          </label>
+          <div class="controls-grid">
+            <label>
+              <span>Layout</span>
+              <select id="nupCount">
+                <option value="2" selected>2 paginas por folha</option>
+                <option value="4">4 paginas por folha</option>
+              </select>
+            </label>
+            <label>
+              <span>Orientacao</span>
+              <select id="nupOrientation">
+                <option value="portrait">A4 retrato</option>
+                <option value="landscape" selected>A4 paisagem</option>
+              </select>
+            </label>
+            <label>
+              <span>Resolucao</span>
+              <select id="nupDpi">
+                <option value="100">Leve</option>
+                <option value="140" selected>Boa</option>
+                <option value="180">Alta</option>
+              </select>
+            </label>
+          </div>
+          <p class="note">Esta ferramenta renderiza as paginas como imagem, ideal para conferencia e impressao, nao para preservar texto pesquisavel.</p>
+          <button class="primary" id="nupBtn" type="button">Gerar PDF 2 em 1</button>
+        </article>
+
+        <aside class="status-panel">
+          <h2>Status</h2>
+          <div id="status" class="status">Aguardando arquivos.</div>
+          <div class="metrics" id="metrics"></div>
+          <div class="download-area" id="downloads"></div>
+          <div class="safety-box">
+            <strong>Privacidade</strong>
+            <span>Nenhum PDF e salvo neste app. Ao recarregar a pagina, os arquivos selecionados sao descartados.</span>
+            <small>Versao 1.0-homologacao</small>
+          </div>
+        </aside>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

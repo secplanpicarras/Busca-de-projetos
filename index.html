@@ -982,6 +982,14 @@ body.controle-light #page-monitor{width:100%}
 body.controle-light #page-monitor .monitor-embed{box-shadow:none}
 body.controle-light:has(#page-monitor[style*="block"]) .content-inner{max-width:none;padding:24px}
 
+/* Ferramentas PDF incorporadas */
+#page-pdf > :not(.pdf-embed){display:none!important}
+.pdf-embed{height:calc(100vh - 52px);min-height:720px;border:0;border-radius:0;overflow:hidden;background:#f3f6f7;margin:-24px}
+.pdf-embed iframe{width:100%;height:100%;border:0;display:block;background:#f3f6f7}
+body.controle-light #page-pdf{width:100%}
+body.controle-light #page-pdf .pdf-embed{box-shadow:none}
+body.controle-light:has(#page-pdf[style*="block"]) .content-inner{max-width:none;padding:24px}
+
 /* Pre-Analise incorporada */
 #page-preanalise > :not(.preanalise-embed){display:none!important}
 .preanalise-embed{height:calc(100vh - 52px);min-height:720px;border:0;border-radius:0;overflow:hidden;background:#edf2f4;margin:-24px}
@@ -1457,6 +1465,11 @@ body.controle-light .fResultadoPreview{
             <div class="hmod-name">Buscas salvas</div>
             <span class="hchip hchip-g">Ver registros</span>
           </div>
+          <div class="hmod hmod-sm" onclick="navTo('pdf')" style="cursor:pointer">
+            <div class="hmod-lbl">Documentos</div>
+            <div class="hmod-name">Ferramentas PDF</div>
+            <span class="hchip hchip-b">Juntar e organizar</span>
+          </div>
           <div class="hmod hmod-sm" onclick="navTo('agenda')" style="cursor:pointer">
             <div class="hmod-badge ok" id="hbadge-agenda" style="position:absolute;top:10px;right:10px;font-size:10px;padding:2px 8px;border-radius:999px;font-family:var(--mono)">—</div>
             <div class="hmod-lbl">Agendamentos</div>
@@ -1786,6 +1799,13 @@ body.controle-light .fResultadoPreview{
         </div>
       </div>
 
+      <!-- PAGE PDF TOOLS -->
+      <div id="page-pdf" style="display:none">
+        <div class="pdf-embed">
+          <iframe id="pdfToolsFrame" src="apps/pdf-tools/index.html" title="Ferramentas PDF SEPLAN"></iframe>
+        </div>
+      </div>
+
       <!-- PAGE PRE-ANALISE -->
       <div id="page-preanalise" style="display:none">
         <div class="preanalise-embed">
@@ -1894,6 +1914,7 @@ body.controle-light .fResultadoPreview{
               <select class="form-select" id="admin-filtro-modulo" onchange="adminRenderLista()">
                 <option value="">Todos os modulos</option>
                 <option value="busca">Busca de projeto</option>
+                <option value="pdf">Ferramentas PDF</option>
                 <option value="historico">Historico</option>
                 <option value="controle">Mesa de controle</option>
                 <option value="digitalizacao">Digitalizacao</option>
@@ -2156,6 +2177,10 @@ body.controle-light .fResultadoPreview{
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
       <div class="dock-tip">Busca de projetos</div>
     </button>
+    <button class="dock-item" id="nav-pdf" onclick="navTo('pdf')">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M7 3.75h7.5L19 8.25v12A1.75 1.75 0 0 1 17.25 22H7a1.75 1.75 0 0 1-1.75-1.75V5.5A1.75 1.75 0 0 1 7 3.75Z"/><path stroke-linecap="round" stroke-linejoin="round" d="M14.5 3.75v4.5H19M8.5 13h7M8.5 16h7"/></svg>
+      <div class="dock-tip">Ferramentas PDF</div>
+    </button>
     <button class="dock-item" id="nav-historico" onclick="navTo('historico')">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
       <div class="dock-tip">Histórico</div>
@@ -2354,10 +2379,11 @@ function usuarioPodeGerenciarDigitalizacao(perfil){
   return ['admin','digitalizacao'].includes((perfil?.papel||'').toLowerCase());
 }
 
-const MODULOS_CENTRAL = ['home','busca','historico','controle','preanalise','digitalizacao','monitor','agenda','admin'];
+const MODULOS_CENTRAL = ['home','busca','pdf','historico','controle','preanalise','digitalizacao','monitor','agenda','admin'];
 const MODULOS_LABELS = {
   home:'Inicio',
   busca:'Busca de projeto',
+  pdf:'Ferramentas PDF',
   historico:'Historico',
   controle:'Mesa de controle',
   preanalise:'Pre-Analise',
@@ -2368,6 +2394,7 @@ const MODULOS_LABELS = {
 };
 const MODULOS_CATALOGO = [
   {id:'busca', nome:'Busca de projeto', status:'ativo', tipo:'operacional', desc:'Consulta de projetos aprovados por matricula, inscricao e proprietarios.'},
+  {id:'pdf', nome:'Ferramentas PDF', status:'ativo', tipo:'operacional', desc:'Juntar, organizar e preparar arquivos PDF dentro da Central.'},
   {id:'digitalizacao', nome:'Digitalizacao', status:'ativo', tipo:'operacional', desc:'Pedidos, acompanhamento e retorno de digitalizacao.'},
   {id:'agenda', nome:'Agenda', status:'ativo', tipo:'operacional', desc:'Agendamentos dos analistas e horarios disponiveis.'},
   {id:'monitor', nome:'Monitor IPM', status:'ativo', tipo:'operacional', desc:'Importacao de relatorios IPM, atrasos e responsaveis.'},
@@ -2379,7 +2406,7 @@ const MODULOS_CATALOGO = [
 ];
 const MODULOS_POR_PERFIL = {
   admin:['*'],
-  analista:['home','busca','preanalise','digitalizacao','agenda','monitor'],
+  analista:['home','busca','pdf','preanalise','digitalizacao','agenda','monitor'],
   digitalizacao:['home','digitalizacao'],
   usuario:['home','busca','digitalizacao']
 };
@@ -2635,6 +2662,12 @@ async function navTo(page){
     if(pageMon) pageMon.style.display = 'block';
     const frame = document.getElementById('monitorFramePage');
     if(frame && !frame.src) frame.src = 'monitor.html';
+  }
+  if(page==='pdf'){
+    const pagePdf = document.getElementById('page-pdf');
+    if(pagePdf) pagePdf.style.display = 'block';
+    const frame = document.getElementById('pdfToolsFrame');
+    if(frame && !frame.src) frame.src = 'apps/pdf-tools/index.html';
   }
   if(page==='preanalise'){
     const pagePre = document.getElementById('page-preanalise');
@@ -3357,6 +3390,40 @@ async function salvarBusca(){
 }
 
 // HISTÓRICO
+function buscaResultadoData(busca){
+  const bruto = busca?.resultado || {};
+  if(typeof bruto === 'string'){
+    try { return JSON.parse(bruto) || {}; }
+    catch { return {}; }
+  }
+  return bruto || {};
+}
+
+function buscaTemResultado(busca){
+  const resultado = buscaResultadoData(busca);
+  if(typeof busca?.tem_resultado === 'boolean') return busca.tem_resultado;
+  if(typeof resultado.tem_resultado === 'boolean') return resultado.tem_resultado;
+  return (Array.isArray(resultado.inscricao_resultados) && resultado.inscricao_resultados.length > 0)
+    || (Array.isArray(resultado.nome_resultados) && resultado.nome_resultados.length > 0)
+    || (Array.isArray(busca?.inscricao_resultados) && busca.inscricao_resultados.length > 0)
+    || (Array.isArray(busca?.nome_resultados) && busca.nome_resultados.length > 0);
+}
+
+function buscaInscricaoResultados(busca){
+  const resultado = buscaResultadoData(busca);
+  return Array.isArray(busca?.inscricao_resultados) ? busca.inscricao_resultados : (Array.isArray(resultado.inscricao_resultados) ? resultado.inscricao_resultados : []);
+}
+
+function buscaNomeResultados(busca){
+  const resultado = buscaResultadoData(busca);
+  return Array.isArray(busca?.nome_resultados) ? busca.nome_resultados : (Array.isArray(resultado.nome_resultados) ? resultado.nome_resultados : []);
+}
+
+function buscaProprietarios(busca){
+  const resultado = buscaResultadoData(busca);
+  return Array.isArray(busca?.proprietarios) ? busca.proprietarios : (Array.isArray(resultado.proprietarios) ? resultado.proprietarios : []);
+}
+
 // MESA DE CONTROLE
 const CONTROLE_KEY = 'seplan_controle_buscas_v1';
 let controleFiltro = 'abertos';
@@ -3424,7 +3491,7 @@ function controleCriarDeBusca(busca, opts={}){
     if(!opts.silent) { navTo('controle'); diShow('salvo'); }
     return;
   }
-  const temResultado = busca.tem_resultado ?? busca.resultado?.tem_resultado;
+  const temResultado = buscaTemResultado(busca);
   const item = {
     id: controleId(),
     buscaId: busca.id || '',
@@ -3727,7 +3794,8 @@ async function loadHistoricoPage(){
   buscasCache={};data.forEach(b=>{buscasCache[b.id]=b;});
   el.innerHTML=data.map(b=>{
     const dt=new Date(b.criado_em).toLocaleString('pt-BR');
-    const badge=b.tem_resultado
+    const temResultado = buscaTemResultado(b);
+    const badge=temResultado
       ?`<span style="font-size:10px;padding:2px 9px;border-radius:999px;background:#EAF3DE;color:#27500A;border:1px solid #C0DD97;font-family:var(--mono)">resultado</span>`
       :`<span style="font-size:10px;padding:2px 9px;border-radius:999px;background:#FCEBEB;color:#791F1F;border:1px solid #F7C1C1;font-family:var(--mono)">nada consta</span>`;
     return `<div class="hist-item" onclick="openDetalhe('${b.id}')"><div style="display:flex;justify-content:space-between;align-items:center;gap:.5rem;flex-wrap:wrap"><span style="font-size:14px;font-weight:500;font-family:var(--mono)">${b.protocolo||'—'}</span>${badge}</div><div class="hist-meta">${b.matricula?'Mat. '+b.matricula+' · ':''}${b.inscricao||''} · ${dt}</div></div>`;
@@ -3740,14 +3808,15 @@ function openDetalhe(id){
   buscaSelecionada=b;
   document.getElementById('detalheTitle').textContent='Protocolo '+(b.protocolo||'—');
   const dt=new Date(b.criado_em).toLocaleString('pt-BR');
-  const nomeRes=Array.isArray(b.nome_resultados)?b.nome_resultados:[];
-  const inscRes=Array.isArray(b.inscricao_resultados)?b.inscricao_resultados:[];
+  const temResultado = buscaTemResultado(b);
+  const nomeRes=buscaNomeResultados(b);
+  const inscRes=buscaInscricaoResultados(b);
 
   let html=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:.5rem;margin-bottom:1rem">
     <div style="padding:.75rem;background:var(--bg3);border-radius:8px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase">Matrícula</div><div style="font-size:13px;font-weight:500;font-family:var(--mono)">${b.matricula||'—'}</div></div>
     <div style="padding:.75rem;background:var(--bg3);border-radius:8px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase">Inscrição</div><div style="font-size:13px;font-weight:500;font-family:var(--mono)">${b.inscricao||'—'}</div></div>
     <div style="padding:.75rem;background:var(--bg3);border-radius:8px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase">Data</div><div style="font-size:13px;font-weight:500;font-family:var(--mono)">${dt}</div></div>
-    <div style="padding:.75rem;background:var(--bg3);border-radius:8px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase">Resultado</div><div style="font-size:13px;font-weight:500;color:${b.tem_resultado?'#1D9E75':'#E24B4A'}">${b.tem_resultado?'Encontrado':'Nada consta'}</div></div>
+    <div style="padding:.75rem;background:var(--bg3);border-radius:8px"><div style="font-size:10px;color:var(--text3);font-family:var(--mono);text-transform:uppercase">Resultado</div><div style="font-size:13px;font-weight:500;color:${temResultado?'#1D9E75':'#E24B4A'}">${temResultado?'Encontrado':'Nada consta'}</div></div>
   </div>`;
 
   if(inscRes.length){
@@ -3773,7 +3842,7 @@ function openDetalhe(id){
   }
 
   document.getElementById('detalheBody').innerHTML=html;
-  document.getElementById('btnCertidao').style.display=b.tem_resultado?'none':'inline-flex';
+  document.getElementById('btnCertidao').style.display=temResultado?'none':'inline-flex';
   document.getElementById('modalDetalhe').style.display='flex';
 }
 
@@ -3863,7 +3932,7 @@ function gerarCertidao(){
   if(!buscaSelecionada) return;
   const b=buscaSelecionada;
   const dt=new Date(b.criado_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
-  const props=Array.isArray(b.proprietarios) ? b.proprietarios : (Array.isArray(b.resultado?.proprietarios) ? b.resultado.proprietarios : []);
+  const props=buscaProprietarios(b);
   const html=`<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><title>Certidão de Nada Consta</title>
 <style>body{font-family:Arial,sans-serif;font-size:12pt;line-height:1.6;margin:0;padding:0}.page{max-width:700px;margin:60px auto;padding:0 40px}.header{text-align:center;border-bottom:2px solid #333;padding-bottom:16px;margin-bottom:32px}.header h2{font-size:13pt;font-weight:700;margin:0 0 4px;text-transform:uppercase}.header p{font-size:10pt;margin:0;color:#555}h1{font-size:14pt;text-align:center;font-weight:700;text-transform:uppercase;margin:0 0 32px}.corpo{text-align:justify;margin-bottom:24px}.destaque{font-weight:700}.rodape{margin-top:60px;text-align:center;font-size:10pt;color:#555;border-top:1px solid #ccc;padding-top:12px}.assinatura{margin-top:80px;text-align:center}.assinatura .linha{width:280px;border-top:1px solid #333;margin:0 auto 6px}.assinatura p{font-size:10pt;margin:2px 0}@media print{.page{margin:20px auto}}</style>
 </head><body><div class="page">
