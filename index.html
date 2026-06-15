@@ -3448,12 +3448,14 @@ function buscaResultadoData(busca){
 
 function buscaTemResultado(busca){
   const resultado = buscaResultadoData(busca);
-  if(typeof busca?.tem_resultado === 'boolean') return busca.tem_resultado;
-  if(typeof resultado.tem_resultado === 'boolean') return resultado.tem_resultado;
-  return (Array.isArray(resultado.inscricao_resultados) && resultado.inscricao_resultados.length > 0)
-    || (Array.isArray(resultado.nome_resultados) && resultado.nome_resultados.length > 0)
-    || (Array.isArray(busca?.inscricao_resultados) && busca.inscricao_resultados.length > 0)
+  const temInscricao = (Array.isArray(resultado.inscricao_resultados) && resultado.inscricao_resultados.length > 0)
+    || (Array.isArray(busca?.inscricao_resultados) && busca.inscricao_resultados.length > 0);
+  const temNomes = (Array.isArray(resultado.nome_resultados) && resultado.nome_resultados.length > 0)
     || (Array.isArray(busca?.nome_resultados) && busca.nome_resultados.length > 0);
+  if(temInscricao || temNomes) return true;
+  if(typeof resultado.tem_resultado === 'boolean') return resultado.tem_resultado;
+  if(typeof busca?.tem_resultado === 'boolean') return busca.tem_resultado;
+  return false;
 }
 
 function buscaInscricaoResultados(busca){
