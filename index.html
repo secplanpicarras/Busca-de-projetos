@@ -55,6 +55,10 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .login-card input{background:#fbfcfd;border:1px solid #cfd9df;color:#172026;border-radius:8px;font-family:var(--sans);font-weight:600}
 .login-card input::placeholder{color:#7b8b96}
 .login-card input:focus{border-color:#1d6f7a;box-shadow:0 0 0 3px rgba(29,111,122,.10)}
+.login-password-wrap{position:relative;margin-bottom:8px}
+.login-password-toggle{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:8px;background:transparent;color:#607080;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+.login-password-toggle:hover{background:#eef4f6;color:#1d6f7a}
+.login-password-toggle svg{width:18px;height:18px;stroke:currentColor}
 .login-card .btn-primary{background:#1d6f7a;border-color:#1d6f7a;color:#fff;border-radius:8px;min-height:44px}
 .login-card .btn-primary:hover{background:#124f58;border-color:#124f58}
 .login-card > div:first-child > div:first-child{color:#172026!important;font-size:46px!important;line-height:.9!important}
@@ -1377,9 +1381,12 @@ body.controle-light .fResultadoPreview{
       <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-top:10px;font-family:'DM Mono',monospace">Balneário Piçarras · Governo Municipal</div>
     </div>
     <input type="email" id="loginEmail" placeholder="E-mail" style="margin-bottom:8px" onkeydown="if(event.key==='Enter')checkLogin()">
-    <div style="position:relative;margin-bottom:8px">
+    <div class="login-password-wrap">
       <input type="password" id="loginInput" placeholder="Senha" style="padding-right:40px;width:100%" onkeydown="if(event.key==='Enter')checkLogin()">
-      <button type="button" onclick="toggleSenha()" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px" id="btnOlho">👁</button>
+      <button type="button" onclick="toggleSenha()" class="login-password-toggle" id="btnOlho" aria-label="Mostrar senha" title="Mostrar senha">
+        <svg id="iconSenhaVer" fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12s3.75-6.75 9.75-6.75S21.75 12 21.75 12 18 18.75 12 18.75 2.25 12 2.25 12Z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg id="iconSenhaOcultar" fill="none" viewBox="0 0 24 24" stroke-width="2" style="display:none"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3l18 18M10.58 10.58A2 2 0 0 0 12 14a2 2 0 0 0 1.42-.58M9.88 5.5A9.9 9.9 0 0 1 12 5.25c6 0 9.75 6.75 9.75 6.75a17.6 17.6 0 0 1-2.58 3.36M6.53 6.53C3.85 8.22 2.25 12 2.25 12s3.75 6.75 9.75 6.75c1.34 0 2.56-.34 3.65-.88"/></svg>
+      </button>
     </div>
     <div class="login-error" id="loginError">E-mail ou senha incorretos.</div>
     <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:4px" onclick="checkLogin()" id="loginBtn">Entrar</button>
@@ -5775,8 +5782,17 @@ function agendaInit() {
 function toggleSenha() {
   const inp = document.getElementById('loginInput');
   const btn = document.getElementById('btnOlho');
-  if(inp.type === 'password'){ inp.type = 'text'; btn.textContent = '🙈'; }
-  else { inp.type = 'password'; btn.textContent = '👁'; }
+  const ver = document.getElementById('iconSenhaVer');
+  const ocultar = document.getElementById('iconSenhaOcultar');
+  const mostrar = inp.type === 'password';
+  inp.type = mostrar ? 'text' : 'password';
+  if(ver) ver.style.display = mostrar ? 'none' : '';
+  if(ocultar) ocultar.style.display = mostrar ? '' : 'none';
+  if(btn){
+    btn.setAttribute('aria-label', mostrar ? 'Ocultar senha' : 'Mostrar senha');
+    btn.setAttribute('title', mostrar ? 'Ocultar senha' : 'Mostrar senha');
+  }
+  inp.focus();
 }
 </script>
 </body>
