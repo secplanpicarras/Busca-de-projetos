@@ -98,6 +98,17 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
 .topbar-menu:hover{border-color:var(--border2);color:var(--text)}
 
 /* ── CONTENT ── */
+.central-toast-wrap{position:fixed;top:66px;right:22px;z-index:5000;display:grid;gap:8px;width:min(390px,calc(100vw - 32px));pointer-events:none}
+.central-toast{pointer-events:auto;background:#fff;border:1px solid #d9e0e5;border-left:4px solid var(--accent);border-radius:12px;box-shadow:0 18px 42px rgba(22,52,59,.18);padding:13px 14px;display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:10px;align-items:flex-start;transform:translateX(18px);opacity:0;animation:centralToastIn .22s ease forwards;color:#172026}
+.central-toast-icon{width:26px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;background:#e8f6f3;color:#12766c;font-weight:900}
+.central-toast-title{font-size:13px;font-weight:900;color:#061524;line-height:1.2}
+.central-toast-msg{font-size:12px;color:#4e6271;line-height:1.35;margin-top:3px}
+.central-toast-close{border:1px solid #d9e0e5;background:#fff;color:#506579;border-radius:8px;width:26px;height:26px;cursor:pointer;font-weight:900;line-height:1}
+.central-toast.err{border-left-color:var(--red)}
+.central-toast.err .central-toast-icon{background:#fff1f1;color:#b33636}
+.central-toast.warn{border-left-color:var(--amber)}
+.central-toast.warn .central-toast-icon{background:#fff7df;color:#9b6800}
+@keyframes centralToastIn{to{transform:translateX(0);opacity:1}}
 .content{margin-left:var(--dock);min-height:100vh;padding-top:52px;background:var(--content-grad);transition:background .3s}
 .content-inner{max-width:800px;margin:0 auto;padding:2rem}
 
@@ -944,7 +955,7 @@ body.controle-light .dock-logo svg{stroke:#15272c}
 body.controle-light .dock-item{color:rgba(255,255,255,.58)}
 body.controle-light .dock-item:hover,
 body.controle-light .dock-item.active{background:rgba(255,255,255,.12);color:#fff}
-body.controle-light .content-inner{max-width:1180px;width:100%;margin:0 auto;padding:24px}
+body.controle-light .content-inner{max-width:1480px;width:100%;margin:0 auto;padding:24px clamp(18px,3vw,44px)}
 body.controle-light #page-controle{width:100%}
 body.controle-light #page-controle .controle-board{grid-template-columns:320px minmax(0,1fr)}
 body.controle-light #page-controle .controle-wrap{width:min(100%,1500px);margin:0 auto}
@@ -1008,7 +1019,7 @@ body.controle-light:has(#page-preanalise[style*="block"]) .content-inner{max-wid
 /* Digitalização no modelo claro */
 /* Monitor IPM em modal */
 body.controle-light #page-digitalizacao{width:100%}
-body.controle-light #page-digitalizacao .digitalizacao-page{width:min(100%,1180px);margin:0 auto}
+body.controle-light #page-digitalizacao .digitalizacao-page{width:min(100%,1480px);margin:0 auto}
 body.controle-light #page-digitalizacao .digitalizacao-header{
   display:flex;
   align-items:flex-start;
@@ -1156,7 +1167,29 @@ body.controle-light #dg-status{color:#506579!important}
 
 /* Busca, histórico e modais no padrão claro */
 body.controle-light #page-busca,
-body.controle-light #page-historico{max-width:1180px;margin:0 auto}
+body.controle-light #page-historico,
+body.controle-light #page-admin,
+body.controle-light #page-home{max-width:1480px;margin:0 auto}
+body.controle-light #page-home .home-hero{padding-top:34px}
+body.controle-light #page-home .home-desc{max-width:430px}
+body.controle-light #page-home .home-grid{grid-template-columns:2fr repeat(3,minmax(220px,1fr));gap:10px}
+body.controle-light #page-home .hmod-main{min-height:206px}
+body.controle-light #page-home .hmod-sm{min-height:88px}
+body.controle-light #page-home .home-feed{max-width:none}
+body.controle-light #modalDetalhe .modal{max-width:760px}
+@media (min-width:1600px){
+  body.controle-light .content-inner{max-width:1600px}
+  body.controle-light #page-busca,
+  body.controle-light #page-historico,
+  body.controle-light #page-admin,
+  body.controle-light #page-home,
+  body.controle-light #page-digitalizacao .digitalizacao-page{max-width:1600px}
+  body.controle-light #page-home .home-grid{grid-template-columns:2.1fr repeat(3,minmax(250px,1fr));gap:12px}
+  body.controle-light #modalDetalhe .modal{max-width:860px}
+}
+@media (max-width:1250px){
+  body.controle-light #page-home .home-grid{grid-template-columns:1.7fr 1fr 1fr}
+}
 body.controle-light .page-header h1{color:#061524;font-size:28px;line-height:1.1;margin:0}
 body.controle-light .page-header p{color:#4e6271;margin-top:4px}
 body.controle-light .steps{gap:8px;margin-bottom:18px}
@@ -1357,14 +1390,37 @@ body.controle-light .fResultadoPreview{
 .admin-module-badge.ok{background:#e8f6f3;color:#12766c;border-color:#bfe4dd}
 .admin-module-badge.warn{background:#fff7df;color:#a36d00;border-color:#f3dc9b}
 .admin-module-badge.admin{background:#eef3ff;color:#3150a3;border-color:#cbd8ff}
-.notif-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+.notif-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border);flex-wrap:wrap}
 .notif-summary{font-size:12px;color:var(--text2);font-weight:700}
+.notif-actions{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.notif-select-all{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:#fff;border-radius:8px;padding:6px 9px;font-size:11px;font-weight:800;color:var(--text2);cursor:pointer}
+.notif-select-all input{width:14px;height:14px;accent-color:var(--accent)}
 .notif-list{display:grid;gap:8px;max-height:520px;overflow:auto}
 .notif-item{border:1px solid var(--border);border-radius:10px;padding:10px 12px;background:var(--surface)}
 .notif-item.unread{background:#eef8f8;border-color:#bfe4dd}
+.notif-item-inner{display:grid;grid-template-columns:18px minmax(0,1fr) auto;gap:10px;align-items:flex-start}
+.notif-check{margin-top:4px;width:14px;height:14px;accent-color:var(--accent)}
 .notif-item-title{font-weight:900;color:var(--text);font-size:13px}
 .notif-item-msg{font-size:12px;color:var(--text2);line-height:1.45;margin-top:4px}
 .notif-item-meta{font-size:10px;color:var(--text3);font-family:var(--mono);margin-top:6px}
+.dg-busca-confirm-head{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.dg-busca-confirm-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+.dg-busca-confirm-card span{display:block;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:900;text-transform:uppercase;letter-spacing:.06em}
+.dg-busca-confirm-card strong{display:block;font-size:13px;color:var(--text);font-family:var(--mono);margin-top:4px}
+.dg-busca-list{display:grid;gap:8px;margin:10px 0 12px}
+.dg-busca-row{border:1px solid var(--border);background:#fbfcfd;border-radius:10px;padding:10px;display:grid;grid-template-columns:26px 120px 90px minmax(0,1fr) 34px;gap:8px;align-items:end}
+.dg-busca-row label{display:block;font-size:10px;color:var(--text3);font-family:var(--mono);font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.dg-busca-row input{width:100%;min-height:36px;border:1px solid #cfd9df;border-radius:8px;background:#fff;color:#172026;font-weight:800;padding:0 10px}
+.dg-busca-row-check{align-self:center;display:flex;align-items:center;justify-content:center}
+.dg-busca-row-check input{width:16px;height:16px;accent-color:var(--accent)}
+.dg-busca-remove{width:34px;height:36px;border:1px solid #ffd5d5;background:#fff;color:#b33636;border-radius:8px;font-weight:900;cursor:pointer}
+.dg-busca-help{font-size:12px;color:var(--text2);line-height:1.45;margin-top:6px}
+@media(max-width:760px){
+  .dg-busca-confirm-head{grid-template-columns:1fr}
+  .dg-busca-row{grid-template-columns:26px 1fr 92px;align-items:end}
+  .dg-busca-row .dg-busca-titular{grid-column:2 / span 2}
+  .dg-busca-remove{grid-column:3}
+}
 @media (max-width:900px){.admin-rules{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:1100px){.admin-catalog{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:700px){.admin-toolbar{grid-template-columns:1fr}.admin-rules,.admin-catalog{grid-template-columns:1fr}}
@@ -1577,7 +1633,7 @@ body.controle-light .fResultadoPreview{
           <div id="resultsContainer"></div>
           <div class="btn-row" style="margin-top:1rem">
             <button class="btn" onclick="goTo(2)">← Voltar</button>
-            <button class="btn btn-green" id="btnSalvarBusca" style="display:none" onclick="openSalvar()">💾 Salvar busca</button>
+            <button class="btn btn-green" id="btnSalvarBusca" style="display:none" onclick="openSalvar()">Salvar busca</button>
             <button class="btn btn-primary" id="btnNovaBusca" style="display:none" onclick="novaBusca()">+ Nova busca</button>
           </div>
         </div>
@@ -2083,7 +2139,7 @@ body.controle-light .fResultadoPreview{
   <div id="modalCadastro" class="modal-overlay" style="display:none">
     <div class="modal">
       <div class="modal-header">
-        <span class="modal-title">💾 Salvar busca</span>
+        <span class="modal-title">Salvar busca</span>
         <button class="modal-close" onclick="closeModal('modalCadastro')">×</button>
       </div>
       <div class="form-group">
@@ -2108,7 +2164,7 @@ body.controle-light .fResultadoPreview{
       </div>
       <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
         <button class="btn" onclick="closeModal('modalCadastro')">Cancelar</button>
-        <button class="btn btn-primary" onclick="salvarBusca()">💾 Salvar</button>
+        <button class="btn btn-primary" onclick="salvarBusca()">Salvar</button>
       </div>
     </div>
   </div>
@@ -2125,8 +2181,33 @@ body.controle-light .fResultadoPreview{
         <button class="btn" onclick="closeModal('modalDetalhe')">Fechar</button>
         <button class="btn" style="color:var(--red);border-color:var(--red)" onclick="excluirBusca()">🗑 Excluir</button>
         <button class="btn" onclick="abrirEdicao()">✏️ Editar</button>
-        <button class="btn btn-primary" id="btnDigitalizarBusca" onclick="pedirDigitalizacaoDaBusca()" style="display:none">Pedir digitalizacao</button>
+        <button class="btn btn-primary" id="btnDigitalizarBusca" onclick="abrirConfirmacaoDigitalizacaoBusca()" style="display:none">Pedir digitalizacao</button>
         <button class="btn btn-primary" id="btnCertidao" onclick="gerarCertidao()" style="display:none">📄 Gerar certidão</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL CONFIRMAR DIGITALIZACAO DA BUSCA -->
+  <div id="modalDigitalizacaoBusca" class="modal-overlay" style="display:none">
+    <div class="modal" style="max-width:760px">
+      <div class="modal-header">
+        <span class="modal-title">Confirmar pedido de digitalizacao</span>
+        <button class="modal-close" onclick="closeModal('modalDigitalizacaoBusca')">Ã—</button>
+      </div>
+      <div id="dgBuscaResumo"></div>
+      <div class="form-group">
+        <label class="form-label">Projetos que serao pedidos</label>
+        <div class="dg-busca-help">Confira os projetos encontrados. Voce pode desmarcar, alterar o numero/ano ou adicionar outro pedido antes de salvar.</div>
+        <div class="dg-busca-list" id="dgBuscaProjetosLista"></div>
+        <button class="btn btn-sm" type="button" onclick="dgBuscaAdicionarProjeto()">+ Adicionar outro projeto</button>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observacao do pedido</label>
+        <textarea class="form-input" id="dgBuscaObs" rows="3" placeholder="Ex: pedir digitalizacao completa, conferir anexos, processo vinculado a busca..."></textarea>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn" onclick="closeModal('modalDigitalizacaoBusca')">Voltar</button>
+        <button class="btn btn-primary" id="dgBuscaConfirmarBtn" onclick="dgBuscaConfirmarPedidos()">Confirmar e pedir digitalizacao</button>
       </div>
     </div>
   </div>
@@ -2166,7 +2247,15 @@ body.controle-light .fResultadoPreview{
       </div>
       <div class="notif-toolbar">
         <div class="notif-summary" id="notificacoes-resumo">Carregando...</div>
-        <button class="btn btn-sm" id="notificacoes-marcar-todas" onclick="notificacoesMarcarTodasLidas()">Marcar todas como lidas</button>
+        <div class="notif-actions">
+          <label class="notif-select-all" id="notificacoes-selecionar-wrap" style="display:none">
+            <input type="checkbox" id="notificacoes-selecionar-todas" onchange="notificacoesSelecionarTudo(this.checked)">
+            Selecionar tudo
+          </label>
+          <button class="btn btn-sm" id="notificacoes-excluir-selecionadas" onclick="notificacoesExcluirSelecionadas()" style="display:none">Excluir selecionadas</button>
+          <button class="btn btn-sm" id="notificacoes-excluir-lidas" onclick="notificacoesExcluirLidas()" style="display:none">Excluir lidas</button>
+          <button class="btn btn-sm" id="notificacoes-marcar-todas" onclick="notificacoesMarcarTodasLidas()">Marcar todas como lidas</button>
+        </div>
       </div>
       <div id="notificacoes-lista" class="notif-list"></div>
     </div>
@@ -2230,6 +2319,7 @@ body.controle-light .fResultadoPreview{
   </div>
 
 </div>
+<div id="centralToastWrap" class="central-toast-wrap" aria-live="polite" aria-atomic="true"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 const PASSWORD='@Ma07nu209970';
@@ -2561,11 +2651,19 @@ async function abrirNotificacoes(){
   const box = document.getElementById('notificacoes-lista');
   const resumo = document.getElementById('notificacoes-resumo');
   const btnTodas = document.getElementById('notificacoes-marcar-todas');
+  const btnExcluirLidas = document.getElementById('notificacoes-excluir-lidas');
+  const btnExcluirSelecionadas = document.getElementById('notificacoes-excluir-selecionadas');
+  const selectWrap = document.getElementById('notificacoes-selecionar-wrap');
+  const selectAll = document.getElementById('notificacoes-selecionar-todas');
   if(!box) return;
   document.getElementById('modalNotificacoes').style.display='flex';
   box.innerHTML = '<div class="empty-note">Carregando notificacoes...</div>';
   if(resumo) resumo.textContent = 'Carregando...';
   if(btnTodas) btnTodas.style.display = 'none';
+  if(btnExcluirLidas) btnExcluirLidas.style.display = 'none';
+  if(btnExcluirSelecionadas) btnExcluirSelecionadas.style.display = 'none';
+  if(selectWrap) selectWrap.style.display = 'none';
+  if(selectAll) selectAll.checked = false;
   try{
     const url = SUPABASE_URL + '/rest/v1/notificacoes?destinatario_email=eq.' + encodeURIComponent(usuarioEmail()) + '&order=criada_em.desc&limit=30';
     const resp = await authFetch(url,{headers:{...getAuthHeaders()}});
@@ -2576,19 +2674,26 @@ async function abrirNotificacoes(){
       return;
     }
     const naoLidas = rows.filter(n => !n.lida).length;
+    const lidas = rows.length - naoLidas;
     if(resumo) resumo.textContent = rows.length + ' notificacao(oes), ' + naoLidas + ' nao lida(s)';
     if(btnTodas) btnTodas.style.display = naoLidas ? '' : 'none';
+    if(btnExcluirLidas) btnExcluirLidas.style.display = lidas ? '' : 'none';
+    if(selectWrap) selectWrap.style.display = '';
+    if(btnExcluirSelecionadas) btnExcluirSelecionadas.style.display = '';
     box.innerHTML = rows.map(n => {
       const dt = n.criada_em ? new Date(n.criada_em).toLocaleString('pt-BR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '';
       const cls = n.lida ? 'notif-item' : 'notif-item unread';
       const page = notificacaoPaginaDestino(n);
       const refId = String(n.referencia_id || '').replaceAll("'", "\\'");
+      const safeId = String(n.id || '').replaceAll("'", "\\'");
       const btnAbrir = page ? '<button class="btn btn-sm btn-primary" onclick="notificacaoAbrirReferencia(\'' + n.id + '\',\'' + page + '\',\'' + refId + '\')">Abrir</button>' : '';
       const btnLida = n.lida ? '' : '<button class="btn btn-sm" onclick="notificacaoMarcarLida(\'' + n.id + '\')">Lida</button>';
-      const btn = '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">' + btnAbrir + btnLida + '</div>';
+      const btnExcluir = n.lida ? '<button class="btn btn-sm" style="color:var(--red);border-color:#ffd5d5" onclick="notificacaoExcluir(\'' + safeId + '\')">Excluir</button>' : '';
+      const btn = '<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;justify-content:flex-end">' + btnAbrir + btnLida + btnExcluir + '</div>';
       const nova = n.lida ? '' : ' - nova';
-      return '<div class="' + cls + '"><div style="display:flex;justify-content:space-between;gap:10px;align-items:flex-start"><div><div class="notif-item-title">' + controleEscape(n.titulo||'Notificacao') + '</div><div class="notif-item-msg">' + controleEscape(n.mensagem||'') + '</div><div class="notif-item-meta">' + controleEscape(dt + nova) + '</div></div>' + btn + '</div></div>';
+      return '<div class="' + cls + '"><div class="notif-item-inner"><input class="notif-check" type="checkbox" data-id="' + controleEscape(n.id || '') + '" onchange="notificacoesAtualizarSelecao()"><div><div class="notif-item-title">' + controleEscape(n.titulo||'Notificacao') + '</div><div class="notif-item-msg">' + controleEscape(n.mensagem||'') + '</div><div class="notif-item-meta">' + controleEscape(dt + nova) + '</div></div>' + btn + '</div></div>';
     }).join('');
+    notificacoesAtualizarSelecao();
   }catch(e){
     box.innerHTML = '<div class="empty-note">Nao foi possivel carregar as notificacoes.</div>';
     if(resumo) resumo.textContent = 'Erro ao carregar';
@@ -2638,6 +2743,79 @@ async function notificacoesMarcarTodasLidas(){
     abrirNotificacoes();
     notificacoesAtualizarContador();
   }catch(e){}
+}
+
+function notificacoesSelecionadas(){
+  return Array.from(document.querySelectorAll('#notificacoes-lista .notif-check:checked'))
+    .map(el => el.dataset.id)
+    .filter(Boolean);
+}
+
+function notificacoesAtualizarSelecao(){
+  const checks = Array.from(document.querySelectorAll('#notificacoes-lista .notif-check'));
+  const selecionadas = checks.filter(el => el.checked).length;
+  const selectAll = document.getElementById('notificacoes-selecionar-todas');
+  const btnExcluir = document.getElementById('notificacoes-excluir-selecionadas');
+  if(selectAll){
+    selectAll.checked = checks.length > 0 && selecionadas === checks.length;
+    selectAll.indeterminate = selecionadas > 0 && selecionadas < checks.length;
+  }
+  if(btnExcluir){
+    btnExcluir.disabled = selecionadas === 0;
+    btnExcluir.textContent = selecionadas ? 'Excluir selecionadas (' + selecionadas + ')' : 'Excluir selecionadas';
+  }
+}
+
+function notificacoesSelecionarTudo(checked){
+  document.querySelectorAll('#notificacoes-lista .notif-check').forEach(el => {
+    el.checked = !!checked;
+  });
+  notificacoesAtualizarSelecao();
+}
+
+async function notificacaoExcluir(id){
+  if(!id) return;
+  try{
+    const resp = await authFetch(SUPABASE_URL + '/rest/v1/notificacoes?id=eq.' + encodeURIComponent(id),{
+      method:'DELETE',
+      headers:{'Prefer':'return=minimal',...getAuthHeaders()}
+    });
+    if(!resp.ok) throw new Error(await resp.text().catch(()=> 'Erro ao excluir.'));
+    centralAviso('Notificacao excluida.', 'ok', 'Notificacoes');
+    abrirNotificacoes();
+    notificacoesAtualizarContador();
+  }catch(e){
+    centralErro('Nao consegui excluir a notificacao. Se o erro continuar, pode faltar permissao DELETE na tabela notificacoes.');
+  }
+}
+
+async function notificacoesExcluirSelecionadas(){
+  const ids = notificacoesSelecionadas();
+  if(!ids.length){
+    centralAviso('Selecione pelo menos uma notificacao.', 'aviso', 'Nada selecionado');
+    return;
+  }
+  await notificacoesExcluirPorFiltro('id=in.(' + ids.map(id => encodeURIComponent(id)).join(',') + ')', ids.length + ' notificacao(oes) excluida(s).');
+}
+
+async function notificacoesExcluirLidas(){
+  if(!usuarioEmail()) return;
+  await notificacoesExcluirPorFiltro('destinatario_email=eq.' + encodeURIComponent(usuarioEmail()) + '&lida=eq.true', 'Notificacoes lidas excluidas.');
+}
+
+async function notificacoesExcluirPorFiltro(filtro, mensagemSucesso){
+  try{
+    const resp = await authFetch(SUPABASE_URL + '/rest/v1/notificacoes?' + filtro,{
+      method:'DELETE',
+      headers:{'Prefer':'return=minimal',...getAuthHeaders()}
+    });
+    if(!resp.ok) throw new Error(await resp.text().catch(()=> 'Erro ao excluir.'));
+    centralAviso(mensagemSucesso, 'ok', 'Notificacoes');
+    abrirNotificacoes();
+    notificacoesAtualizarContador();
+  }catch(e){
+    centralErro('Nao consegui excluir as notificacoes. Se o erro continuar, pode faltar permissao DELETE na tabela notificacoes.');
+  }
 }
 async function refreshToken(){
   const refresh = sessionStorage.getItem('seplan_refresh');
@@ -3383,7 +3561,7 @@ function marcarLive(pid,valor){
 async function openSalvar(){
   if(!currentSearch) return;
   if(!(await usuarioPodeSalvarBusca())){
-    alert('Seu perfil permite consultar a busca, mas nao salvar no historico.');
+    centralAviso('Seu perfil permite consultar a busca, mas nao salvar no historico.', 'aviso', 'Permissao limitada');
     return;
   }
   const confirmados=[];
@@ -3424,7 +3602,7 @@ async function openSalvar(){
 async function salvarBusca(){
   const protocolo=document.getElementById('fProtocolo').value.trim();
   const matricula=document.getElementById('fMatricula').value.trim();
-  if(!protocolo){alert('Informe o numero/ano do protocolo.');return;}
+  if(!protocolo){centralAviso('Informe o numero/ano do protocolo.', 'aviso', 'Campo obrigatorio');return;}
   const confirmados=currentSearch._confirmados||[];
   const temRes=confirmados.length>0||(currentSearch.inscricao_resultados||[]).length>0;
   const btnSalvar = document.querySelector('#modalCadastro .btn-primary');
@@ -3466,7 +3644,7 @@ async function salvarBusca(){
           const savedBusca = Array.isArray(saved) ? {...saved[0], resultado: payload.resultado} : null;
           if(savedBusca) controleCriarDeBusca(savedBusca, { silent:true });
           closeModal('modalCadastro');diShow('salvo');loadHomeStats();
-          alert('Busca salva com dados basicos. Para salvar os processos confirmados no historico, precisa atualizar a tabela buscas no Supabase com a coluna resultado.');
+          centralAviso('Busca salva com dados basicos. Para salvar os processos confirmados no historico, precisa atualizar a tabela buscas no Supabase com a coluna resultado.', 'aviso', 'Busca salva');
           return;
         }
       }
@@ -3478,10 +3656,10 @@ async function salvarBusca(){
       closeModal('modalCadastro');diShow('salvo');loadHomeStats();
     } else {
       err = err || await resp.json().catch(()=>({message:'Erro desconhecido'}));
-      alert('Erro ao salvar: '+JSON.stringify(err));
+      centralErro('Erro ao salvar: '+JSON.stringify(err));
     }
   } finally {
-    if(btnSalvar){ btnSalvar.disabled = false; btnSalvar.textContent = '?? Salvar'; }
+    if(btnSalvar){ btnSalvar.disabled = false; btnSalvar.textContent = 'Salvar'; }
   }
 }
 
@@ -4224,73 +4402,208 @@ async function dgSalvarPedido(payloadCompleto, payloadBasico, opcoes={}){
   return {registro, modoBasico};
 }
 
-async function pedirDigitalizacaoDaBusca(){
+function buscaProjetosParaDigitalizacao(busca){
+  const itens = [];
+  const vistos = new Set();
+  const add = (m={}, origem='resultado', nomeBuscado='') => {
+    const numero = String(m.alvara || m.numero || '').trim();
+    const ano = String(m.ano || '').trim();
+    const titular = String(m.titular || nomeBuscado || '').trim();
+    const inscricaoProj = String(m.inscricao || '').trim();
+    if(!numero && !ano && !titular) return;
+    const key = [numero, ano, normalize(titular), inscricaoProj].join('|');
+    if(vistos.has(key)) return;
+    vistos.add(key);
+    itens.push({
+      uid:'proj_'+itens.length+'_'+Date.now(),
+      selecionado:true,
+      numero,
+      ano,
+      titular,
+      inscricao:inscricaoProj,
+      tipo:m.tipo || '',
+      origem,
+      nome_buscado:nomeBuscado,
+      obs:''
+    });
+  };
+  buscaInscricaoResultados(busca).forEach(m => add(m, 'inscricao', 'Inscricao '+(busca.inscricao || '')));
+  buscaNomeResultados(busca).forEach(r => {
+    if(r.titular) add(r, r.fonte || 'nome', r.nome_buscado || '');
+    else if(r.name && Array.isArray(r.matches)) r.matches.forEach(m => add(m, 'nome', r.name));
+  });
+  return itens;
+}
+
+function dgBuscaResumoHtml(busca, total){
+  return '<div class="dg-busca-confirm-head">'
+    + '<div class="dg-busca-confirm-card"><span>Busca</span><strong>'+controleEscape(busca.protocolo || '-')+'</strong></div>'
+    + '<div class="dg-busca-confirm-card"><span>Matricula</span><strong>'+controleEscape(busca.matricula || '-')+'</strong></div>'
+    + '<div class="dg-busca-confirm-card"><span>Projetos</span><strong>'+total+'</strong></div>'
+    + '</div>';
+}
+
+function dgBuscaRenderProjetos(){
+  const lista = document.getElementById('dgBuscaProjetosLista');
+  if(!lista) return;
+  const projetos = window._dgBuscaProjetos || [];
+  lista.innerHTML = projetos.map((p,idx) => {
+    return '<div class="dg-busca-row" data-row="'+controleEscape(p.uid)+'">'
+      + '<div class="dg-busca-row-check"><input type="checkbox" data-field="selecionado" '+(p.selecionado?'checked':'')+' title="Incluir este pedido"></div>'
+      + '<div><label>Numero</label><input data-field="numero" value="'+controleEscape(p.numero || '')+'" placeholder="Ex: 73"></div>'
+      + '<div><label>Ano</label><input data-field="ano" value="'+controleEscape(p.ano || '')+'" placeholder="2001" maxlength="4"></div>'
+      + '<div class="dg-busca-titular"><label>Projeto / observacao</label><input data-field="titular" value="'+controleEscape(p.titular || p.nome_buscado || '')+'" placeholder="Ex: titular ou complemento"></div>'
+      + '<button class="dg-busca-remove" type="button" onclick="dgBuscaRemoverProjeto('+idx+')" title="Remover">x</button>'
+      + '</div>';
+  }).join('') || '<div class="empty-note">Nenhum projeto na lista. Adicione um pedido manualmente.</div>';
+}
+
+function dgBuscaColetarProjetos(apenasSelecionados){
+  const rows = Array.from(document.querySelectorAll('#dgBuscaProjetosLista .dg-busca-row'));
+  return rows.map((row,idx) => {
+    const original = (window._dgBuscaProjetos || [])[idx] || {};
+    const get = field => row.querySelector('[data-field="'+field+'"]');
+    return {
+      ...original,
+      selecionado: !!get('selecionado')?.checked,
+      numero: get('numero')?.value.trim() || '',
+      ano: get('ano')?.value.trim() || '',
+      titular: get('titular')?.value.trim() || '',
+      obs: original.obs || ''
+    };
+  }).filter(p => !apenasSelecionados || p.selecionado);
+}
+
+function abrirConfirmacaoDigitalizacaoBusca(){
   const b = buscaSelecionada;
   if(!b) return;
   if(!buscaTemResultado(b)){
-    alert('Esta busca nao tem projeto encontrado para pedir digitalizacao.');
+    centralAviso('Esta busca nao tem projeto encontrado para pedir digitalizacao.', 'aviso', 'Sem projeto encontrado');
     return;
   }
-  const processo = b.protocolo || '';
-  if(!processo){
-    alert('Informe o numero/ano do protocolo antes de pedir digitalizacao.');
+  if(!b.protocolo){
+    centralAviso('Informe o numero/ano do protocolo antes de pedir digitalizacao.', 'aviso', 'Protocolo necessario');
     return;
   }
-  if(!confirm('Criar pedido de digitalizacao vinculado a esta busca?')) return;
+  let projetos = buscaProjetosParaDigitalizacao(b);
+  if(!projetos.length){
+    projetos = [{uid:'proj_manual_'+Date.now(),selecionado:true,numero:'',ano:String(new Date().getFullYear()),titular:'Projeto encontrado',obs:''}];
+  }
+  window._dgBuscaProjetos = projetos;
+  const resumo = document.getElementById('dgBuscaResumo');
+  if(resumo) resumo.innerHTML = dgBuscaResumoHtml(b, projetos.length);
+  const obs = document.getElementById('dgBuscaObs');
+  if(obs) obs.value = [
+    'Pedido gerado a partir da busca '+b.protocolo+'.',
+    b.inscricao ? 'Inscricao: '+b.inscricao+'.' : '',
+    b.matricula ? 'Matricula: '+b.matricula+'.' : ''
+  ].filter(Boolean).join(' ');
+  dgBuscaRenderProjetos();
+  document.getElementById('modalDigitalizacaoBusca').style.display = 'flex';
+}
+
+function dgBuscaAdicionarProjeto(){
+  window._dgBuscaProjetos = dgBuscaColetarProjetos(false);
+  window._dgBuscaProjetos.push({
+    uid:'proj_manual_'+Date.now(),
+    selecionado:true,
+    numero:'',
+    ano:String(new Date().getFullYear()),
+    titular:'',
+    obs:''
+  });
+  dgBuscaRenderProjetos();
+}
+
+function dgBuscaRemoverProjeto(index){
+  window._dgBuscaProjetos = dgBuscaColetarProjetos(false);
+  window._dgBuscaProjetos.splice(index,1);
+  dgBuscaRenderProjetos();
+}
+
+async function dgBuscaConfirmarPedidos(){
+  const b = buscaSelecionada;
+  if(!b) return;
+  const selecionados = dgBuscaColetarProjetos(true);
+  if(!selecionados.length){
+    centralAviso('Marque pelo menos um projeto para pedir digitalizacao.', 'aviso', 'Nenhum projeto selecionado');
+    return;
+  }
+  for(const p of selecionados){
+    if(!p.numero){
+      centralAviso('Informe o numero do projeto em todos os pedidos marcados.', 'aviso', 'Numero do projeto');
+      return;
+    }
+    if(p.ano && !/^\d{4}$/.test(p.ano)){
+      centralAviso('Informe o ano com 4 digitos nos projetos marcados.', 'aviso', 'Ano invalido');
+      return;
+    }
+  }
   const data = new Date().toISOString().slice(0,10);
-  const resultados = buscaResultadosResumo(b);
-  const obsPartes = [
-    `Pedido gerado a partir da busca ${processo}.`,
-    b.matricula ? `Matricula: ${b.matricula}.` : '',
-    b.inscricao ? `Inscricao: ${b.inscricao}.` : '',
-    resultados.length ? `Projetos encontrados: ${resultados.join('; ')}.` : 'Resultado encontrado na busca salva.'
-  ].filter(Boolean);
-  const obs = obsPartes.join(' ');
-  const payloadCompleto = {
-    processo,
-    ano: dgAnoDoProcesso(processo),
-    data,
-    motivo: 'busca_projeto',
-    detalhe: usuarioNome(),
-    obs,
-    observacao_solicitante: obs,
-    status:'pedido',
-    status_detalhado:'tramitando',
-    solicitante_email:usuarioEmail(),
-    solicitante_nome:usuarioNome(),
-    busca_id:b.id || null,
-    busca_protocolo:b.protocolo || '',
-    busca_resultado:buscaResultadoData(b)
-  };
-  const payloadBasico = {
-    processo,
-    data,
-    motivo: 'busca_projeto',
-    detalhe: usuarioNome(),
-    obs,
-    status:'pedido'
-  };
-  const btn = document.getElementById('btnDigitalizarBusca');
-  if(btn){ btn.disabled = true; btn.textContent = 'Enviando...'; }
+  const obsGeral = document.getElementById('dgBuscaObs')?.value.trim() || '';
+  const btn = document.getElementById('dgBuscaConfirmarBtn');
+  if(btn){ btn.disabled = true; btn.textContent = 'Criando pedidos...'; }
+  let criados = 0;
+  let basicos = 0;
   try{
-    const result = await dgSalvarPedido(payloadCompleto, payloadBasico, {
-      mensagemNotificacao:`${usuarioNome()} pediu digitalizacao do projeto encontrado na busca ${processo}.`
-    });
+    for(const projeto of selecionados){
+      const processo = projeto.ano ? projeto.numero + '/' + projeto.ano : projeto.numero;
+      const obsPartes = [
+        obsGeral,
+        'Projeto solicitado: '+processo+'.',
+        projeto.titular ? 'Referencia: '+projeto.titular+'.' : '',
+        projeto.inscricao ? 'Inscricao do projeto: '+projeto.inscricao+'.' : '',
+        projeto.nome_buscado ? 'Encontrado por: '+projeto.nome_buscado+'.' : ''
+      ].filter(Boolean);
+      const obs = obsPartes.join(' ');
+      const payloadCompleto = {
+        processo,
+        ano: projeto.ano ? Number(projeto.ano) : dgAnoDoProcesso(processo),
+        data,
+        motivo: 'busca_projeto',
+        detalhe: usuarioNome(),
+        obs,
+        observacao_solicitante: obs,
+        status:'pedido',
+        status_detalhado:'tramitando',
+        solicitante_email:usuarioEmail(),
+        solicitante_nome:usuarioNome(),
+        busca_id:b.id || null,
+        busca_protocolo:b.protocolo || '',
+        busca_resultado:{...buscaResultadoData(b), projeto_digitalizacao:projeto}
+      };
+      const payloadBasico = {
+        processo,
+        data,
+        motivo: 'busca_projeto',
+        detalhe: usuarioNome(),
+        obs,
+        status:'pedido'
+      };
+      const result = await dgSalvarPedido(payloadCompleto, payloadBasico, {
+        mensagemNotificacao:`${usuarioNome()} pediu digitalizacao do projeto ${processo} encontrado na busca ${b.protocolo}.`
+      });
+      criados++;
+      if(result.modoBasico) basicos++;
+    }
+    closeModal('modalDigitalizacaoBusca');
     closeModal('modalDetalhe');
     notificacoesAtualizarContador();
     loadHomeStats();
     diShow('digitalizacao');
-    alert(result.modoBasico
-      ? 'Pedido criado. Para manter o vinculo tecnico com a busca, rode o SQL de vinculo da digitalizacao no Supabase.'
-      : 'Pedido de digitalizacao criado e vinculado a busca.');
+    centralAviso(criados + ' pedido(s) de digitalizacao criado(s)' + (basicos ? '. Para manter o vinculo tecnico com a busca, rode o SQL de vinculo da digitalizacao no Supabase.' : ' e vinculado(s) a busca.'), basicos ? 'aviso' : 'ok', 'Digitalizacao solicitada');
     navTo('digitalizacao');
     dgShowTab('lista');
   }catch(e){
     console.error('Erro ao pedir digitalizacao da busca:', e);
-    alert('Erro ao criar pedido de digitalizacao:\n' + (e.message || 'Tente novamente.'));
+    centralErro('Erro ao criar pedido de digitalizacao: ' + (e.message || 'Tente novamente.'));
   }finally{
-    if(btn){ btn.disabled = false; btn.textContent = 'Pedir digitalizacao'; }
+    if(btn){ btn.disabled = false; btn.textContent = 'Confirmar e pedir digitalizacao'; }
   }
+}
+
+async function pedirDigitalizacaoDaBusca(){
+  abrirConfirmacaoDigitalizacaoBusca();
 }
 
 async function dgAdicionar() {
@@ -4893,6 +5206,39 @@ function diShow(type){
 
 // ── SUPABASE ADAPTER (substitui Firebase) ────────────────────────────────────
 // ── SUPABASE ADAPTER (substitui Firebase) ───────────────────────────────────
+function centralAviso(mensagem, tipo='ok', titulo='Central SEPLAN'){
+  const wrap = document.getElementById('centralToastWrap');
+  if(!wrap){
+    console.log(titulo + ': ' + mensagem);
+    return;
+  }
+  const el = document.createElement('div');
+  const classe = tipo === 'erro' ? 'err' : (tipo === 'aviso' ? 'warn' : '');
+  const icone = tipo === 'erro' ? '!' : (tipo === 'aviso' ? 'i' : '✓');
+  el.className = 'central-toast ' + classe;
+  el.innerHTML = '<div class="central-toast-icon">'+icone+'</div>'
+    + '<div><div class="central-toast-title">'+controleEscape(titulo)+'</div><div class="central-toast-msg">'+controleEscape(mensagem)+'</div></div>'
+    + '<button class="central-toast-close" type="button" aria-label="Fechar aviso">×</button>';
+  const fechar = () => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(18px)';
+    setTimeout(() => el.remove(), 180);
+  };
+  el.querySelector('button').addEventListener('click', fechar);
+  wrap.appendChild(el);
+  setTimeout(fechar, tipo === 'erro' ? 6200 : 4600);
+}
+
+function centralErro(mensagem, titulo='Nao foi possivel concluir'){
+  centralAviso(mensagem, 'erro', titulo);
+}
+
+window.alert = function(mensagem){
+  const texto = typeof mensagem === 'string' ? mensagem : JSON.stringify(mensagem);
+  const isErro = /erro|falha|nao foi possivel|tente novamente/i.test(texto || '');
+  centralAviso(texto || 'Aviso da Central.', isErro ? 'erro' : 'aviso', isErro ? 'Nao foi possivel concluir' : 'Central SEPLAN');
+};
+
 window._fb = {
   listenDays: async function(cb) {
     try {
