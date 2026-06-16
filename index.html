@@ -2125,6 +2125,7 @@ body.controle-light .fResultadoPreview{
         <button class="btn" onclick="closeModal('modalDetalhe')">Fechar</button>
         <button class="btn" style="color:var(--red);border-color:var(--red)" onclick="excluirBusca()">🗑 Excluir</button>
         <button class="btn" onclick="abrirEdicao()">✏️ Editar</button>
+        <button class="btn btn-primary" id="btnDigitalizarBusca" onclick="pedirDigitalizacaoDaBusca()" style="display:none">Pedir digitalizacao</button>
         <button class="btn btn-primary" id="btnCertidao" onclick="gerarCertidao()" style="display:none">📄 Gerar certidão</button>
       </div>
     </div>
@@ -3940,6 +3941,8 @@ function openDetalhe(id){
 
   document.getElementById('detalheBody').innerHTML=html;
   document.getElementById('btnCertidao').style.display=temResultado?'none':'inline-flex';
+  const btnDigitalizar = document.getElementById('btnDigitalizarBusca');
+  if(btnDigitalizar) btnDigitalizar.style.display=temResultado?'inline-flex':'none';
   document.getElementById('modalDetalhe').style.display='flex';
 }
 
@@ -4155,6 +4158,141 @@ document.addEventListener('click', function(e) {
   }
 });
 
+function dgAnoDoProcesso(processo){
+  const m = String(processo || '').match(/\/\s*(\d{4})\b/);
+  return m ? Number(m[1]) : new Date().getFullYear();
+}
+
+function buscaResultadosResumo(busca){
+  const itens = [];
+  buscaInscricaoResultados(busca).forEach(r => {
+    const partes = [r.titular, r.alvara ? 'Alvara ' + r.alvara : '', r.ano || '', r.inscricao || ''].filter(Boolean);
+    if(partes.length) itens.push(partes.join(' - '));
+  });
+  buscaNomeResultados(busca).forEach(r => {
+    if(r.titular){
+      const partes = [r.titular, r.alvara ? 'Alvara ' + r.alvara : '', r.ano || '', r.inscricao || ''].filter(Boolean);
+      itens.push(partes.join(' - '));
+    } else if(r.name && Array.isArray(r.matches)){
+      r.matches.forEach(m => {
+        const partes = [m.titular || r.name, m.alvara ? 'Alvara ' + m.alvara : '', m.ano || '', m.inscricao || ''].filter(Boolean);
+        if(partes.length) itens.push(partes.join(' - '));
+      });
+    }
+  });
+  return [...new Set(itens)].slice(0,8);
+}
+
+async function dgSalvarPedido(payloadCompleto, payloadBasico, opcoes={}){
+  let resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao`, {
+    method:'POST',
+    headers:{'Content-Type':'application/json','Prefer':'return=representation',...getAuthHeaders()},
+    body: JSON.stringify(payloadCompleto)
+  });
+  let err = null;
+  let modoBasico = false;
+  if(!resp.ok){
+    err = await resp.clone().json().catch(()=>null);
+    const msg = JSON.stringify(err || {});
+    if(err?.code === 'PGRST204' || /schema cache|Could not find|column/i.test(msg)){
+      resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao`, {
+        method:'POST',
+        headers:{'Content-Type':'application/json','Prefer':'return=representation',...getAuthHeaders()},
+        body: JSON.stringify(payloadBasico)
+      });
+      modoBasico = resp.ok;
+    }
+  }
+  if(!resp.ok){
+    const detalheErro = err?.message || await resp.clone().text().catch(()=> '');
+    throw new Error(detalheErro || 'Erro desconhecido do Supabase.');
+  }
+  const saved = await resp.json();
+  const registro = Array.isArray(saved) ? saved[0] : null;
+  const responsaveis = await notificacaoResponsaveisDigitalizacao();
+  const processo = payloadCompleto.processo || payloadBasico.processo;
+  const titulo = opcoes.tituloNotificacao || 'Novo pedido de digitalizacao';
+  const mensagem = opcoes.mensagemNotificacao || `${usuarioNome()} solicitou digitalizacao do processo ${processo}.`;
+  await Promise.all(responsaveis.map(email => notificacaoCriar(
+    email,
+    'digitalizacao_solicitada',
+    titulo,
+    mensagem,
+    'digitalizacao',
+    registro?.id || ''
+  )));
+  return {registro, modoBasico};
+}
+
+async function pedirDigitalizacaoDaBusca(){
+  const b = buscaSelecionada;
+  if(!b) return;
+  if(!buscaTemResultado(b)){
+    alert('Esta busca nao tem projeto encontrado para pedir digitalizacao.');
+    return;
+  }
+  const processo = b.protocolo || '';
+  if(!processo){
+    alert('Informe o numero/ano do protocolo antes de pedir digitalizacao.');
+    return;
+  }
+  if(!confirm('Criar pedido de digitalizacao vinculado a esta busca?')) return;
+  const data = new Date().toISOString().slice(0,10);
+  const resultados = buscaResultadosResumo(b);
+  const obsPartes = [
+    `Pedido gerado a partir da busca ${processo}.`,
+    b.matricula ? `Matricula: ${b.matricula}.` : '',
+    b.inscricao ? `Inscricao: ${b.inscricao}.` : '',
+    resultados.length ? `Projetos encontrados: ${resultados.join('; ')}.` : 'Resultado encontrado na busca salva.'
+  ].filter(Boolean);
+  const obs = obsPartes.join(' ');
+  const payloadCompleto = {
+    processo,
+    ano: dgAnoDoProcesso(processo),
+    data,
+    motivo: 'busca_projeto',
+    detalhe: usuarioNome(),
+    obs,
+    observacao_solicitante: obs,
+    status:'pedido',
+    status_detalhado:'tramitando',
+    solicitante_email:usuarioEmail(),
+    solicitante_nome:usuarioNome(),
+    busca_id:b.id || null,
+    busca_protocolo:b.protocolo || '',
+    busca_resultado:buscaResultadoData(b)
+  };
+  const payloadBasico = {
+    processo,
+    data,
+    motivo: 'busca_projeto',
+    detalhe: usuarioNome(),
+    obs,
+    status:'pedido'
+  };
+  const btn = document.getElementById('btnDigitalizarBusca');
+  if(btn){ btn.disabled = true; btn.textContent = 'Enviando...'; }
+  try{
+    const result = await dgSalvarPedido(payloadCompleto, payloadBasico, {
+      mensagemNotificacao:`${usuarioNome()} pediu digitalizacao do projeto encontrado na busca ${processo}.`
+    });
+    closeModal('modalDetalhe');
+    notificacoesAtualizarContador();
+    loadHomeStats();
+    diShow('digitalizacao');
+    alert(result.modoBasico
+      ? 'Pedido criado. Para manter o vinculo tecnico com a busca, rode o SQL de vinculo da digitalizacao no Supabase.'
+      : 'Pedido de digitalizacao criado e vinculado a busca.');
+    navTo('digitalizacao');
+    dgShowTab('lista');
+  }catch(e){
+    console.error('Erro ao pedir digitalizacao da busca:', e);
+    alert('Erro ao criar pedido de digitalizacao:\n' + (e.message || 'Tente novamente.'));
+  }finally{
+    if(btn){ btn.disabled = false; btn.textContent = 'Pedir digitalizacao'; }
+  }
+}
+
 async function dgAdicionar() {
   const processoRaw = document.getElementById('dg-processo').value.trim();
   const anoRaw = document.getElementById('dg-ano').value.trim();
@@ -4188,41 +4326,10 @@ async function dgAdicionar() {
     status:'pedido'
   };
   try {
-    let resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao`, {
-      method:'POST',
-      headers:{'Content-Type':'application/json','Prefer':'return=representation',...getAuthHeaders()},
-      body: JSON.stringify(payloadCompleto)
-    });
-    let err = null;
-    if(!resp.ok){
-      err = await resp.clone().json().catch(()=>null);
-      const msg = JSON.stringify(err || {});
-      if(err?.code === 'PGRST204' || /schema cache|Could not find|column/i.test(msg)){
-        resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao`, {
-          method:'POST',
-          headers:{'Content-Type':'application/json','Prefer':'return=representation',...getAuthHeaders()},
-          body: JSON.stringify(payloadBasico)
-        });
-        if(resp.ok){
-          alert('Pedido salvo em modo basico. Para vincular ao usuario, notificacoes e status detalhado, rode a atualizacao da tabela digitalizacao no Supabase.');
-        }
-      }
+    const result = await dgSalvarPedido(payloadCompleto, payloadBasico);
+    if(result.modoBasico){
+      alert('Pedido salvo em modo basico. Para vincular ao usuario, notificacoes e status detalhado, rode a atualizacao da tabela digitalizacao no Supabase.');
     }
-    if(!resp.ok){
-      const detalheErro = err?.message || await resp.clone().text().catch(()=> '');
-      throw new Error(detalheErro || 'Erro desconhecido do Supabase.');
-    }
-    const saved = await resp.json();
-    const registro = Array.isArray(saved) ? saved[0] : null;
-    const responsaveis = await notificacaoResponsaveisDigitalizacao();
-    await Promise.all(responsaveis.map(email => notificacaoCriar(
-      email,
-      'digitalizacao_solicitada',
-      'Novo pedido de digitalizacao',
-      `${usuarioNome()} solicitou digitalizacao do processo ${processo}.`,
-      'digitalizacao',
-      registro?.id || ''
-    )));
     document.getElementById('dg-processo').value = '';
     document.getElementById('dg-ano').value = String(new Date().getFullYear());
     document.getElementById('dg-obs').value = '';
@@ -4335,6 +4442,9 @@ function dgItemHtml(r) {
   const solicitante = r.solicitante_nome || r.solicitante_email || r.detalhe || 'Solicitante nao registrado';
   const obsSolicitante = r.observacao_solicitante || r.obs || '';
   const obsResposta = r.observacao_resposta || '';
+  const vinculoBusca = r.busca_protocolo
+    ? '<div style="font-size:11px;color:#1d6f7a;font-family:var(--mono);margin-top:5px;font-weight:800">Busca vinculada: '+controleEscape(r.busca_protocolo)+'</div>'
+    : '';
   const podeGerenciar = window._dgPodeGerenciar !== false;
   let acao = '';
   if(!podeGerenciar) {
@@ -4347,7 +4457,7 @@ function dgItemHtml(r) {
     acao = '<span style="font-size:11px;padding:5px 10px;border-radius:999px;border:1px solid var(--green);color:var(--green);font-family:var(--mono);font-weight:800">Finalizada</span>';
   }
   const respostaBox = podeGerenciar ? '<div style="margin-top:9px;display:grid;gap:6px"><label class="form-label" style="margin:0">Observacao do atendimento</label><textarea class="form-input" id="dg-resposta-'+r.id+'" rows="2" placeholder="Ex: pedido enviado para a empresa, retorno previsto..." style="resize:vertical;line-height:1.45">'+controleEscape(obsResposta)+'</textarea><button class="btn btn-sm" onclick="dgSalvarResposta(\''+r.id+'\')" style="justify-self:start">Salvar observacao</button></div>' : (obsResposta ? '<div style="font-size:12px;color:var(--text2);margin-top:7px;line-height:1.45"><strong>Retorno:</strong> '+controleEscape(obsResposta)+'</div>' : '');
-  return '<div id="dg-item-'+r.id+'" style="padding:12px 0;border-bottom:1px solid var(--border);animation:fadeIn .2s ease"><div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:flex-start"><div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:800;font-family:var(--mono);color:var(--text)">'+controleEscape(r.processo||'')+'</span><span style="font-size:10px;padding:3px 8px;border-radius:999px;border:1px solid '+status.color+';color:'+status.color+';background:'+status.bg+';font-family:var(--mono);font-weight:800">'+status.label+'</span></div><div style="font-size:12px;color:var(--text2);margin-top:6px;line-height:1.45">'+(obsSolicitante?'<strong>Pedido:</strong> '+controleEscape(obsSolicitante):'Sem observacao do solicitante.')+'</div><div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:5px">Solicitado por '+controleEscape(solicitante)+' em '+controleEscape(dt)+'</div>'+respostaBox+'</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">'+acao+(podeGerenciar?'<button onclick="dgRemover(\''+r.id+'\')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:2px 4px;line-height:1;border-radius:4px" title="Remover">x</button>':'')+'</div></div></div>';
+  return '<div id="dg-item-'+r.id+'" style="padding:12px 0;border-bottom:1px solid var(--border);animation:fadeIn .2s ease"><div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:flex-start"><div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:800;font-family:var(--mono);color:var(--text)">'+controleEscape(r.processo||'')+'</span><span style="font-size:10px;padding:3px 8px;border-radius:999px;border:1px solid '+status.color+';color:'+status.color+';background:'+status.bg+';font-family:var(--mono);font-weight:800">'+status.label+'</span></div><div style="font-size:12px;color:var(--text2);margin-top:6px;line-height:1.45">'+(obsSolicitante?'<strong>Pedido:</strong> '+controleEscape(obsSolicitante):'Sem observacao do solicitante.')+'</div>'+vinculoBusca+'<div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:5px">Solicitado por '+controleEscape(solicitante)+' em '+controleEscape(dt)+'</div>'+respostaBox+'</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">'+acao+(podeGerenciar?'<button onclick="dgRemover(\''+r.id+'\')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:2px 4px;line-height:1;border-radius:4px" title="Remover">x</button>':'')+'</div></div></div>';
 }
 async function dgAtualizarStatus(id, novoStatusDetalhado) {
   const payload = {
