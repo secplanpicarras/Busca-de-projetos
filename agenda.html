@@ -1922,7 +1922,7 @@ function renderConfig() {
   html += '</div>';
   html += '<div class="config-add-row" style="flex-wrap:wrap;gap:8px">';
   html += '<div style="flex:1;min-width:120px"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data início</div><input class="form-input" id="bloq-ini" type="date"></div>';
-  html += '<div style="flex:1;min-width:120px" id="bloq-fim-wrap" style="display:none"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data fim</div><input class="form-input" id="bloq-fim" type="date"></div>';
+  html += '<div id="bloq-fim-wrap" style="flex:1;min-width:120px;display:none"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data fim</div><input class="form-input" id="bloq-fim" type="date"></div>';
   html += '<button class="btn-primary" style="align-self:flex-end;padding:10px 16px;white-space:nowrap" onclick="salvarBloqueio()">🚫 Bloquear</button>';
   html += '</div></div></div>';
 
@@ -1934,7 +1934,11 @@ function renderConfig() {
 function toggleBloqFim() {
   const tipo = document.getElementById('bloq-tipo')?.value;
   const wrap = document.getElementById('bloq-fim-wrap');
-  if (wrap) wrap.style.display = tipo === 'periodo' ? 'block' : 'none';
+  const fim = document.getElementById('bloq-fim');
+  const mostrar = tipo === 'periodo';
+  if (wrap) wrap.style.display = mostrar ? 'block' : 'none';
+  if (fim && !wrap) fim.style.display = mostrar ? '' : 'none';
+  if (fim && !mostrar) fim.value = '';
 }
 
 function salvarBloqueio() {
@@ -2182,7 +2186,7 @@ function renderConfigV2() {
   html += '</div>';
   html += '<div class="config-add-row" style="flex-wrap:wrap;gap:8px">';
   html += '<div style="flex:1;min-width:120px"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data início</div><input class="form-input" id="bloq-ini" type="date"></div>';
-  html += '<div style="flex:1;min-width:120px" id="bloq-fim-wrap" style="display:none"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data fim</div><input class="form-input" id="bloq-fim" type="date"></div>';
+  html += '<div id="bloq-fim-wrap" style="flex:1;min-width:120px;display:none"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data fim</div><input class="form-input" id="bloq-fim" type="date"></div>';
   html += '<button class="btn-primary" style="align-self:flex-end;padding:10px 16px;white-space:nowrap" onclick="salvarBloqueio()">Bloquear</button>';
   html += '</div></div></div>';
   html += '</div>';
