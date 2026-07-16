@@ -1061,7 +1061,7 @@ body.controle-light #page-digitalizacao .form-input:focus{
 }
 body.controle-light #page-digitalizacao .dg-resumo{
   display:grid;
-  grid-template-columns:repeat(4,minmax(0,1fr));
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
   gap:10px;
   margin-bottom:12px;
 }
@@ -1829,6 +1829,7 @@ body.controle-light .fResultadoPreview{
           <button class="dg-filter" id="dg-filter-tramitando" onclick="dgSetFiltroStatus('tramitando')">Tramitando</button>
           <button class="dg-filter" id="dg-filter-pedido_feito" onclick="dgSetFiltroStatus('pedido_feito')">Pedido feito</button>
           <button class="dg-filter" id="dg-filter-concluido" onclick="dgSetFiltroStatus('concluido')">Finalizados</button>
+          <button class="dg-filter" id="dg-filter-nao_encontrado" onclick="dgSetFiltroStatus('nao_encontrado')">Nao encontrados</button>
         </div>
         <div style="display:flex;gap:8px;margin-bottom:1rem">
           <input class="form-input" id="dg-pesquisa" placeholder="Buscar por processo..." oninput="dgFiltrar()" style="flex:1">
@@ -4661,7 +4662,7 @@ async function dgAdicionar() {
 }
 
 function dgStatusNormalizado(r){
-  const statusDetalhado = r.status_detalhado || (r.status === 'entregue' ? 'concluido' : 'tramitando');
+  const statusDetalhado = r.status_detalhado || (r.status === 'entregue' ? 'concluido' : (r.status === 'nao_encontrado' ? 'nao_encontrado' : 'tramitando'));
   return statusDetalhado === 'solicitado' ? 'tramitando' : statusDetalhado;
 }
 
@@ -4670,17 +4671,19 @@ function dgResumoHtml(data){
   const tramitando = data.filter(r => dgStatusNormalizado(r) === 'tramitando').length;
   const pedidoFeito = data.filter(r => dgStatusNormalizado(r) === 'pedido_feito').length;
   const concluido = data.filter(r => dgStatusNormalizado(r) === 'concluido').length;
+  const naoEncontrado = data.filter(r => dgStatusNormalizado(r) === 'nao_encontrado').length;
   return [
-    ['Total', total],
-    ['Tramitando', tramitando],
-    ['Pedido feito', pedidoFeito],
-    ['Finalizados', concluido]
-  ].map(([label, value]) => '<div class="dg-card"><small>'+label+'</small><strong>'+value+'</strong></div>').join('');
+    ['Total', total, ''],
+    ['Tramitando', tramitando, ''],
+    ['Pedido feito', pedidoFeito, ''],
+    ['Finalizados', concluido, ''],
+    ['Nao encontrados', naoEncontrado, ' style="border-color:#ffd5d5;background:#fff7f7"']
+  ].map(([label, value, attr]) => '<div class="dg-card"'+attr+'><small>'+label+'</small><strong'+(label==='Nao encontrados'?' style="color:var(--red)"':'')+'>'+value+'</strong></div>').join('');
 }
 
 function dgSetFiltroStatus(status){
   window._dgFiltroStatus = status || 'todos';
-  ['todos','tramitando','pedido_feito','concluido'].forEach(s => {
+  ['todos','tramitando','pedido_feito','concluido','nao_encontrado'].forEach(s => {
     const btn = document.getElementById('dg-filter-'+s);
     if(btn) btn.classList.toggle('active', s === window._dgFiltroStatus);
   });
@@ -4748,7 +4751,8 @@ function dgItemHtml(r) {
   const statusMap = {
     tramitando:{label:'Tramitando', color:'var(--amber)', bg:'#fff7df'},
     pedido_feito:{label:'Pedido feito', color:'var(--blue)', bg:'#eef5ff'},
-    concluido:{label:'Digitalizacao finalizada', color:'var(--green)', bg:'#eaf8f1'}
+    concluido:{label:'Digitalizacao finalizada', color:'var(--green)', bg:'#eaf8f1'},
+    nao_encontrado:{label:'Projeto nao encontrado', color:'var(--red)', bg:'#fff1f1'}
   };
   const status = statusMap[normalizado] || statusMap.tramitando;
   const dt = r.data ? r.data.split('-').reverse().join('/') : '-';
@@ -4765,7 +4769,9 @@ function dgItemHtml(r) {
   } else if(normalizado === 'tramitando') {
     acao = '<button class="btn btn-sm btn-primary" onclick="dgAtualizarStatus(\''+r.id+'\',\'pedido_feito\')">Pedido feito</button>';
   } else if(normalizado === 'pedido_feito') {
-    acao = '<button class="btn btn-sm btn-primary" onclick="dgAtualizarStatus(\''+r.id+'\',\'concluido\')">Finalizar digitalizacao</button>';
+    acao = '<button class="btn btn-sm btn-primary" onclick="dgAtualizarStatus(\''+r.id+'\',\'concluido\')">Finalizar digitalizacao</button><button class="btn btn-sm" style="color:var(--red);border-color:#ffd5d5" onclick="dgAtualizarStatus(\''+r.id+'\',\'nao_encontrado\')">Projeto nao encontrado</button>';
+  } else if(normalizado === 'nao_encontrado') {
+    acao = '<span style="font-size:11px;padding:5px 10px;border-radius:999px;border:1px solid var(--red);color:var(--red);font-family:var(--mono);font-weight:800">Nao encontrado</span>';
   } else {
     acao = '<span style="font-size:11px;padding:5px 10px;border-radius:999px;border:1px solid var(--green);color:var(--green);font-family:var(--mono);font-weight:800">Finalizada</span>';
   }
@@ -4773,14 +4779,17 @@ function dgItemHtml(r) {
   return '<div id="dg-item-'+r.id+'" style="padding:12px 0;border-bottom:1px solid var(--border);animation:fadeIn .2s ease"><div style="display:grid;grid-template-columns:1fr auto;gap:12px;align-items:flex-start"><div><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font-size:14px;font-weight:800;font-family:var(--mono);color:var(--text)">'+controleEscape(r.processo||'')+'</span><span style="font-size:10px;padding:3px 8px;border-radius:999px;border:1px solid '+status.color+';color:'+status.color+';background:'+status.bg+';font-family:var(--mono);font-weight:800">'+status.label+'</span></div><div style="font-size:12px;color:var(--text2);margin-top:6px;line-height:1.45">'+(obsSolicitante?'<strong>Pedido:</strong> '+controleEscape(obsSolicitante):'Sem observacao do solicitante.')+'</div>'+vinculoBusca+'<div style="font-size:11px;color:var(--text3);font-family:var(--mono);margin-top:5px">Solicitado por '+controleEscape(solicitante)+' em '+controleEscape(dt)+'</div>'+respostaBox+'</div><div style="display:flex;align-items:center;gap:6px;flex-shrink:0;flex-wrap:wrap;justify-content:flex-end">'+acao+(podeGerenciar?'<button onclick="dgRemover(\''+r.id+'\')" style="background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:2px 4px;line-height:1;border-radius:4px" title="Remover">x</button>':'')+'</div></div></div>';
 }
 async function dgAtualizarStatus(id, novoStatusDetalhado) {
+  const statusBase = novoStatusDetalhado === 'concluido'
+    ? 'entregue'
+    : (novoStatusDetalhado === 'nao_encontrado' ? 'nao_encontrado' : 'pedido');
   const payload = {
     status_detalhado: novoStatusDetalhado,
-    status: novoStatusDetalhado === 'concluido' ? 'entregue' : 'pedido'
+    status: statusBase
   };
   payload.responsavel_email = usuarioEmail();
   payload.responsavel_nome = usuarioNome();
   if(novoStatusDetalhado === 'pedido_feito') payload.pedido_feito_em = new Date().toISOString();
-  if(novoStatusDetalhado === 'concluido') payload.concluido_em = new Date().toISOString();
+  if(novoStatusDetalhado === 'concluido' || novoStatusDetalhado === 'nao_encontrado') payload.concluido_em = new Date().toISOString();
   try {
     const resp = await authFetch(`${SUPABASE_URL}/rest/v1/digitalizacao?id=eq.${id}`, {
       method:'PATCH',
@@ -4791,13 +4800,28 @@ async function dgAtualizarStatus(id, novoStatusDetalhado) {
     if(Array.isArray(data) && data[0]) {
       const r = data[0];
       if(r.solicitante_email){
+        const notifInfo = novoStatusDetalhado === 'pedido_feito'
+          ? {
+              tipo:'digitalizacao_pedido_feito',
+              titulo:'Pedido de digitalizacao feito',
+              mensagem:`O pedido de digitalizacao do processo ${r.processo} foi feito.`
+            }
+          : (novoStatusDetalhado === 'nao_encontrado'
+            ? {
+                tipo:'digitalizacao_nao_encontrada',
+                titulo:'Projeto nao encontrado',
+                mensagem:`A empresa de digitalizacao informou que nao encontrou o projeto do processo ${r.processo}.`
+              }
+            : {
+                tipo:'digitalizacao_concluida',
+                titulo:'Digitalizacao finalizada',
+                mensagem:`A digitalizacao do processo ${r.processo} foi finalizada.`
+              });
         await notificacaoCriar(
           r.solicitante_email,
-          novoStatusDetalhado === 'pedido_feito' ? 'digitalizacao_pedido_feito' : 'digitalizacao_concluida',
-          novoStatusDetalhado === 'pedido_feito' ? 'Pedido de digitalizacao feito' : 'Digitalizacao finalizada',
-          novoStatusDetalhado === 'pedido_feito'
-            ? `O pedido de digitalizacao do processo ${r.processo} foi feito.`
-            : `A digitalizacao do processo ${r.processo} foi finalizada.`,
+          notifInfo.tipo,
+          notifInfo.titulo,
+          notifInfo.mensagem,
           'digitalizacao',
           r.id
         );
@@ -4880,7 +4904,8 @@ async function dgCarregarAnalistas() {
     if(Array.isArray(data)) data.forEach(r => {
       if(contagem[r.detalhe]!==undefined) {
         contagem[r.detalhe]++;
-        if(dgStatusNormalizado(r)!=='concluido') pendentes[r.detalhe]++;
+        const st = dgStatusNormalizado(r);
+        if(st!=='concluido' && st!=='nao_encontrado') pendentes[r.detalhe]++;
       }
     });
     grid.innerHTML = analistas.map(a => {
@@ -4974,12 +4999,13 @@ async function loadHomeStats(){
     if(Array.isArray(data)){
       const tramitando = data.filter(r=>dgStatusNormalizado(r)==='tramitando').length;
       const pedidoFeito = data.filter(r=>dgStatusNormalizado(r)==='pedido_feito').length;
+      const naoEncontrado = data.filter(r=>dgStatusNormalizado(r)==='nao_encontrado').length;
       const pend = tramitando + pedidoFeito;
       countTo(document.getElementById('home-ndig'), data.length, 800);
       const dashDig = document.getElementById('dash-dig-pendentes');
       if(dashDig) dashDig.textContent = pend;
       const dashDigSub = document.getElementById('dash-dig-sub');
-      if(dashDigSub) dashDigSub.textContent = tramitando + ' tramitando | ' + pedidoFeito + ' pedido feito';
+      if(dashDigSub) dashDigSub.textContent = tramitando + ' tramitando | ' + pedidoFeito + ' pedido feito' + (naoEncontrado ? ' | ' + naoEncontrado + ' nao encontrado(s)' : '');
       const chip = document.getElementById('hchip-dig');
       const badge = document.getElementById('hbadge-dig');
       if(chip){chip.textContent = pend ? pend + ' nao entregue(s)' : 'Tudo entregue'; chip.className = pend>0?'hchip hchip-a':'hchip hchip-g';}
@@ -6070,7 +6096,7 @@ function renderConfig() {
   html += '</div>';
   html += '<div class="config-add-row" style="flex-wrap:wrap;gap:8px">';
   html += '<div style="flex:1;min-width:120px"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data início</div><input class="form-input" id="bloq-ini" type="date"></div>';
-  html += '<div style="flex:1;min-width:120px" id="bloq-fim-wrap" style="display:none"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data fim</div><input class="form-input" id="bloq-fim" type="date"></div>';
+  html += '<div id="bloq-fim-wrap" style="flex:1;min-width:120px;display:none"><div style="font-size:10px;color:var(--muted);margin-bottom:4px">Data fim</div><input class="form-input" id="bloq-fim" type="date"></div>';
   html += '<button class="btn-primary" style="align-self:flex-end;padding:10px 16px;white-space:nowrap" onclick="salvarBloqueio()">🚫 Bloquear</button>';
   html += '</div></div></div>';
 
@@ -6082,7 +6108,11 @@ function renderConfig() {
 function toggleBloqFim() {
   const tipo = document.getElementById('bloq-tipo')?.value;
   const wrap = document.getElementById('bloq-fim-wrap');
-  if (wrap) wrap.style.display = tipo === 'periodo' ? 'block' : 'none';
+  const fim = document.getElementById('bloq-fim');
+  const mostrar = tipo === 'periodo';
+  if (wrap) wrap.style.display = mostrar ? 'block' : 'none';
+  if (fim && !wrap) fim.style.display = mostrar ? '' : 'none';
+  if (fim && !mostrar) fim.value = '';
 }
 
 function salvarBloqueio() {
