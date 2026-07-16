@@ -668,6 +668,13 @@ body.app-loaded .main { opacity: 1; }
 .analista-opt.sel-Vera     { border-color: var(--vera);     background: var(--vera-b);     color: var(--vera); }
 .analista-opt.sel-Marco    { border-color: var(--marco);    background: var(--marco-b);    color: var(--marco); }
 .analista-opt.nenhum.sel-nenhum { border-color: var(--border2); background: var(--border); color: var(--text); }
+.slot-analistas {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 4px;
+  max-width: 220px;
+}
 
 /* EMPTY / TOAST */
 .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
@@ -964,7 +971,7 @@ body{background:#edf2f4;color:#172026}
         <input class="form-input" id="slot-agendadopor" placeholder="Nome de quem agendou" autocomplete="off">
       </div>
       <div class="form-group">
-        <div class="form-label">Responsável</div>
+        <div class="form-label">Responsável <span style="font-weight:500;color:var(--muted);text-transform:none;letter-spacing:0">(selecione uma ou mais pessoas)</span></div>
         <div class="analista-grid" id="analista-grid">
           <!-- preenchido dinamicamente por rebuildAnalistaGrid() -->
         </div>
@@ -1036,6 +1043,7 @@ let currentView     = 'agenda';
 let currentAnalista = 'todos';
 let editCtx         = null;
 let selAnalistaVal  = '';
+let selAnalistasVals = [];
 let lastBookedSlotKey = '';
 window._appReady    = false;
 window.BASE_DAYS    = BASE_DAYS;
@@ -1054,6 +1062,23 @@ function analClass(an) { return an ? 'ocupado' : ''; }
 function badgeHtml(an) {
   if (!an) return '';
   return `<span class="analista-badge" style="background:${CORES_BG[an]||'var(--border)'};color:${CORES_AN[an]||'var(--accent)'}">${htmlAttr(an)}</span>`;
+}
+function slotAnalistas(slot) {
+  const raw = slot?.analistas;
+  const lista = Array.isArray(raw) ? raw : (raw ? Object.values(raw) : []);
+  const base = lista.length ? lista : (slot?.analista ? [slot.analista] : []);
+  return [...new Set(base.filter(Boolean))];
+}
+function slotPrincipal(slot) {
+  return slotAnalistas(slot)[0] || '';
+}
+function slotTemAnalista(slot, an) {
+  return slotAnalistas(slot).includes(an);
+}
+function slotBadgesHtml(slot) {
+  const lista = slotAnalistas(slot);
+  if (!lista.length) return '';
+  return `<div class="slot-analistas">${lista.map(badgeHtml).join('')}</div>`;
 }
 function dateToDDMMYYYY(iso) {
   const [y,m,d] = iso.split('-');
@@ -1175,17 +1200,46 @@ function overlayClick(e, id) { if (e.target.id === id) closeModal(id); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 // ── ANALISTA SELECTOR ──────────────────────────────────────────────────────
-function selAnalista(an) {
-  selAnalistaVal = an;
-  document.getElementById('analista-grid')?.classList.remove('needs-selection');
+function getSelectedAnalistas() {
+  return [...new Set(selAnalistasVals.filter(Boolean))];
+}
+
+function atualizarAnalistasSelecionados() {
+  const selecionados = getSelectedAnalistas();
   document.querySelectorAll('.analista-opt').forEach(el => {
     el.className = el.className.replace(/\bsel-\S+/g,'').trim();
     el.classList.remove('selected-person');
+    const nome = el.dataset.analista || '';
+    const marcado = nome ? selecionados.includes(nome) : selecionados.length === 0;
+    if (marcado) {
+      const key = nome || 'nenhum';
+      el.classList.add('selected-person', 'sel-' + key.replace(/\s+/g, '-'));
+    }
   });
-  const el = Array.from(document.querySelectorAll('.analista-opt'))
-    .find(opt => (opt.dataset.analista || '') === (an || ''));
-  if (el) {
-    el.classList.add('selected-person');
+}
+
+function selAnalistas(lista) {
+  selAnalistasVals = [...new Set((lista || []).filter(Boolean))];
+  selAnalistaVal = selAnalistasVals[0] || '';
+  document.getElementById('analista-grid')?.classList.remove('needs-selection');
+  atualizarAnalistasSelecionados();
+}
+
+function selAnalista(an) {
+  if (!an) {
+    selAnalistasVals = [];
+  } else if (selAnalistasVals.includes(an)) {
+    selAnalistasVals = selAnalistasVals.filter(nome => nome !== an);
+  } else {
+    selAnalistasVals.push(an);
+  }
+  selAnalistaVal = selAnalistasVals[0] || '';
+  document.getElementById('analista-grid')?.classList.remove('needs-selection');
+  atualizarAnalistasSelecionados();
+  const el = an
+    ? Array.from(document.querySelectorAll('.analista-opt')).find(opt => (opt.dataset.analista || '') === an)
+    : document.querySelector('.analista-opt.nenhum');
+  if (el && (an || !selAnalistasVals.length)) {
     el.style.animation = 'none';
     void el.offsetWidth;
     el.style.animation = '';
@@ -1229,7 +1283,7 @@ function openSlot(dayId, hora) {
 
   // Reconstrói grid com analistas atuais, marcando bloqueados para este dia
   rebuildAnalistaGrid(dayId);
-  selAnalista(slot.analista);
+  selAnalistas(slotAnalistas(slot));
   document.getElementById('overlay-slot').classList.add('open');
   setTimeout(() => document.getElementById('slot-nome').focus(), 200);
 }
@@ -1237,8 +1291,8 @@ function openSlot(dayId, hora) {
 function salvarSlot() {
   const nome = document.getElementById('slot-nome').value.trim();
   if (!nome) { toast('Informe o nome do requerente', true); return; }
-  const selectedAnalista = selAnalistaVal || document.querySelector('.analista-opt.selected-person')?.dataset.analista || '';
-  if (!selectedAnalista) {
+  const selectedAnalistas = getSelectedAnalistas();
+  if (!selectedAnalistas.length) {
     const grid = document.getElementById('analista-grid');
     grid?.classList.remove('needs-selection');
     void grid?.offsetWidth;
@@ -1251,7 +1305,8 @@ function salvarSlot() {
   day.slots[hora] = {
     nome,
     assunto: protocoloValue(),
-    analista: selectedAnalista,
+    analista: selectedAnalistas[0] || '',
+    analistas: selectedAnalistas,
     agendadopor: document.getElementById('slot-agendadopor').value.trim()
   };
   lastBookedSlotKey = slotKey(dayId, hora);
@@ -1269,7 +1324,7 @@ function limparSlot(dayId, hora, e) {
   if (el) el.classList.add('canceling');
   setTimeout(() => {
     const day = DAYS.find(d => d.id === dayId);
-    day.slots[hora] = { nome:'', assunto:'', analista:'' };
+    day.slots[hora] = { nome:'', assunto:'', analista:'', analistas:[] };
     saveDays();
     toast('Agendamento cancelado');
     render();
@@ -1313,7 +1368,7 @@ function salvarNovoDia() {
   if (DAYS.find(d => d.id === id)) { toast('Este dia já existe', true); return; }
 
   const emptySlots = {};
-  horariosDaData(data).forEach(h => { emptySlots[h] = { nome:'', assunto:'', analista:'' }; });
+  horariosDaData(data).forEach(h => { emptySlots[h] = { nome:'', assunto:'', analista:'', analistas:[] }; });
   const newDay = { id, data, weekday, avisos: aviso ? [aviso] : [], slots: emptySlots };
   DAYS.push(newDay);
   DAYS.sort((a,b) => {
@@ -1354,7 +1409,7 @@ function renderAgenda() {
   DAYS.forEach((day) => {
     const slots = horariosDoDia(day).map(h => ({ h, ...day.slots[h] }));
     if (filt === 'livres' && !slots.some(s => !s.nome)) return;
-    if (filt !== 'todos' && filt !== 'livres' && !slots.some(s => s.analista === filt)) return;
+    if (filt !== 'todos' && filt !== 'livres' && !slots.some(s => slotTemAnalista(s, filt))) return;
     anyDay = true;
     const parts = day.data.split('/');
     const monthKey = parts[2] + '-' + parts[1];
@@ -1420,16 +1475,17 @@ function renderAgenda() {
       html += '<div class="slots">';
       slots.forEach(s => {
         const isLivre = !s.nome;
-        const anClass = analClass(s.analista);
+        const principal = slotPrincipal(s);
+        const anClass = analClass(principal);
         let cls = isLivre ? 'livre' : (anClass || 'ocupado');
         const key = slotKey(day.id, s.h);
         if (key === lastBookedSlotKey) cls += ' just-booked';
-        const slotColor = !isLivre && s.analista ? (CORES_AN[s.analista] || '#8890a8') : '';
-        const slotBg = !isLivre && s.analista ? corFundo(slotColor) : '';
+        const slotColor = !isLivre && principal ? (CORES_AN[principal] || '#8890a8') : '';
+        const slotBg = !isLivre && principal ? corFundo(slotColor) : '';
         let dimmed = false;
         if (filt !== 'todos') {
           if (filt === 'livres' && !isLivre) dimmed = true;
-          if (filt !== 'livres' && !isLivre && s.analista !== filt) dimmed = true;
+          if (filt !== 'livres' && !isLivre && !slotTemAnalista(s, filt)) dimmed = true;
         }
         html += `<div class="slot ${cls}${dimmed ? ' dimmed' : ''}${isPast ? ' past-slot' : ''}" data-slot-key="${key}" style="${slotColor ? `--slot-color:${slotColor};--slot-bg:${slotBg};` : ''}" ${isPast ? '' : `onclick="openSlot('${day.id}','${s.h}')"`}>`;
         html += '<div class="slot-time">' + s.h + '</div>';
@@ -1441,7 +1497,7 @@ function renderAgenda() {
           if (s.assunto) html += '<div class="slot-assunto">' + s.assunto + '</div>';
           if (s.agendadopor) html += '<div class="slot-agendadopor">por ' + s.agendadopor + '</div>';
         }
-        html += '</div>' + badgeHtml(s.analista);
+        html += '</div>' + slotBadgesHtml(s);
         if (!isLivre && !isPast) html += `<button class="slot-rm" onclick="limparSlot('${day.id}','${s.h}',event)" title="Remover">×</button>`;
         html += '</div>';
       });
@@ -1477,7 +1533,7 @@ function calcPainel(filtDays, anFiltro) {
       const s = day.slots[h] || { nome:'', assunto:'', analista:'', agendadopor:'' };
       if (anFiltro !== 'todos') {
         // Conta só atendimentos do analista filtrado
-        if (s.analista === anFiltro) {
+        if (s.nome && slotTemAnalista(s, anFiltro)) {
           totalSlots++;
           totalAgend++;
           totals[anFiltro]++;
@@ -1486,7 +1542,9 @@ function calcPainel(filtDays, anFiltro) {
         totalSlots++;
         if (s.nome) {
           totalAgend++;
-          if (totals[s.analista] !== undefined) totals[s.analista]++;
+          slotAnalistas(s).forEach(an => {
+            if (totals[an] !== undefined) totals[an]++;
+          });
         }
       }
     });
@@ -1511,7 +1569,7 @@ function calcPainel(filtDays, anFiltro) {
 
 function buildPie(totals, totalAgend) {
   const pieData = ANALISTAS.map(an => ({ an, val: totals[an] })).filter(d => d.val > 0);
-  const semAn = totalAgend - pieData.reduce((s,d) => s+d.val, 0);
+  const semAn = Math.max(0, totalAgend - pieData.reduce((s,d) => s+d.val, 0));
   if (semAn > 0) pieData.push({ an:'Sem responsável', val: semAn });
   const tot = pieData.reduce((s,d) => s+d.val, 0) || 1;
   const R = 72, CX = 90, CY = 90;
@@ -1541,7 +1599,7 @@ function renderPainel() {
   const ate = document.getElementById('p-ate')?.value || '';
 
   const filtDays = DAYS.filter(day => {
-    if (painelAnalista !== 'todos' && !horariosDoDia(day).some(h => day.slots[h] && day.slots[h].analista === painelAnalista)) return false;
+    if (painelAnalista !== 'todos' && !horariosDoDia(day).some(h => day.slots[h] && slotTemAnalista(day.slots[h], painelAnalista))) return false;
     if (de || ate) {
       const d = parseDataBR(day.data);
       if (de) { const [dy,dm,dd]=de.split('-'); if (d < new Date(dy,dm-1,dd)) return false; }
@@ -1625,17 +1683,18 @@ function renderPainel() {
   html += '<div class="dash-card-title">Resumo por pessoa</div>';
   html += '<table class="an-table"><thead><tr><th>Pessoa</th><th>Atendimentos</th><th>% do total</th><th>Próximos agendados</th><th>Carga</th></tr></thead><tbody>';
 
+  const totalParticipacoes = Object.values(totals).reduce((s, v) => s + v, 0) || totalAgend;
   ANALISTAS.forEach(an => {
     if (painelAnalista !== 'todos' && painelAnalista !== an) return;
     const val = totals[an];
-    const pct = totalAgend > 0 ? Math.round(val/totalAgend*100) : 0;
+    const pct = totalParticipacoes > 0 ? Math.round(val/totalParticipacoes*100) : 0;
     // Próximos agendados (futuros) para esse analista
     let proximos = 0;
     filtDays.forEach(day => {
       if (!isFuturoOuHoje(day.data)) return;
-      horariosDoDia(day).forEach(h => { if (day.slots[h] && day.slots[h].analista === an) proximos++; });
+      horariosDoDia(day).forEach(h => { if (day.slots[h] && slotTemAnalista(day.slots[h], an)) proximos++; });
     });
-    const barW = totalAgend > 0 ? Math.round(val/totalAgend*100) : 0;
+    const barW = totalParticipacoes > 0 ? Math.round(val/totalParticipacoes*100) : 0;
     const col = CORES_AN[an] || 'var(--accent)';
     const p = pessoaInfo(an);
     html += `<tr>
@@ -1986,6 +2045,9 @@ function editarPessoa(idx, campo, valor) {
       DAYS.forEach(day => {
         Object.values(day.slots || {}).forEach(slot => {
           if (slot.analista === antigoNome) slot.analista = novoNome;
+          if (Array.isArray(slot.analistas)) {
+            slot.analistas = slot.analistas.map(nome => nome === antigoNome ? novoNome : nome);
+          }
         });
       });
       if (BLOQUEIOS[antigoNome]) {
@@ -2500,8 +2562,10 @@ window._fb.listenDays(function(data) {
         });
         baseHorarios.sort((a, b) => a.localeCompare(b)).forEach(h => {
           const s = day.slots && day.slots[h];
-          slots[h] = s ? { nome: s.nome||'', assunto: s.assunto||'', analista: s.analista||'', agendadopor: s.agendadopor||'' }
-                      : { nome:'', assunto:'', analista:'', agendadopor:'' };
+          const rawAnalistas = s?.analistas;
+          const listaAnalistas = s ? (Array.isArray(rawAnalistas) ? rawAnalistas : (rawAnalistas ? Object.values(rawAnalistas) : (s.analista ? [s.analista] : []))) : [];
+          slots[h] = s ? { nome: s.nome||'', assunto: s.assunto||'', analista: listaAnalistas[0] || s.analista || '', analistas: listaAnalistas, agendadopor: s.agendadopor||'' }
+                      : { nome:'', assunto:'', analista:'', analistas:[], agendadopor:'' };
         });
         return { ...day, avisos, slots };
       })
